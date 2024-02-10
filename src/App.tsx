@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { Routes, Route } from "react-router-dom";
-import {MainPage} from "./pages/main/main-page";
-import {LoginPage} from "./pages/login/login-page";
-import {RegisterPage} from "./pages/register/register-page";
-import {NotFound} from "./pages/not-found/not-found";
+import React, { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { MainPage } from './pages/main/main-page'
+import { LoginPage } from './pages/login/login-page'
+import { RegisterPage } from './pages/register/register-page'
+import { NotFound } from './pages/not-found/not-found'
 
-function App() {
+export const App: React.FC = () => {
   const [count, setCount] = useState(0)
 
   return (
@@ -17,5 +17,3 @@ function App() {
       </Routes>
   )
 }
-
-export default App

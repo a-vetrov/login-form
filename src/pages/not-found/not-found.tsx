@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
-export const NotFound = () => {
-    return (
-        <div>
-            Not found!
-        </div>
-    );
-};
+export const NotFound: React.FC = () => {
+  return (
+    <div>
+        Not found!
+    </div>
+  )
+}
