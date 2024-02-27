@@ -2,6 +2,7 @@ import React from 'react'
 import { Avatar, Box, Button, Container, CssBaseline, Grid, Link, TextField, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import IconLoader from '../../components/icon-loader'
 
 export const LoginPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -25,7 +26,7 @@ export const LoginPage: React.FC = () => {
               }}
           >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
+                <IconLoader IconClass={LockOutlinedIcon} />
             </Avatar>
             <Typography component="h1" variant="h5">
               Войти

@@ -9,6 +9,7 @@ import {
   Typography
 } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import IconLoader from '../../components/icon-loader'
 
 export const RegisterPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -33,7 +34,7 @@ export const RegisterPage: React.FC = () => {
               }}
           >
               <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                  <LockOutlinedIcon />
+                  <IconLoader IconClass={LockOutlinedIcon} />
               </Avatar>
               <Typography component="h1" variant="h5">
                   Зарегистрироваться
