@@ -17,6 +17,16 @@ const ssrManifest = isProduction
 // Create http server
 const app = express()
 
+
+const router = express.Router()
+
+router.get('/api/register', (req, res) => {
+  console.log('Register API call!', req)
+})
+
+app.use(router)
+
+
 // Add Vite or respective production middlewares
 let vite
 if (!isProduction) {
@@ -33,6 +43,8 @@ if (!isProduction) {
   app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
+
+
 
 // Serve HTML
 app.use('*', async (req, res) => {

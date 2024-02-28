@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
+import axios from 'axios'
 
 export const RegisterPage: React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -19,6 +20,8 @@ export const RegisterPage: React.FC = () => {
       email: data.get('email'),
       password: data.get('password')
     })
+
+    void axios.post('/api/register', data)
   }
 
   return (
