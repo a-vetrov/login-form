@@ -11,8 +11,11 @@ import {
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
 import axios from 'axios'
+import {useLazyRegisterUserQuery} from "../../services/api.ts";
 
 export const RegisterPage: React.FC = () => {
+  const [trigger, data] = useLazyRegisterUserQuery()
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)

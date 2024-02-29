@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import express from 'express'
+import apiRouter from "./backend/api.js";
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -18,13 +19,7 @@ const ssrManifest = isProduction
 const app = express()
 
 
-const router = express.Router()
-
-router.get('/api/register', (req, res) => {
-  console.log('Register API call!', req)
-})
-
-app.use(router)
+app.use(apiRouter)
 
 
 // Add Vite or respective production middlewares
