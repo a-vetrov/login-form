@@ -1,30 +1,28 @@
 import React from 'react'
 import {
   Avatar,
-  Box, Button,
+  Box,
   Container,
   CssBaseline,
   Grid, Link,
   TextField,
-  Typography
+  Typography,
+  Button,
+  Alert, AlertTitle
 } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
-import axios from 'axios'
-import {useLazyRegisterUserQuery} from "../../services/api.ts";
+import { useRegisterUserMutation } from '../../services/register'
 
 export const RegisterPage: React.FC = () => {
-  const [trigger, data] = useLazyRegisterUserQuery()
+  const [trigger, data] = useRegisterUserMutation()
+
+  const { isLoading, error } = data
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    })
-
-    void axios.post('/api/register', data)
+    void trigger(data)
   }
 
   return (
@@ -90,11 +88,20 @@ export const RegisterPage: React.FC = () => {
                           />
                       </Grid>
                   </Grid>
+                {
+                  error && (
+                    <Alert severity="warning">
+                      <AlertTitle>{error.data.error.title}</AlertTitle>
+                      {error.data.error.message}
+                    </Alert>
+                  )
+                }
                   <Button
                       type="submit"
                       fullWidth
                       variant="contained"
                       sx={{ mt: 3, mb: 2 }}
+                      disabled={isLoading}
                   >
                       Зарегистрироваться
                   </Button>
