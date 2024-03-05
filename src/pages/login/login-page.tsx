@@ -3,15 +3,15 @@ import { Avatar, Box, Button, Container, CssBaseline, Grid, Link, TextField, Typ
 import { Link as RouterLink } from 'react-router-dom'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
+import { useLoginUserMutation } from '../../services/login.ts'
 
 export const LoginPage: React.FC = () => {
+  const [trigger, { isLoading }] = useLoginUserMutation()
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get('email'),
-      password: data.get('password')
-    })
+    const formData = new FormData(event.currentTarget)
+    void trigger(formData)
   }
 
   return (
@@ -57,6 +57,7 @@ export const LoginPage: React.FC = () => {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
+                  disabled={isLoading}
               >
                 Войти
               </Button>

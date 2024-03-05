@@ -89,11 +89,13 @@ export const RegisterPage: React.FC = () => {
                       </Grid>
                   </Grid>
                 {
-                  error && (
+                  (error != null) && (
+                        <Box marginTop={2}>
                     <Alert severity="warning">
                       <AlertTitle>{error.data.error.title}</AlertTitle>
                       {error.data.error.message}
                     </Alert>
+                        </Box>
                   )
                 }
                   <Button

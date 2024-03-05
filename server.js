@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import express from 'express'
 import apiRouter from "./backend/api.js";
+import {createDefaultUsers} from "./backend/db.js";
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -76,3 +77,5 @@ app.use('*', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
+
+createDefaultUsers()

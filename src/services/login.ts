@@ -4,11 +4,11 @@ interface ServerAnswer {
   success: boolean
 }
 
-export const registerApi = api.injectEndpoints({
+export const loginApi = api.injectEndpoints({
   endpoints: (build) => ({
-    registerUser: build.mutation<ServerAnswer, FormData>({
+    loginUser: build.mutation<ServerAnswer, FormData>({
       query: (data) => ({
-        url: 'register',
+        url: 'login',
         method: 'POST',
         body: data
       })
@@ -16,4 +16,4 @@ export const registerApi = api.injectEndpoints({
   })
 })
 
-export const { useRegisterUserMutation } = registerApi
+export const { useLoginUserMutation } = loginApi
