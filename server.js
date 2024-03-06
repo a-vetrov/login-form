@@ -1,7 +1,11 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import apiRouter from "./backend/api.js";
-import {createDefaultUsers} from "./backend/db.js";
+import apiRouter from './backend/api.js'
+import { createDefaultUsers } from './backend/db.js'
+import cookieParser from 'cookie-parser'
+import expressSession from 'express-session'
+import { redisStore } from './backend/db/redis.js'
+import { authRouter } from "./backend/routes/auth.js"
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -19,9 +23,20 @@ const ssrManifest = isProduction
 // Create http server
 const app = express()
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+// TODO: вынести секреты в отдельный файл за пределы гита
+app.use(cookieParser('Some cookie secret'))
 
+app.use(expressSession({
+  secret: 'Some cookie secret',
+  resave: false, // don't save session if unmodified
+  saveUninitialized: false, // don't create session until something stored
+  store: redisStore
+}))
+
+app.use(authRouter)
 app.use(apiRouter)
-
 
 // Add Vite or respective production middlewares
 let vite
@@ -39,8 +54,6 @@ if (!isProduction) {
   app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
-
-
 
 // Serve HTML
 app.use('*', async (req, res) => {
@@ -62,8 +75,8 @@ app.use('*', async (req, res) => {
     const rendered = await render('/' + url, ssrManifest)
 
     const html = template
-      .replace(`<!--app-head-->`, rendered.head ?? '')
-      .replace(`<!--app-html-->`, rendered.html ?? '')
+      .replace('<!--app-head-->', rendered.head ?? '')
+      .replace('<!--app-html-->', rendered.html ?? '')
 
     res.status(200).set({ 'Content-Type': 'text/html' }).send(html)
   } catch (e) {

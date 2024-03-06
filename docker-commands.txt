@@ -1,1 +1,3 @@
 docker run -d --rm -p 27017:27017 --name vizify-mongo mongo
+
+docker run -d --rm -p 6379:6379 --name vizify-redis redis
