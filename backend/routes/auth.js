@@ -3,7 +3,10 @@ import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
 
-passport.use(new LocalStrategy(function verify(username, password, cb) {
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+}, function verify(username, password, cb) {
 
   console.log('LocalStrategy', username, password)
   return cb(null, false, { message: 'Incorrect username or password.' })
