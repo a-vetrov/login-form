@@ -2,39 +2,44 @@ import express from 'express'
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
+import {getUserByEmail, getUserById} from "../db.js";
+
+const checkPassword = (userInfo, password) => {
+  const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512');
+  return crypto.timingSafeEqual(userInfo.password, key)
+}
 
 passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
-}, function verify(username, password, cb) {
-
-  console.log('LocalStrategy', username, password)
-  return cb(null, false, { message: 'Incorrect username or password.' })
+}, async function verify(email, password, cb) {
+  const userInfo = await getUserByEmail(email)
+  if (!userInfo || !checkPassword(userInfo, password)) {
+    return cb(null, false, {message: 'Incorrect username or password.'})
+  }
+  return cb(null, userInfo)
 }));
 
-
-passport.serializeUser(function(user, cb) {
-  console.log('serializeUser', user)
-  process.nextTick(function() {
-    cb(null, { id: user.id, username: user.username });
-  });
-});
-
-passport.deserializeUser(function(user, cb) {
-  console.log('deserializeUser', user)
-  process.nextTick(function() {
-    return cb(null, user);
-  });
-});
-
+passport.serializeUser((user, done) => done(null, user._id))
+passport.deserializeUser((id, done) => {
+  getUserById(id)
+    .then(user => done(null, user))
+    .catch(err => done(err, null))
+})
 
 export const authRouter = express.Router();
 
-authRouter.post('/api/login/', passport.authenticate('local', {
-  successReturnToOrRedirect: '/',
-  failureRedirect: '/login',
-  failureMessage: true
-}));
+authRouter.post('/api/login', passport.authenticate('local', {
+  failureMessage: true,
+  successMessage: 'Success message',
+}), function(req, res) {
+  let data
+  if(res.req.user) {
+    const {name, email, role} = res.req.user
+    data = {userInfo: {name, email, role}}
+  }
+  res.status(200).send({ success: true, data });
+});
 
 /* POST /logout
  *

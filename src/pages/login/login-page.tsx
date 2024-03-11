@@ -1,17 +1,41 @@
-import React from 'react'
-import { Avatar, Box, Button, Container, CssBaseline, Grid, Link, TextField, Typography } from '@mui/material'
-import { Link as RouterLink } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import {
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  Grid,
+  Link,
+  TextField,
+  Typography
+} from '@mui/material'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
 import { useLoginUserMutation } from '../../services/login.ts'
 
 export const LoginPage: React.FC = () => {
-  const [trigger, { isLoading }] = useLoginUserMutation()
+  const [trigger, { isLoading, error, data }] = useLoginUserMutation()
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if ((error == null) && (data != null)) {
+      console.log('Data:', data)
+      navigate('/account')
+    }
+  }, [error, data])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    void trigger(formData)
+    const result = {
+      email: formData.get('email'),
+      password: formData.get('password')
+    }
+    void trigger(result)
   }
 
   return (
@@ -52,6 +76,15 @@ export const LoginPage: React.FC = () => {
                   id="password"
                   autoComplete="current-password"
               />
+              {
+                (error != null) && (
+                  <Box marginTop={2}>
+                    <Alert severity="warning">
+                      Неправильный логин или пароль
+                    </Alert>
+                  </Box>
+                )
+              }
               <Button
                   type="submit"
                   fullWidth
@@ -68,7 +101,7 @@ export const LoginPage: React.FC = () => {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="./register" to="/register" variant="body2" as={RouterLink}>
+                  <Link to="/register" variant="body2" component={RouterLink}>
                     Еще нет аккаунта? Зарегистрируйтесь
                   </Link>
                 </Grid>

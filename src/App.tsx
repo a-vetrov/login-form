@@ -7,6 +7,7 @@ import { NotFound } from './pages/not-found/not-found'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Provider } from 'react-redux'
 import { store } from './store'
+import AccountPage from './pages/account/account-page.tsx'
 
 export const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ export const App: React.FC = () => {
               <Route path='/' element={<MainPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/account" element={<AccountPage />} />
               <Route path="*" element={<NotFound />} />
           </Routes>
       </Provider>

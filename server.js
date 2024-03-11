@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import expressSession from 'express-session'
 import { redisStore } from './backend/db/redis.js'
 import { authRouter } from "./backend/routes/auth.js"
+import passport from "passport";
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -20,6 +21,8 @@ const ssrManifest = isProduction
   ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
   : undefined
 
+void createDefaultUsers();
+
 // Create http server
 const app = express()
 
@@ -32,8 +35,12 @@ app.use(expressSession({
   secret: 'Some cookie secret',
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  store: redisStore
+  store: redisStore,
+  cookie: { secure: false }
 }))
+
+app.use(passport.initialize())
+app.use(passport.authenticate('session'));
 
 app.use(authRouter)
 app.use(apiRouter)
@@ -91,4 +98,4 @@ app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
 
-createDefaultUsers()
+

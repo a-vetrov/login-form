@@ -6,7 +6,7 @@ interface ServerAnswer {
 
 export const loginApi = api.injectEndpoints({
   endpoints: (build) => ({
-    loginUser: build.mutation<ServerAnswer, FormData>({
+    loginUser: build.mutation<ServerAnswer, unknown>({
       query: (data) => ({
         url: 'login',
         method: 'POST',

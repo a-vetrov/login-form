@@ -5,6 +5,8 @@ const userSchema = new Schema({
   authId: String,
   name: String,
   email: String,
+  password: Buffer,
+  salt: String,
   role: String,
   created: Date,
 })
