@@ -15,16 +15,19 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
 import { useLoginUserMutation } from '../../services/login.ts'
+import { useDispatch } from 'react-redux'
+import { userInfoSlice } from '../../store/slices/user-slice.ts'
 
 export const LoginPage: React.FC = () => {
   const [trigger, { isLoading, error, data }] = useLoginUserMutation()
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    if ((error == null) && (data != null)) {
-      console.log('Data:', data)
-      navigate('/account')
+    if (!error && data?.userInfo) {
+      dispatch(userInfoSlice.actions.update(data.userInfo))
+      navigate('/')
     }
   }, [error, data])
 

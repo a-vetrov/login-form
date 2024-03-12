@@ -1,7 +1,9 @@
 import { api } from './api'
+import { type UserInfo } from '../store/slices/user-slice.ts'
 
 interface ServerAnswer {
   success: boolean
+  userInfo?: UserInfo
 }
 
 export const loginApi = api.injectEndpoints({
@@ -11,7 +13,8 @@ export const loginApi = api.injectEndpoints({
         url: 'login',
         method: 'POST',
         body: data
-      })
+      }),
+      transformResponse: ({ data }) => data as ServerAnswer
     })
   })
 })
