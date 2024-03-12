@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Container,
-  CssBaseline,
   Grid,
   Link,
   TextField,
@@ -43,7 +42,6 @@ export const LoginPage: React.FC = () => {
 
   return (
         <Container component="main" maxWidth="xs">
-          <CssBaseline />
           <Box
               sx={{
                 marginTop: 8,
