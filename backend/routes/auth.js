@@ -3,6 +3,8 @@ import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
 import {getUserByEmail, getUserById} from "../db.js";
+import {sendError} from "../handlers/error.js";
+import {ensureLoggedIn} from "../handlers/ensure-logged-in.js";
 
 const checkPassword = (userInfo, password) => {
   const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512');
@@ -34,7 +36,7 @@ authRouter.post('/api/login', passport.authenticate('local', {
   successMessage: 'Success message',
 }), function(req, res) {
   let data
-  if(res.req.user) {
+  if(req.user) {
     const {name, email, role} = res.req.user
     data = {userInfo: {name, email, role}}
   }
@@ -51,6 +53,22 @@ authRouter.post('/api/logout', function(req, res, next) {
     res.redirect('/');
   });
 });
+
+
+/* POST /user-info
+ *
+ * This route returns user info if logged in.
+ */
+authRouter.get('/api/user-info', ensureLoggedIn, (req, res) => {
+  if(req.user) {
+    const {name, email, role} = res.req.user
+    const data = {userInfo: {name, email, role}}
+    res.status(200).send({ success: true, data });
+  } else {
+    sendError(res, 403, 'Ошибка', 'Неожиданная ошибка')
+  }
+
+})
 
 
 /* POST /signup

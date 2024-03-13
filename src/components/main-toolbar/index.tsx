@@ -1,16 +1,35 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { AppBar, Box, Button, Container, IconButton, MenuItem, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import IconLoader from '../icon-loader'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { userInfoSelector } from '../../store/selectors/user-info.ts'
 import AccountCircle from '@mui/icons-material/AccountCircle'
+import { useUserInfo } from '../../utils/hooks/use-user-info.ts'
 
 export const MainToolbar: React.FC = () => {
-  const userInfo = useSelector(userInfoSelector)
+  const { isLoading, isAuth } = useUserInfo()
 
-  const isAuth = userInfo !== null
+  const userPart = useMemo(() => {
+    if (isLoading) {
+      return null
+    }
+
+    return isAuth
+      ? (
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="menu-appbar"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <IconLoader IconClass={AccountCircle} />
+        </IconButton>
+        )
+      : (
+        <Button color="inherit" component={Link} to='/login'>Войти</Button>
+        )
+  }, [isLoading, isAuth])
 
   return (
     <AppBar position="static">
@@ -46,21 +65,7 @@ export const MainToolbar: React.FC = () => {
                 </MenuItem>
               </Box>
             )}
-            {isAuth
-              ? (
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                color="inherit"
-              >
-                <IconLoader IconClass={AccountCircle} />
-              </IconButton>
-                )
-              : (
-              <Button color="inherit" component={Link} to='/login'>Войти</Button>
-                )}
+            {userPart}
           </Box>
         </Toolbar>
       </Container>

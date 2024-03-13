@@ -15,8 +15,15 @@ export const loginApi = api.injectEndpoints({
         body: data
       }),
       transformResponse: ({ data }) => data as ServerAnswer
+    }),
+    getUserInfo: build.query<ServerAnswer, undefined>({
+      query: () => ({
+        url: 'user-info',
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data as ServerAnswer
     })
   })
 })
 
-export const { useLoginUserMutation } = loginApi
+export const { useLoginUserMutation, useLazyGetUserInfoQuery } = loginApi
