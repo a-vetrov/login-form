@@ -55,7 +55,7 @@ authRouter.post('/api/logout', function(req, res, next) {
 });
 
 
-/* POST /user-info
+/* GET /user-info
  *
  * This route returns user info if logged in.
  */

@@ -1,5 +1,7 @@
 import express from 'express'
 import { sendError } from './handlers/error.js'
+import {authRouter} from "./routes/auth.js";
+import {brokerRouter} from "./routes/broker.js";
 
 const router = express.Router()
 
@@ -11,4 +13,8 @@ router.all('/api/*', (req, res) => {
   sendError(res, 404, 'API route not found')
 })
 
-export default router
+export const initializeAPI = (app) => {
+  app.use(authRouter)
+  app.use(brokerRouter)
+  app.use(router)
+}

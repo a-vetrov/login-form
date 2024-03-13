@@ -2,7 +2,6 @@ import { api } from './api'
 import { type UserInfo } from '../store/slices/user-slice.ts'
 
 interface ServerAnswer {
-  success: boolean
   userInfo?: UserInfo
 }
 

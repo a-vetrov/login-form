@@ -1,11 +1,10 @@
 import fs from 'node:fs/promises'
 import express from 'express'
-import apiRouter from './backend/api.js'
+import { initializeAPI } from './backend/api.js'
 import { createDefaultUsers } from './backend/db.js'
 import cookieParser from 'cookie-parser'
 import expressSession from 'express-session'
 import { redisStore } from './backend/db/redis.js'
-import { authRouter } from "./backend/routes/auth.js"
 import passport from "passport";
 
 // Constants
@@ -42,8 +41,7 @@ app.use(expressSession({
 app.use(passport.initialize())
 app.use(passport.authenticate('session'));
 
-app.use(authRouter)
-app.use(apiRouter)
+initializeAPI(app)
 
 // Add Vite or respective production middlewares
 let vite

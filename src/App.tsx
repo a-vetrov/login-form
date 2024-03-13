@@ -9,6 +9,7 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 import AccountPage from './pages/account/account-page.tsx'
 import { CssBaseline } from '@mui/material'
+import { BrokerListPage } from './pages/broker-list/broker-list-page'
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme()
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/account" element={<AccountPage />} />
+              <Route path="/broker/list" element={<BrokerListPage />} />
               <Route path="*" element={<NotFound />} />
           </Routes>
         </ThemeProvider>
