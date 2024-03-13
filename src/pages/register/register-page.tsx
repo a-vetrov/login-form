@@ -3,7 +3,6 @@ import {
   Avatar,
   Box,
   Container,
-  CssBaseline,
   Grid, Link,
   TextField,
   Typography,
@@ -27,8 +26,6 @@ export const RegisterPage: React.FC = () => {
 
   return (
       <Container component="main" maxWidth="xs">
-          <CssBaseline />
-
           <Box
               sx={{
                 marginTop: 8,

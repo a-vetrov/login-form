@@ -5,6 +5,15 @@ interface BrokerInfoType {
   created: string
 }
 
+interface ServerAnswer {
+  success: boolean
+}
+
+export interface TokenDataType {
+  name: string
+  token: string
+}
+
 export const brokerApi = api.injectEndpoints({
   endpoints: (build) => ({
     getBrokerList: build.query<BrokerInfoType[], undefined>({
@@ -13,8 +22,16 @@ export const brokerApi = api.injectEndpoints({
         method: 'GET'
       }),
       transformResponse: ({ data }) => data as BrokerInfoType[]
+    }),
+    addBrokerToken: build.mutation<ServerAnswer, TokenDataType>({
+      query: (data) => ({
+        url: 'broker/add',
+        method: 'POST',
+        body: data
+      }),
+      transformResponse: ({ data }) => data as ServerAnswer
     })
   })
 })
 
-export const { useGetBrokerListQuery } = brokerApi
+export const { useGetBrokerListQuery, useAddBrokerTokenMutation } = brokerApi

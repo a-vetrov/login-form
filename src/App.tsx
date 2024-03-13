@@ -10,6 +10,7 @@ import { store } from './store'
 import AccountPage from './pages/account/account-page.tsx'
 import { CssBaseline } from '@mui/material'
 import { BrokerListPage } from './pages/broker-list/broker-list-page'
+import { BrokerAddPage } from './pages/broker-add/broker-add.tsx'
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme()
@@ -24,6 +25,7 @@ export const App: React.FC = () => {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/account" element={<AccountPage />} />
               <Route path="/broker/list" element={<BrokerListPage />} />
+              <Route path="/broker/add" element={<BrokerAddPage />} />
               <Route path="*" element={<NotFound />} />
           </Routes>
         </ThemeProvider>
