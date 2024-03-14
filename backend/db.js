@@ -12,9 +12,6 @@ db.on('error', err => {
 db.once('open', () => console.log('MongoDB connection established'))
 
 
-export const getUserByEmail = async (email) => UserModel.findOne({ email })
-export const getUserById = async id => UserModel.findById(id)
-
 export const createDefaultUsers = async () => {
   const users = await UserModel.find({})
   if (users.length > 0) {
@@ -38,6 +35,7 @@ export const createDefaultUsers = async () => {
     ...getUserHash('123'),
     role: 'admin',
     created: new Date(),
+    tokens: []
   }).save()
 
   void new UserModel({
@@ -47,6 +45,7 @@ export const createDefaultUsers = async () => {
     email: 'a@b.com',
     role: 'admin',
     created: new Date(),
+    tokens: []
   }).save()
 
 }

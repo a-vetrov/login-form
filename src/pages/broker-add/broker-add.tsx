@@ -1,11 +1,18 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Box, Button, Container, TextField } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Container, TextField } from '@mui/material'
 import { type TokenDataType, useAddBrokerTokenMutation } from '../../services/broker.ts'
 
 export const BrokerAddPage: React.FC = () => {
   const [postData, { isLoading, error, isSuccess }] = useAddBrokerTokenMutation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate('/broker/list')
+    }
+  }, [isSuccess])
 
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -20,12 +27,28 @@ export const BrokerAddPage: React.FC = () => {
     }
   }, [])
 
+  const alert = useMemo(() => {
+    if (error) {
+      const { title, message } = error.data?.error
+
+      return (
+        <Box marginTop={2}>
+          <Alert severity="warning">
+            {title && <AlertTitle>{error.data.error.title}</AlertTitle>}
+            {message ?? 'Не удалось добавить токен'}
+          </Alert>
+        </Box>
+      )
+    }
+    return null
+  }, [error])
+
   return (
     <>
       <MainToolbar />
       <Container component="main" maxWidth="xs">
         <h1>Добавить токен брокера</h1>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} noValidate>
           <TextField
             margin="normal"
             required
@@ -46,6 +69,7 @@ export const BrokerAddPage: React.FC = () => {
             multiline
             rows={4}
           />
+          {alert}
           <Button variant="contained" fullWidth type="submit" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
             Добавить
           </Button>

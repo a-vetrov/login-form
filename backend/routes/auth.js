@@ -2,9 +2,9 @@ import express from 'express'
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
-import {getUserByEmail, getUserById} from "../db.js";
 import {sendError} from "../handlers/error.js";
 import {ensureLoggedIn} from "../handlers/ensure-logged-in.js";
+import {getUserByEmail, getUserById} from "../db/models/user.js";
 
 const checkPassword = (userInfo, password) => {
   const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512');
@@ -37,7 +37,7 @@ authRouter.post('/api/login', passport.authenticate('local', {
 }), function(req, res) {
   let data
   if(req.user) {
-    const {name, email, role} = res.req.user
+    const {name, email, role} = req.user
     data = {userInfo: {name, email, role}}
   }
   res.status(200).send({ success: true, data });

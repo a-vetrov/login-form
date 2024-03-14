@@ -25,8 +25,8 @@ export const brokerApi = api.injectEndpoints({
     }),
     addBrokerToken: build.mutation<ServerAnswer, TokenDataType>({
       query: (data) => ({
-        url: 'broker/add',
-        method: 'POST',
+        url: 'broker',
+        method: 'PUT',
         body: data
       }),
       transformResponse: ({ data }) => data as ServerAnswer
