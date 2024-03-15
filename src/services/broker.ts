@@ -3,6 +3,7 @@ import { api } from './api'
 interface BrokerInfoType {
   name: string
   created: string
+  id: string
 }
 
 interface ServerAnswer {
@@ -30,8 +31,20 @@ export const brokerApi = api.injectEndpoints({
         body: data
       }),
       transformResponse: ({ data }) => data as ServerAnswer
+    }),
+    deleteBrokerToken: build.mutation<ServerAnswer, string>({
+      query: (id) => ({
+        url: 'broker',
+        method: 'DELETE',
+        body: { id }
+      }),
+      transformResponse: ({ data }) => data as ServerAnswer
     })
   })
 })
 
-export const { useGetBrokerListQuery, useAddBrokerTokenMutation } = brokerApi
+export const {
+  useGetBrokerListQuery,
+  useAddBrokerTokenMutation,
+  useDeleteBrokerTokenMutation
+} = brokerApi
