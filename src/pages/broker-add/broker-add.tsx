@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Alert, AlertTitle, Box, Button, Container, TextField } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Container, TextField, Typography } from '@mui/material'
 import { type TokenDataType, useAddBrokerTokenMutation } from '../../services/broker.ts'
 
 export const BrokerAddPage: React.FC = () => {
@@ -46,8 +46,10 @@ export const BrokerAddPage: React.FC = () => {
   return (
     <>
       <MainToolbar />
-      <Container component="main" maxWidth="xs">
-        <h1>Добавить токен брокера</h1>
+      <Container component="main" maxWidth="xs" sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Добавить токен брокера
+        </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} noValidate>
           <TextField
             margin="normal"

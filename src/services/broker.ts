@@ -15,14 +15,17 @@ export interface TokenDataType {
   token: string
 }
 
-export const brokerApi = api.injectEndpoints({
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['Broker'] })
+
+export const brokerApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
     getBrokerList: build.query<BrokerInfoType[], undefined>({
       query: () => ({
         url: 'broker/list',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as BrokerInfoType[]
+      transformResponse: ({ data }) => data as BrokerInfoType[],
+      providesTags: ['Broker']
     }),
     addBrokerToken: build.mutation<ServerAnswer, TokenDataType>({
       query: (data) => ({
@@ -30,7 +33,8 @@ export const brokerApi = api.injectEndpoints({
         method: 'PUT',
         body: data
       }),
-      transformResponse: ({ data }) => data as ServerAnswer
+      transformResponse: ({ data }) => data as ServerAnswer,
+      invalidatesTags: ['Broker']
     }),
     deleteBrokerToken: build.mutation<ServerAnswer, string>({
       query: (id) => ({
@@ -38,7 +42,8 @@ export const brokerApi = api.injectEndpoints({
         method: 'DELETE',
         body: { id }
       }),
-      transformResponse: ({ data }) => data as ServerAnswer
+      transformResponse: ({ data }) => data as ServerAnswer,
+      invalidatesTags: ['Broker']
     })
   })
 })
