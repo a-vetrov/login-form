@@ -58,6 +58,11 @@ export const MainToolbar: React.FC = () => {
             </Typography>
             {isAuth && (
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                <MenuItem sx={{ py: '6px', px: '12px' }} component={ Link } to='/portfolio'>
+                  <Typography variant="body2">
+                    Портфель
+                  </Typography>
+                </MenuItem>
                 <MenuItem sx={{ py: '6px', px: '12px' }} component={ Link } to='/broker/list'>
                   <Typography variant="body2">
                     Брокеры
