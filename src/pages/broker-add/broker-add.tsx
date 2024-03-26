@@ -1,7 +1,18 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Alert, AlertTitle, Box, Button, Container, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Button,
+  Container, FormControl,
+  InputLabel,
+  MenuItem,
+  Select, type SelectChangeEvent,
+  TextField,
+  Typography
+} from '@mui/material'
 import { type TokenDataType, useAddBrokerTokenMutation } from '../../services/broker.ts'
 
 export const BrokerAddPage: React.FC = () => {
@@ -14,12 +25,19 @@ export const BrokerAddPage: React.FC = () => {
     }
   }, [isSuccess])
 
+  const [tokenType, setTokenType] = useState('')
+
+  const handleTokenTypeChange = useCallback((event: SelectChangeEvent) => {
+    setTokenType(event.target.value)
+  }, [setTokenType])
+
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const result = {
       name: formData.get('name'),
-      token: formData.get('token')
+      token: formData.get('token'),
+      tokenType: formData.get('token-type')
     }
 
     if (result.name !== null && result.token !== null) {
@@ -61,6 +79,20 @@ export const BrokerAddPage: React.FC = () => {
             autoComplete="Тинькофф"
             autoFocus
           />
+          <FormControl fullWidth sx={{ my: 1 }}>
+          <InputLabel id="demo-simple-select-helper-label">Тип токена</InputLabel>
+            <Select
+              id="token-type"
+              name="token-type"
+              label="Тип токена"
+              labelId="demo-simple-select-helper-label"
+              onChange={handleTokenTypeChange}
+              value={tokenType}
+            >
+              <MenuItem value='real'>Боевой</MenuItem>
+              <MenuItem value='sandbox'>Песочница</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             margin="normal"
             required
