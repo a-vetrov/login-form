@@ -1,18 +1,21 @@
 import { api } from './api'
+import { type PortfolioResponse } from '../types/tinkoff/operations.ts'
 
-
-interface ServerAnswer {
+interface PortfolioApiType {
   success: boolean
+  data: {
+    portfolio: PortfolioResponse
+  }
 }
 
 export const portfolioApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getPortfolio: build.query<ServerAnswer, undefined>({
+    getPortfolio: build.query<PortfolioApiType['data'], undefined>({
       query: () => ({
         url: 'portfolio',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as ServerAnswer
+      transformResponse: ({ data }) => data as PortfolioApiType['data']
     })
   })
 })
