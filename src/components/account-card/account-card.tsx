@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { type Account } from '../../types/tinkoff/users.ts'
 import { Card, CardContent, Typography } from '@mui/material'
-import {getAccountAccessLevelInfo, getAccountStatusInfo, getAccountTypeInfo} from "./utils.ts";
+import { getAccountAccessLevelInfo, getAccountStatusInfo, getAccountTypeInfo } from './utils.ts'
 import { format } from 'date-fns'
 
 interface Props {

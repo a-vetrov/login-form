@@ -2,7 +2,6 @@ import express from "express";
 import {ensureLoggedIn} from "../handlers/ensure-logged-in.js";
 import {getUserById, TokenType} from "../db/models/user.js";
 import {sendError} from "../handlers/error.js";
-import {brokerRouter} from "./broker.js";
 // https://github.com/vitalets/tinkoff-invest-api
 import {TinkoffApiError, TinkoffInvestApi} from "tinkoff-invest-api";
 import {PortfolioRequest_CurrencyRequest} from "tinkoff-invest-api/cjs/generated/operations.js";

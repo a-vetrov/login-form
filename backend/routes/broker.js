@@ -13,7 +13,7 @@ export const brokerRouter = express.Router();
 brokerRouter.get('/api/broker/list', ensureLoggedIn, async (req, res) => {
   try {
     const user = await getUserById(req.user._id)
-    const data = user.tokens.map((item, index) => ({name: item.name, created: item.created, id: item._id, type: item.type}))
+    const data = user.tokens.map((item) => ({name: item.name, created: item.created, id: item._id, type: item.type}))
 
     res.status(200).send({ success: true, data });
   } catch (error) {

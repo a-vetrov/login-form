@@ -1,6 +1,6 @@
 import { api } from './api'
 import { type PortfolioResponse } from '../types/tinkoff/operations.ts'
-import {Account} from "../types/tinkoff/users.ts";
+import { type Account } from '../types/tinkoff/users.ts'
 
 interface PortfolioApiType {
   success: boolean

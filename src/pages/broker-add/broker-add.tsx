@@ -52,7 +52,7 @@ export const BrokerAddPage: React.FC = () => {
       return (
         <Box marginTop={2}>
           <Alert severity="warning">
-            {title && <AlertTitle>{error.data.error.title}</AlertTitle>}
+            {title && <AlertTitle>{title}</AlertTitle>}
             {message ?? 'Не удалось добавить токен'}
           </Alert>
         </Box>

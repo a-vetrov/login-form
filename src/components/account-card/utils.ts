@@ -1,4 +1,4 @@
-import {AccessLevel, AccountStatus, AccountType} from '../../types/tinkoff/users.ts'
+import { AccessLevel, AccountStatus, AccountType } from '../../types/tinkoff/users.ts'
 
 export const getAccountTypeInfo = (type: AccountType): string => {
   switch (type) {
@@ -26,4 +26,3 @@ export const getAccountAccessLevelInfo = (accessLevel: AccessLevel): string => {
     default: return 'Уровень доступа не определён'
   }
 }
-
