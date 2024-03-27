@@ -66,7 +66,7 @@ export const BrokerAddPage: React.FC = () => {
       <MainToolbar />
       <Container component="main" maxWidth="xs" sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Добавить токен брокера
+          Добавить токен брокера Тинькофф
         </Typography>
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} noValidate>
           <TextField

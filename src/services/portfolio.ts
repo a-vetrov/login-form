@@ -1,10 +1,12 @@
 import { api } from './api'
 import { type PortfolioResponse } from '../types/tinkoff/operations.ts'
+import {Account} from "../types/tinkoff/users.ts";
 
 interface PortfolioApiType {
   success: boolean
   data: {
     portfolio: PortfolioResponse
+    accounts: Account[]
   }
 }
 

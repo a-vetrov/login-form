@@ -1,9 +1,15 @@
 import { api } from './api'
 
+export enum TokenType {
+  real = 'real',
+  sandbox = 'sandbox'
+}
+
 interface BrokerInfoType {
   name: string
   created: string
   id: string
+  type: TokenType
 }
 
 interface ServerAnswer {

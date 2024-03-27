@@ -19,6 +19,7 @@ import AddIcon from '@mui/icons-material/Add'
 import TokenIcon from '@mui/icons-material/Token'
 import IconLoader from '../../components/icon-loader'
 import { DeleteButton } from './components/delete-button.tsx'
+import { TokenTypeLabel } from './components/token-type.tsx'
 
 export const BrokerListPage: React.FC = () => {
   const { data, error, isLoading } = useGetBrokerListQuery()
@@ -39,7 +40,7 @@ export const BrokerListPage: React.FC = () => {
     }
 
     if (!data?.length) {
-      return <p>Пока что ни одного брокера не подключено</p>
+      return <p>Пока что ни одного токена не подключено</p>
     }
 
     return (
@@ -56,6 +57,7 @@ export const BrokerListPage: React.FC = () => {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText primary={item.name} secondary={format(item.created, 'dd.MM.yyyy HH:mm')} />
+                  <TokenTypeLabel type={item.type}/>
               </ListItem>
             ))
           }
@@ -69,7 +71,7 @@ export const BrokerListPage: React.FC = () => {
       <MainToolbar />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Список брокеров
+          Список токенов
         </Typography>
         {isLoading && <CircularProgress />}
         {list}
