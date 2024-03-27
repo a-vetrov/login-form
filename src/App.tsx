@@ -12,6 +12,7 @@ import { CssBaseline } from '@mui/material'
 import { BrokerListPage } from './pages/broker-list/broker-list-page'
 import { BrokerAddPage } from './pages/broker-add/broker-add.tsx'
 import { PortfolioPage } from './pages/portfolio/portfolio-page.tsx'
+import {SandboxPage} from "./pages/sandbox/sandbox-page.tsx";
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme()
@@ -26,6 +27,7 @@ export const App: React.FC = () => {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/account" element={<AccountPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/sandbox" element={<SandboxPage />} />
               <Route path="/broker/list" element={<BrokerListPage />} />
               <Route path="/broker/add" element={<BrokerAddPage />} />
               <Route path="*" element={<NotFound />} />
