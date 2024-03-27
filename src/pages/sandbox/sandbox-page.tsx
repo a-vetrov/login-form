@@ -1,7 +1,7 @@
-import React from 'react';
-import {MainToolbar} from "../../components/main-toolbar";
-import { Container, Typography } from '@mui/material';
-import {sandboxApi} from "../../services/sandbox.ts";
+import React from 'react'
+import { MainToolbar } from '../../components/main-toolbar'
+import { Container, Typography } from '@mui/material'
+import { sandboxApi } from '../../services/sandbox.ts'
 
 export const SandboxPage: React.FC = () => {
   const accounts = sandboxApi.useGetAccountsQuery()
@@ -20,5 +20,5 @@ export const SandboxPage: React.FC = () => {
         </Typography>
       </Container>
     </>
-  );
-};
+  )
+}
