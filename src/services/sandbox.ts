@@ -8,15 +8,40 @@ interface AccountsApiType {
   }
 }
 
+interface AccountsCreateApiType {
+  success: boolean
+  data: {
+    id: string
+  }
+}
 
-export const sandboxApi = api.injectEndpoints({
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts'] })
+
+export const sandboxApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
     getAccounts: build.query<AccountsApiType['data'], undefined>({
       query: () => ({
         url: 'sandbox/accounts',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as AccountsApiType['data']
+      transformResponse: ({ data }) => data as AccountsApiType['data'],
+      providesTags: ['SandboxAccounts']
+    }),
+    createAccount: build.mutation<AccountsCreateApiType['data'], undefined>({
+      query: () => ({
+        url: 'sandbox/accounts/create',
+        method: 'POST'
+      }),
+      transformResponse: ({ data }) => data as AccountsCreateApiType['data'],
+      invalidatesTags: ['SandboxAccounts']
+    }),
+    deleteAccount: build.mutation<AccountsCreateApiType['data'], string>({
+      query: (id) => ({
+        url: `sandbox/accounts/${id}`,
+        method: 'DELETE'
+      }),
+      transformResponse: ({ data }) => data as AccountsCreateApiType['data'],
+      invalidatesTags: ['SandboxAccounts']
     })
   })
 })
