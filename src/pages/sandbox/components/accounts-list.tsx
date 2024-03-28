@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import type { Account } from '../../../types/tinkoff/users.ts'
-import {Alert, Box, Button, Stack, Typography} from '@mui/material'
+import { Alert, Box, Button, Stack, Typography } from '@mui/material'
 import { AccountCard } from '../../../components/account-card/account-card.tsx'
 import { sandboxApi } from '../../../services/sandbox.ts'
 
@@ -32,7 +32,7 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
 
   const deleteButton = useMemo(() => {
     const clickHandler = (): void => {
-      deleteTrigger(selectedAccount as string)
+      deleteTrigger(selectedAccount!)
     }
 
     if (!selectedAccount) {
