@@ -3,6 +3,7 @@ import {ensureLoggedIn} from "../handlers/ensure-logged-in.js";
 import {getUserById, TokenType} from "../db/models/user.js";
 import {sendError} from "../handlers/error.js";
 // https://github.com/vitalets/tinkoff-invest-api
+// https://tinkoff.github.io/investAPI/sandbox/
 import {TinkoffApiError, TinkoffInvestApi} from "tinkoff-invest-api";
 import {PortfolioRequest_CurrencyRequest} from "tinkoff-invest-api/cjs/generated/operations.js";
 import {getFirstRealToken, getFirstSandboxToken} from "../utils/tokens.js";

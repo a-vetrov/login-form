@@ -3,14 +3,12 @@ import { MainToolbar } from '../../components/main-toolbar'
 import { useGetPortfolioQuery } from '../../services/portfolio.ts'
 import { ProductCard } from '../../components/product-card/product-card.tsx'
 import { AccountCard } from '../../components/account-card/account-card.tsx'
-import { Container } from '@mui/material'
+import { Container, Stack, Typography } from '@mui/material'
 
 export const PortfolioPage: React.FC = () => {
   const { data, isLoading } = useGetPortfolioQuery()
 
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
-
-  console.log({ data, isLoading })
 
   const positions = data?.portfolio.positions
 
@@ -18,13 +16,30 @@ export const PortfolioPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <h1>Ваши счета</h1>
-        {data?.accounts.map((item) => (
-          <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={setSelectedAccount} />
-        ))}
+        <Typography variant="h2">
+          Ваши продукты
+        </Typography>
+        <Typography variant="body1">
+          Это ваши реальные счета и продукты.
+        </Typography>
+        <Typography variant="h3" marginTop={3}>
+          Ваши счета
+        </Typography>
+        <Stack direction="row" spacing={2} marginY={2}>
+          {data?.accounts.map((item) => (
+            <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={setSelectedAccount} />
+          ))}
+        </Stack>
 
-        <h1>Ваш портфель</h1>
-        {positions?.map((item) => <ProductCard data={item} key={item.figi} />)}
+        <Typography variant="h3" marginTop={3}>
+          Ваш портфель
+        </Typography>
+        <Typography variant="body1" marginBottom={2}>
+          Пока что выводим портфель первого счета из списка
+        </Typography>
+        <Stack spacing={2} marginY={4}>
+          {positions?.map((item) => <ProductCard data={item} key={item.figi} />)}
+        </Stack>
       </Container>
     </>
   )
