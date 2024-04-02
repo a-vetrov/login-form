@@ -40,7 +40,7 @@ export const BrokerListPage: React.FC = () => {
     }
 
     if (!data?.length) {
-      return <p>Пока что ни одного токена не подключено</p>
+      return <Typography variant="body1">Пока что ни одного токена не подключено</Typography>
     }
 
     return (
@@ -70,7 +70,7 @@ export const BrokerListPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h2" gutterBottom>
           Список токенов
         </Typography>
         {isLoading && <CircularProgress />}

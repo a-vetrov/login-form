@@ -63,6 +63,11 @@ export const MainToolbar: React.FC = () => {
                     Портфель
                   </Typography>
                 </MenuItem>
+                <MenuItem sx={{ py: '6px', px: '12px' }} component={ Link } to='/catalog'>
+                  <Typography variant="body2">
+                    Каталог
+                  </Typography>
+                </MenuItem>
                 <MenuItem sx={{ py: '6px', px: '12px' }} component={ Link } to='/sandbox'>
                   <Typography variant="body2">
                     Песочница

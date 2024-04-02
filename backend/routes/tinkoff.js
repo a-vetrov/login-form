@@ -93,6 +93,25 @@ tinkoffRouter.delete('/api/sandbox/accounts/:id', ensureLoggedIn, async (req, re
   }
 })
 
+tinkoffRouter.get('/api/catalog/bonds', ensureLoggedIn, async (req, res) => {
+  try {
+    const user = await getUserById(req.user._id)
+    const token = getFirstSandboxToken(user)
+
+    if (!token) {
+      return sendError(res, 403, 'Ошибка', 'Не удалось найти подходящий токен')
+    }
+
+    const api = new TinkoffInvestApi({ token: token.token });
+
+    const data = await api.instruments.bonds({});
+    res.status(200).send({ success: true, data });
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
 export const checkToken = async (token) => {
   let result;
   const api = new TinkoffInvestApi({ token: token.token });

@@ -31,5 +31,17 @@ module.exports = {
         "react"
     ],
     "rules": {
+        "@typescript-eslint/strict-boolean-expressions": [
+            "warn",
+            {
+                "allowString": true,
+                "allowNumber": false,
+                "allowNullableObject": true,
+                "allowNullableBoolean": true,
+                "allowNullableNumber": false,
+                "allowNullableString": true,
+                "allowAny": false
+            }
+        ]
     }
 }

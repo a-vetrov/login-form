@@ -13,6 +13,7 @@ import { BrokerListPage } from './pages/broker-list/broker-list-page'
 import { BrokerAddPage } from './pages/broker-add/broker-add.tsx'
 import { PortfolioPage } from './pages/portfolio/portfolio-page.tsx'
 import { SandboxPage } from './pages/sandbox/sandbox-page.tsx'
+import { CatalogPage } from './pages/catalog/catalog-page.tsx'
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme()
@@ -28,6 +29,8 @@ export const App: React.FC = () => {
               <Route path="/account" element={<AccountPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />
               <Route path="/sandbox" element={<SandboxPage />} />
+              <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/catalog/:category" element={<CatalogPage />} />
               <Route path="/broker/list" element={<BrokerListPage />} />
               <Route path="/broker/add" element={<BrokerAddPage />} />
               <Route path="*" element={<NotFound />} />
