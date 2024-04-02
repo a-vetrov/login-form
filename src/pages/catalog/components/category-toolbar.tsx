@@ -1,6 +1,6 @@
 import React from 'react'
-import {Box, Chip, Stack} from '@mui/material'
-import {Link, NavLink} from 'react-router-dom'
+import { Chip, Stack } from '@mui/material'
+import { Link, NavLink } from 'react-router-dom'
 
 const categoriesList = [
   {
