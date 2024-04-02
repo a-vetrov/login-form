@@ -21,7 +21,7 @@ export const CatalogPage: React.FC = () => {
           Список продуктов, торгующихся на Московской бирже.
         </Typography>
         <CategoryToolbar />
-        {data?.instruments?.slice(0, 100).map((item) => {
+        {data?.instruments?.slice(0, 10).map((item) => {
           return (
             <BondCatalogCard data={item} key={item.isin} />
           )

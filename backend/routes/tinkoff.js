@@ -7,6 +7,7 @@ import {sendError} from "../handlers/error.js";
 import {TinkoffApiError, TinkoffInvestApi} from "tinkoff-invest-api";
 import {PortfolioRequest_CurrencyRequest} from "tinkoff-invest-api/cjs/generated/operations.js";
 import {getFirstRealToken, getFirstSandboxToken} from "../utils/tokens.js";
+import {getBondsData, mergeWithMOEXData} from "../utils/moex.js";
 
 export const tinkoffRouter = express.Router();
 
@@ -105,7 +106,9 @@ tinkoffRouter.get('/api/catalog/bonds', ensureLoggedIn, async (req, res) => {
     const api = new TinkoffInvestApi({ token: token.token });
 
     const data = await api.instruments.bonds({});
-    res.status(200).send({ success: true, data });
+    const moex = await getBondsData()
+    const instruments = mergeWithMOEXData(data.instruments, moex)
+    res.status(200).send({ success: true, data: {instruments, moex} });
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

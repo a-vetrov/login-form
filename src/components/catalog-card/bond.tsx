@@ -9,11 +9,15 @@ interface Props {
     name: string
     isin: string
     maturityDate: string
+    moex?: {
+      PREVPRICE?: number
+      YIELDATPREVWAPRICE?: number
+    }
   }
 }
 
 export const BondCatalogCard: React.FC<Props> = ({ data }) => {
-  const { isin, name, maturityDate } = data
+  const { isin, name, maturityDate, moex } = data
 
   const deadline = useMemo(() => {
     try {
@@ -33,6 +37,20 @@ export const BondCatalogCard: React.FC<Props> = ({ data }) => {
     }
   }, [maturityDate])
 
+  const price = useMemo(() => {
+    if (moex?.PREVPRICE !== undefined) {
+      return `${moex.PREVPRICE.toLocaleString('ru-RU')} %`
+    }
+    return '-'
+  }, [moex])
+
+  const percent = useMemo(() => {
+    if (moex?.YIELDATPREVWAPRICE !== undefined) {
+      return `${moex.YIELDATPREVWAPRICE.toLocaleString('ru-RU')} %`
+    }
+    return null
+  }, [moex])
+
   return (
     <Card>
       <CardActionArea>
@@ -45,9 +63,13 @@ export const BondCatalogCard: React.FC<Props> = ({ data }) => {
               <Typography variant='subtitle1'>{name}</Typography>
               <Typography variant='body2'>{isin}</Typography>
             </Stack>
-            <Stack spacing={0} alignItems='flex-end'>
+            <Stack spacing={0} >
               <Typography variant='subtitle1'>{deadline}</Typography>
               <Typography variant='body2'>{toDeadline}</Typography>
+            </Stack>
+            <Stack spacing={0} alignItems='flex-end'>
+              <Typography variant='subtitle1'>{price}</Typography>
+              <Typography variant='body2'>{percent}</Typography>
             </Stack>
           </Stack>
         </CardContent>
