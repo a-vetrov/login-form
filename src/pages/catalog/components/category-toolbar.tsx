@@ -1,22 +1,24 @@
 import React from 'react'
 import {Chip, NoSsr, Stack} from '@mui/material'
-import { Link, NavLink } from 'react-router-dom'
-import {categoriesList} from "../utils/category-list.ts";
+import { Link } from 'react-router-dom'
+import {CatalogCategoryName, categoriesList} from "../utils/category-list.ts";
 
-export const CategoryToolbar: React.FC = () => {
+interface Props {
+  value: CatalogCategoryName
+}
+
+export const CategoryToolbar: React.FC<Props> = ({value}) => {
   return (
     <NoSsr>
       <Stack marginTop={2} marginBottom={2} direction="row" spacing={2}>
         {categoriesList.map((item) => (
-          <NavLink to={item.link} key={item.title}>
-            {({ isActive }) => (
+          <Link to={item.link} key={item.title}>
               <Chip
                 label={item.title}
                 clickable
-                variant={isActive ? 'outlined' : 'filled'}
+                variant={value === item.name ? 'outlined' : 'filled'}
               />
-            )}
-          </NavLink>
+          </Link>
         ))}
       </Stack>
     </NoSsr>

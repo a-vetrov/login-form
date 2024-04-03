@@ -1,6 +1,6 @@
 import { api } from './api'
 
-const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks'] })
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks', 'CatalogCurrencies'] })
 
 export const catalogApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
@@ -19,6 +19,14 @@ export const catalogApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data,
       providesTags: ['CatalogStocks']
+    }),
+    getCurrencies: build.query<unknown, undefined>({
+      query: () => ({
+        url: 'catalog/currency',
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data,
+      providesTags: ['CatalogCurrencies']
     })
   })
 })
