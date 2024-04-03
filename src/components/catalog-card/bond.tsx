@@ -63,11 +63,11 @@ export const BondCatalogCard: React.FC<Props> = ({ data }) => {
               <Typography variant='subtitle1'>{name}</Typography>
               <Typography variant='body2'>{isin}</Typography>
             </Stack>
-            <Stack spacing={0} >
+            <Stack spacing={0} alignItems='flex-end' >
               <Typography variant='subtitle1'>{deadline}</Typography>
               <Typography variant='body2'>{toDeadline}</Typography>
             </Stack>
-            <Stack spacing={0} alignItems='flex-end'>
+            <Stack spacing={0} alignItems='flex-end' minWidth='100px'>
               <Typography variant='subtitle1'>{price}</Typography>
               <Typography variant='body2'>{percent}</Typography>
             </Stack>
