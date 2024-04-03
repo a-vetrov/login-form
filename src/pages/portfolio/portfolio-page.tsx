@@ -3,7 +3,8 @@ import { MainToolbar } from '../../components/main-toolbar'
 import { useGetPortfolioQuery } from '../../services/portfolio.ts'
 import { ProductCard } from '../../components/product-card/product-card.tsx'
 import { AccountCard } from '../../components/account-card/account-card.tsx'
-import { Alert, Box, Container, Stack, Typography } from '@mui/material'
+import { Container, Stack, Typography } from '@mui/material'
+import { ErrorAlert } from '../../components/error-alert/error-alert.tsx'
 
 export const PortfolioPage: React.FC = () => {
   const { data, error } = useGetPortfolioQuery()
@@ -22,15 +23,7 @@ export const PortfolioPage: React.FC = () => {
         <Typography variant="body1">
           Это ваши реальные счета и продукты.
         </Typography>
-        {
-          error && (
-            <Box marginTop={2} marginBottom={2}>
-              <Alert severity="warning">
-                Ошибка загрузки списка токенов
-              </Alert>
-            </Box>
-          )
-        }
+        <ErrorAlert error={error} />
         {data && (
           <>
             <Typography variant="h3" marginTop={3}>

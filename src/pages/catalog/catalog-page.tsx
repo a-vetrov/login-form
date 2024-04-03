@@ -1,12 +1,22 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Container, TextField, Typography } from '@mui/material'
+import { CircularProgress, Container, TextField, Typography } from '@mui/material'
 import { CategoryToolbar } from './components/category-toolbar.tsx'
-import { catalogApi } from '../../services/catalog.ts'
 import { BondCatalogCard } from '../../components/catalog-card/bond.tsx'
+import { useMatch } from 'react-router-dom'
+import { type CatalogCategoryName, defaultCategory } from './utils/category-list.ts'
+import { useCatalogApi } from './utils/use-catalog.ts'
+import {ErrorAlert} from "../../components/error-alert/error-alert.tsx";
 
 export const CatalogPage: React.FC = () => {
-  const { data, error } = catalogApi.useGetBondsQuery()
+  //  const [bondsTrigger, bondsData] = catalogApi.useLazyGetBondsQuery()
+  //  const [stocksTrigger, stocksData] = catalogApi.useLazyGetStocksQuery()
+
+  const match = useMatch('/catalog/:category')
+
+  const category = match?.params.category ?? defaultCategory
+
+  const { data, error, isFetching } = useCatalogApi(category as CatalogCategoryName)
 
   const [filterValue, setFilterValue] = useState('')
 
@@ -23,7 +33,9 @@ export const CatalogPage: React.FC = () => {
 
     const arr = filterValue
       ? data.instruments.filter((item) => {
-        return item.name.toLowerCase().includes(filterLowerCase) || item.isin.toLowerCase().includes(filterLowerCase)
+        return item.name.toLowerCase().includes(filterLowerCase) ||
+          item.isin.toLowerCase().includes(filterLowerCase) ||
+          item.ticker?.toLowerCase().includes(filterLowerCase)
       })
       : data.instruments
 
@@ -49,6 +61,14 @@ export const CatalogPage: React.FC = () => {
           value={filterValue}
           onChange={handleFilterChange}
         />
+        {
+          isFetching && (
+            <Container sx={{ display: 'flex', justifyContent: 'center', marginY: 2 }}>
+              <CircularProgress />
+            </Container>
+          )
+        }
+        <ErrorAlert error={error} />
         {items?.map((item) => {
           return (
             <BondCatalogCard data={item} key={item.isin} />

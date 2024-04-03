@@ -1,17 +1,7 @@
 import React from 'react'
 import {Chip, NoSsr, Stack} from '@mui/material'
 import { Link, NavLink } from 'react-router-dom'
-
-const categoriesList = [
-  {
-    title: 'Акции',
-    link: '/catalog/stocks'
-  },
-  {
-    title: 'Облигации',
-    link: '/catalog/bonds'
-  }
-]
+import {categoriesList} from "../utils/category-list.ts";
 
 export const CategoryToolbar: React.FC = () => {
   return (
