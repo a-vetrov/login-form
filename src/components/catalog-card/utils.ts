@@ -1,10 +1,10 @@
-import {dotDelimiter} from "../../constants.ts";
+import { dotDelimiter } from '../../constants'
 
 interface GetIsinStringProps {
   isin?: string
   ticker?: string
 }
-export const getIsinString = ({isin, ticker}: GetIsinStringProps): string | null => {
+export const getIsinString = ({ isin, ticker }: GetIsinStringProps): string | null => {
   const arr = []
   if (isin) {
     arr.push(isin)
@@ -13,7 +13,7 @@ export const getIsinString = ({isin, ticker}: GetIsinStringProps): string | null
     arr.push(ticker)
   }
 
-  if (arr.length) {
+  if (arr.length > 0) {
     return arr.join(dotDelimiter)
   }
 
@@ -21,7 +21,6 @@ export const getIsinString = ({isin, ticker}: GetIsinStringProps): string | null
 }
 
 export const getColor = (value: number | undefined): string | undefined => {
-  console.log('getColor', value)
   if (!value) {
     return 'text.secondary'
   }

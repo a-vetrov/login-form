@@ -1,8 +1,9 @@
-import React, {useMemo} from 'react';
-import {rubSign} from "../../constants.ts";
-import {Avatar, Card, CardActionArea, CardContent, Stack, Typography} from "@mui/material";
-import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
-import {getColor, getIsinString} from "./utils.ts";
+import React, { useMemo } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
+import { rubSign } from '../../constants'
+import { Avatar, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material'
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined'
+import { getColor, getIsinString } from './utils'
 
 interface Props {
   data: {
@@ -16,8 +17,8 @@ interface Props {
   }
 }
 
-export const StockCatalogCard: React.FC<Props> = ({data}) => {
-  const { name, moex } = data
+export const StockCatalogCard: React.FC<Props> = ({ data }) => {
+  const { name, moex, isin } = data
 
   const price = useMemo(() => {
     if (moex?.LAST != undefined) {
@@ -37,9 +38,17 @@ export const StockCatalogCard: React.FC<Props> = ({data}) => {
 
   const isinString = useMemo(() => getIsinString(data), [data])
 
+  const action = useMemo(() => isin
+    ? {
+        component: RouterLink,
+        to: `/catalog/stocks/${isin}`
+      }
+    : {}
+  , [isin])
+
   return (
     <Card>
-      <CardActionArea>
+      <CardActionArea {...action}>
         <CardContent>
           <Stack direction="row" spacing={2} justifyContent='space-between'>
             <Avatar sx={{ m: 1, bgcolor: 'primary.light' }}>
@@ -57,5 +66,5 @@ export const StockCatalogCard: React.FC<Props> = ({data}) => {
         </CardContent>
       </CardActionArea>
     </Card>
-  );
-};
+  )
+}

@@ -18,6 +18,10 @@ module.exports = {
             "parserOptions": {
                 "sourceType": "script"
             }
+        },
+        {
+            "files": ['**/*.js'],
+            "extends": ['plugin:@typescript-eslint/disable-type-checked']
         }
     ],
     "parserOptions": {

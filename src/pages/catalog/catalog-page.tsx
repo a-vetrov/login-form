@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import { CircularProgress, Container, TextField, Typography } from '@mui/material'
-import { CategoryToolbar } from './components/category-toolbar.tsx'
+import { CategoryToolbar } from './components/category-toolbar'
 import { useMatch } from 'react-router-dom'
-import { type CatalogCategoryName, defaultCategory } from './utils/category-list.ts'
-import { useCatalogApi } from './utils/use-catalog.ts'
-import {ErrorAlert} from "../../components/error-alert/error-alert.tsx";
-import {getCardClassByCategory} from "../../components/catalog-card/factory.ts";
+import { type CatalogCategoryName, defaultCategory } from './utils/category-list'
+import { useCatalogApi } from './utils/use-catalog'
+import { ErrorAlert } from '../../components/error-alert/error-alert'
+import { getCardClassByCategory } from '../../components/catalog-card/factory'
 
 export const CatalogPage: React.FC = () => {
   const match = useMatch('/catalog/:category')

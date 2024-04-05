@@ -13,9 +13,9 @@ import {
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import IconLoader from '../../components/icon-loader'
-import { useLoginUserMutation } from '../../services/login.ts'
+import { useLoginUserMutation } from '../../services/login'
 import { useDispatch } from 'react-redux'
-import { userInfoSlice } from '../../store/slices/user-slice.ts'
+import { userInfoSlice } from '../../store/slices/user-slice'
 
 export const LoginPage: React.FC = () => {
   const [trigger, { isLoading, error, data }] = useLoginUserMutation()

@@ -1,6 +1,6 @@
-import {CatalogCategoryName} from "../../pages/catalog/utils/category-list.ts";
-import {BondCatalogCard} from "./bond.tsx";
-import {StockCatalogCard} from "./stock.tsx";
+import { type CatalogCategoryName } from '../../pages/catalog/utils/category-list'
+import { BondCatalogCard } from './bond'
+import { StockCatalogCard } from './stock'
 
 export const getCardClassByCategory = (category: CatalogCategoryName) => {
   switch (category) {
