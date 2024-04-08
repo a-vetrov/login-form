@@ -1,37 +1,28 @@
 import React from 'react'
-import { Typography } from '@mui/material'
-import { useSelector } from 'react-redux'
-import { getStockByIsin } from '../../store/selectors/catalog-data'
+import { CircularProgress, Typography } from '@mui/material'
 import { type DetailsProps } from './factory'
-
-const widgetScript = {
-  __html: `
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js">
-  {
-  "symbol": "MOEX:SBER",
-  "width": 550,
-  "locale": "en",
-  "colorTheme": "dark",
-  "isTransparent": false
-}
-  </script>
-</div>
-`
-}
+import { catalogApi } from '../../services/catalog'
+import { getIds } from './utils'
 
 export const StockDetails: React.FC<DetailsProps> = ({ isin }) => {
-  const data = useSelector(getStockByIsin(isin))
+  const { data, isLoading } = catalogApi.useGetStocksByIsinQuery(isin)
 
-  console.log('Data!!!!', data)
+  const ids = getIds(data)
+
+  if (isLoading) {
+    return <CircularProgress />
+  }
 
   return (
     <>
       <Typography variant="h2">
-        Stock details
+        {data.name}
       </Typography>
-      <div dangerouslySetInnerHTML={widgetScript} />
+      {ids && (
+        <Typography variant="body1">
+          {ids}
+        </Typography>
+      )}
     </>
   )
 }

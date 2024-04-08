@@ -46,11 +46,18 @@ export const mergeWithMOEXData = (arr, dictionary) => {
 
   try {
     return arr.map((item) => {
+      const {
+        name, figi, uid, ticker, isin, lot, currency, exchange, maturityDate, riskLevel
+      } = item
       const moex = dictionary[item.isin || item.ticker]
       if (moex) {
-        return { ...item, moex }
+        return {
+          name, figi, uid, ticker, isin, lot, currency, exchange, maturityDate, riskLevel, moex
+        }
       } else {
-        return item
+        return {
+          name, figi, uid, ticker, isin, lot, currency, exchange, maturityDate, riskLevel
+        }
       }
     })
   } catch (error) {

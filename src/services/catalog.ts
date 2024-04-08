@@ -20,6 +20,13 @@ export const catalogApi = apiWithTag.injectEndpoints({
       transformResponse: ({ data }) => data,
       providesTags: ['CatalogStocks']
     }),
+    getStocksByIsin: build.query<unknown, string>({
+      query: (isin) => ({
+        url: `catalog/stocks/${isin}`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data
+    }),
     getCurrencies: build.query<unknown, undefined>({
       query: () => ({
         url: 'catalog/currency',
