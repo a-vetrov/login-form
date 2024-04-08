@@ -1,18 +1,17 @@
 import mongoose from 'mongoose'
-const { Schema } = mongoose;
+const { Schema } = mongoose
 
 export const TokenType = {
   sandbox: 'sandbox',
-  real: 'real',
+  real: 'real'
 }
 
 const BrokerTokenSchema = new Schema({
   token: String,
   name: String,
   type: String,
-  created: Date,
+  created: Date
 })
-
 
 const userSchema = new Schema({
   authId: String,

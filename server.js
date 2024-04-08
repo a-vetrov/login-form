@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import expressSession from 'express-session'
 import { redisStore } from './backend/db/redis.js'
 import passport from 'passport'
+import {updateCatalog} from "./backend/utils/update-catalog.js";
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -21,6 +22,7 @@ const ssrManifest = isProduction
   : undefined
 
 void createDefaultUsers()
+void updateCatalog()
 
 // Create http server
 const app = express()

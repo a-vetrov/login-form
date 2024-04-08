@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import crypto from 'crypto'
-import {UserModel} from "./db/models/user.js";
+import { UserModel } from './db/models/user.js'
 
 const connectionString = 'mongodb://127.0.0.1:27017'
 mongoose.connect(connectionString)
@@ -11,7 +11,6 @@ db.on('error', err => {
 })
 db.once('open', () => console.log('MongoDB connection established'))
 
-
 export const createDefaultUsers = async () => {
   const users = await UserModel.find({})
   if (users.length > 0) {
@@ -20,8 +19,8 @@ export const createDefaultUsers = async () => {
   }
 
   const getUserHash = (password) => {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const key = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512');
+    const salt = crypto.randomBytes(16).toString('hex')
+    const key = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512')
     return {
       password: key,
       salt
@@ -47,5 +46,4 @@ export const createDefaultUsers = async () => {
     created: new Date(),
     tokens: []
   }).save()
-
 }

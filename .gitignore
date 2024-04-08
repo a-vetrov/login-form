@@ -25,3 +25,7 @@ dist-ssr
 *.sw?
 token
 
+# Secrets
+credentials.development.json
+credentials.production.json
+
