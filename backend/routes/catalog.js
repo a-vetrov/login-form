@@ -74,3 +74,19 @@ catalogRouter.get('/api/catalog/currency', ensureLoggedIn, async (req, res) => {
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
   }
 })
+
+catalogRouter.get('/api/catalog/currency/:ticker', ensureLoggedIn, async (req, res) => {
+  try {
+    const ticker = req.params.ticker
+    const data = await CatalogCurrenciesModel.findOne({ ticker }).lean()
+    console.log('Ticker', ticker, data, data)
+    const {
+      _id, __v, ...rest
+    } = data
+    res.status(200).send({ success: true, data: rest })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+

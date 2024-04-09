@@ -18,6 +18,7 @@ interface Props {
       EFFECTIVEYIELDWAPRICE?: number
     }
   }
+  category: string
 }
 
 export const BondCatalogCard: React.FC<Props> = ({ data }) => {

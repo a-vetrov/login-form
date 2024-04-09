@@ -70,7 +70,7 @@ export const CatalogPage: React.FC = () => {
         {!isFetching && <ErrorAlert error={error} />}
         {items?.map((item) => {
           return (
-            <CardClass data={item} key={item.isin || item.ticker || item.figi} />
+            <CardClass data={item} key={item.isin || item.ticker || item.figi} category={category}/>
           )
         })}
       </Container>

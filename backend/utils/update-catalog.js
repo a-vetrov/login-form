@@ -6,17 +6,10 @@ import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
 
 const updateBonds = async (api) => {
   try {
-    const bondsData = await CatalogBondsModel.find({})
-    if (bondsData.length > 1) {
-      console.log('Bonds data is already exist. ', bondsData.length)
-      return
-    }
-
     console.log('Updating bonds catalog...')
 
     const bonds = await api.instruments.bonds({})
-    await Promise.all(bonds.instruments.slice(1, 10).map(async (item) => {
-      console.log(item)
+    await Promise.all(bonds.instruments.map(async (item) => {
       const {
         name,
         figi,
@@ -34,7 +27,7 @@ const updateBonds = async (api) => {
         nominal,
         aciValue
       } = item
-      await new CatalogBondsModel({
+      const doc = await CatalogBondsModel.findOneAndUpdate({ isin }, {
         name,
         figi,
         uid,
@@ -50,7 +43,12 @@ const updateBonds = async (api) => {
         couponQuantityPerYear,
         nominal,
         aciValue
-      }).save()
+      },
+      {
+        new: true,
+        upsert: true // Make this update into an upsert
+      })
+      await doc.save()
     }))
     console.log('Done.')
   } catch (error) {
@@ -60,12 +58,6 @@ const updateBonds = async (api) => {
 
 const updateStocks = async (api) => {
   try {
-    const stocksData = await CatalogStocksModel.find({})
-    if (stocksData.length > 1) {
-      console.log('Stocks data is already exist. ', stocksData.length)
-      return
-    }
-
     console.log('Updating stocks catalog...')
 
     const stocks = await api.instruments.shares({})
@@ -82,9 +74,10 @@ const updateStocks = async (api) => {
         riskLevel,
         countryOfRiskName,
         sector,
-        shareType
+        shareType,
+        nominal
       } = item
-      await new CatalogStocksModel({
+      const doc = await CatalogStocksModel.findOneAndUpdate({ isin }, {
         name,
         figi,
         uid,
@@ -96,8 +89,13 @@ const updateStocks = async (api) => {
         riskLevel,
         countryOfRiskName,
         sector,
-        shareType
-      }).save()
+        shareType,
+        nominal
+      }, {
+        new: true,
+        upsert: true // Make this update into an upsert
+      })
+      await doc.save()
     }))
     console.log('Done.')
   } catch (error) {
@@ -107,12 +105,6 @@ const updateStocks = async (api) => {
 
 const updateCurrencies = async (api) => {
   try {
-    const currenciesData = await CatalogCurrenciesModel.find({})
-    if (currenciesData.length > 1) {
-      console.log('Currencies data is already exist. ', currenciesData.length)
-      return
-    }
-
     console.log('Updating currencies catalog...')
 
     const currencies = await api.instruments.currencies({})
@@ -125,10 +117,10 @@ const updateCurrencies = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
+        realExchange,
         riskLevel
       } = item
-      await new CatalogCurrenciesModel({
+      const doc = await CatalogCurrenciesModel.findOneAndUpdate({ ticker }, {
         name,
         figi,
         uid,
@@ -136,9 +128,13 @@ const updateCurrencies = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
+        realExchange,
         riskLevel
-      }).save()
+      }, {
+        new: true,
+        upsert: true // Make this update into an upsert
+      })
+      await doc.save()
     }))
     console.log('Done.')
   } catch (error) {

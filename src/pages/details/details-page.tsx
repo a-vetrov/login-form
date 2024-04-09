@@ -15,7 +15,7 @@ export const DetailsPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        {Details && isin && <Details isin={isin}/>}
+        {Details && isin && <Details isin={isin} ticker={isin}/>}
       </Container>
 
     </>

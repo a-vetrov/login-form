@@ -15,10 +15,11 @@ interface Props {
       LASTTOPREVPRICE?: number
     }
   }
+  category: string
 }
 
-export const StockCatalogCard: React.FC<Props> = ({ data }) => {
-  const { name, moex, isin } = data
+export const StockCatalogCard: React.FC<Props> = ({ data, category }) => {
+  const { name, moex, isin, ticker } = data
 
   const price = useMemo(() => {
     if (moex?.LAST != undefined) {
@@ -38,13 +39,13 @@ export const StockCatalogCard: React.FC<Props> = ({ data }) => {
 
   const isinString = useMemo(() => getIsinString(data), [data])
 
-  const action = useMemo(() => isin
+  const action = useMemo(() => isin || ticker
     ? {
         component: RouterLink,
-        to: `/catalog/stocks/${isin}`
+        to: `/catalog/${category}/${isin || ticker}`
       }
     : {}
-  , [isin])
+  , [isin, ticker, category])
 
   return (
     <Card>

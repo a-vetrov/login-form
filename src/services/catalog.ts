@@ -41,6 +41,13 @@ export const catalogApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data,
       providesTags: ['CatalogCurrencies']
+    }),
+    getCurrencyByTicker: build.query<unknown, string>({
+      query: (ticker) => ({
+        url: `catalog/currency/${ticker}`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data
     })
   })
 })
