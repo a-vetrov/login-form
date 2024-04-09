@@ -2,6 +2,15 @@ import { type MoneyValue, type Quotation } from '../types/tinkoff/common.ts'
 import { type PortfolioPosition } from '../types/tinkoff/operations.ts'
 
 const RUB = '₽'
+const USD = '$'
+const EUR = '€'
+
+const mainCurrencies = { RUB, USD, EUR }
+
+const getCurrencySign = (currency: string): string => {
+  const toUpperCase = currency.toUpperCase()
+  return mainCurrencies[toUpperCase as keyof typeof mainCurrencies] || toUpperCase
+}
 
 export const getFromMoneyValue = (value?: MoneyValue | Quotation): number | undefined => {
   return (value ? value.units + value.nano / 1000000000 : undefined)
@@ -14,7 +23,7 @@ export const toMoneyString = (value?: MoneyValue): string => {
     return ''
   }
 
-  return `${total.toLocaleString('ru-RU')} ${value.currency}`
+  return `${total.toLocaleString('ru-RU')} ${getCurrencySign(value.currency)}`
 }
 
 export const getProductTotal = (product: PortfolioPosition): number | undefined => {

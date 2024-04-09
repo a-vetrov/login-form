@@ -22,6 +22,21 @@ catalogRouter.get('/api/catalog/bonds', ensureLoggedIn, async (req, res) => {
   }
 })
 
+catalogRouter.get('/api/catalog/bonds/:isin', ensureLoggedIn, async (req, res) => {
+  try {
+    const isin = req.params.isin
+    const data = await CatalogBondsModel.findOne({ isin }).lean()
+    const {
+      _id, __v, ...rest
+    } = data
+    res.status(200).send({ success: true, data: rest })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+
 catalogRouter.get('/api/catalog/stocks', ensureLoggedIn, async (req, res) => {
   try {
     const data = await CatalogStocksModel.find({})
@@ -37,11 +52,11 @@ catalogRouter.get('/api/catalog/stocks', ensureLoggedIn, async (req, res) => {
 catalogRouter.get('/api/catalog/stocks/:isin', ensureLoggedIn, async (req, res) => {
   try {
     const isin = req.params.isin
-    const data = await CatalogStocksModel.findOne({ isin })
+    const data = await CatalogStocksModel.findOne({ isin }).lean()
     const {
-      name, figi, uid, ticker, lot, currency, exchange, riskLevel
+      _id, __v, ...rest
     } = data
-    res.status(200).send({ success: true, data: { name, figi, uid, ticker, isin, lot, currency, exchange, riskLevel } })
+    res.status(200).send({ success: true, data: rest })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

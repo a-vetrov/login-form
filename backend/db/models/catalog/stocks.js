@@ -9,8 +9,11 @@ const stocksSchema = new Schema({
   isin: String,
   lot: Number,
   currency: String,
-  exchange: String,
-  riskLevel: Number
+  realExchange: Number,
+  riskLevel: Number,
+  countryOfRiskName: String,
+  sector: String,
+  shareType: Number
 })
 
 export const CatalogStocksModel = mongoose.model('CatalogStocks', stocksSchema)

@@ -3,7 +3,8 @@ import { Avatar, Card, CardActionArea, CardContent, Stack, Typography } from '@m
 import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined'
 import { format, formatDistanceToNow } from 'date-fns'
 import { ru } from 'date-fns/locale'
-import {getColor, getIsinString} from "./utils.ts";
+import { getColor, getIsinString } from './utils'
+import { Link as RouterLink } from 'react-router-dom'
 
 interface Props {
   data: {
@@ -20,7 +21,7 @@ interface Props {
 }
 
 export const BondCatalogCard: React.FC<Props> = ({ data }) => {
-  const { name, maturityDate, moex } = data
+  const { name, maturityDate, moex, isin } = data
 
   const deadline = useMemo(() => {
     try {
@@ -58,9 +59,17 @@ export const BondCatalogCard: React.FC<Props> = ({ data }) => {
 
   const isinString = useMemo(() => getIsinString(data), [data])
 
+  const action = useMemo(() => isin
+    ? {
+        component: RouterLink,
+        to: `/catalog/bonds/${isin}`
+      }
+    : {}
+  , [isin])
+
   return (
     <Card>
-      <CardActionArea>
+      <CardActionArea {...action}>
         <CardContent>
           <Stack direction="row" spacing={2} justifyContent='space-between'>
             <Avatar sx={{ m: 1, bgcolor: 'primary.light' }}>

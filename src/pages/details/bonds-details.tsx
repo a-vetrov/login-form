@@ -1,4 +1,7 @@
 import React, { useMemo } from 'react'
+import type { DetailsProps } from './factory'
+import { catalogApi } from '../../services/catalog'
+import { getIds, getMainProperties } from './utils'
 import {
   CircularProgress,
   Paper,
@@ -9,13 +12,10 @@ import {
   TableRow,
   Typography
 } from '@mui/material'
-import { type DetailsProps } from './factory'
-import { catalogApi } from '../../services/catalog'
-import { getIds, getMainProperties } from './utils'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 
-export const StockDetails: React.FC<DetailsProps> = ({ isin }) => {
-  const { data, isLoading, error } = catalogApi.useGetStocksByIsinQuery(isin)
+export const BondsDetails: React.FC<DetailsProps> = ({ isin }) => {
+  const { data, isLoading, error } = catalogApi.useGetBondsByIsinQuery(isin)
 
   const ids = useMemo(() => getIds(data), [data])
 
@@ -28,7 +28,7 @@ export const StockDetails: React.FC<DetailsProps> = ({ isin }) => {
   return (
     <>
       <Typography variant="h2">
-        {data?.name}
+        {data?.name || 'Детальная карточка'}
       </Typography>
       {ids && (
         <Typography variant="body1">

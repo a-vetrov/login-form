@@ -15,7 +15,8 @@ const updateBonds = async (api) => {
     console.log('Updating bonds catalog...')
 
     const bonds = await api.instruments.bonds({})
-    await Promise.all(bonds.instruments.map(async (item) => {
+    await Promise.all(bonds.instruments.slice(1, 10).map(async (item) => {
+      console.log(item)
       const {
         name,
         figi,
@@ -24,9 +25,14 @@ const updateBonds = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
+        realExchange,
         maturityDate,
-        riskLevel
+        riskLevel,
+        countryOfRiskName,
+        sector,
+        couponQuantityPerYear,
+        nominal,
+        aciValue
       } = item
       await new CatalogBondsModel({
         name,
@@ -36,9 +42,14 @@ const updateBonds = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
+        realExchange,
         maturityDate,
-        riskLevel
+        riskLevel,
+        countryOfRiskName,
+        sector,
+        couponQuantityPerYear,
+        nominal,
+        aciValue
       }).save()
     }))
     console.log('Done.')
@@ -67,8 +78,11 @@ const updateStocks = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
-        riskLevel
+        realExchange,
+        riskLevel,
+        countryOfRiskName,
+        sector,
+        shareType
       } = item
       await new CatalogStocksModel({
         name,
@@ -78,8 +92,11 @@ const updateStocks = async (api) => {
         isin,
         lot,
         currency,
-        exchange,
-        riskLevel
+        realExchange,
+        riskLevel,
+        countryOfRiskName,
+        sector,
+        shareType
       }).save()
     }))
     console.log('Done.')
