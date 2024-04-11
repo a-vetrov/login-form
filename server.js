@@ -6,7 +6,8 @@ import cookieParser from 'cookie-parser'
 import expressSession from 'express-session'
 import { redisStore } from './backend/db/redis.js'
 import passport from 'passport'
-import {updateCatalog} from "./backend/utils/update-catalog.js";
+import { updateCatalog } from './backend/utils/update-catalog.js'
+import { credentials } from './credentials.js'
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -29,11 +30,10 @@ const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-// TODO: вынести секреты в отдельный файл за пределы гита
-app.use(cookieParser('Some cookie secret'))
+app.use(cookieParser(credentials.cookieSecret))
 
 app.use(expressSession({
-  secret: 'Some cookie secret',
+  secret: credentials.cookieSecret,
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
   store: redisStore,

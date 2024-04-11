@@ -1,8 +1,8 @@
-import { credentials } from '../config.js'
 import { TinkoffInvestApi } from 'tinkoff-invest-api'
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
+import { credentials } from '../../credentials.js'
 
 const updateBonds = async (api) => {
   try {

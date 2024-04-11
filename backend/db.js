@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
 import crypto from 'crypto'
 import { UserModel } from './db/models/user.js'
+import { credentials } from '../credentials.js'
 
-const connectionString = 'mongodb://127.0.0.1:27017'
-mongoose.connect(connectionString)
+// const connectionString = 'mongodb://127.0.0.1:27017'
+mongoose.connect(credentials.mongo.connectionString)
 const db = mongoose.connection
 db.on('error', err => {
   console.error('MongoDB error: ' + err.message)
