@@ -1,8 +1,8 @@
-import { useLazyGetUserInfoQuery } from '../../services/login.ts'
+import { useLazyGetUserInfoQuery } from '../../services/login'
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { userInfoSelector } from '../../store/selectors/user-info.ts'
-import { type UserInfo } from '../../store/slices/user-slice.ts'
+import { userInfoSelector } from '../../store/selectors/user-info'
+import { type UserInfo } from '../../store/slices/user-slice'
 
 interface UseUserInfoReturnType {
   userInfo: UserInfo | null
@@ -21,7 +21,7 @@ export const useUserInfo = (): UseUserInfoReturnType => {
     if (userInfo == null) {
       void trigger()
     }
-  }, [])
+  }, [userInfo])
 
   const result = userInfo ?? data?.userInfo ?? null
 

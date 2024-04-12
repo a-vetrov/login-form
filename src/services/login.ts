@@ -1,11 +1,13 @@
 import { api } from './api'
-import { type UserInfo } from '../store/slices/user-slice.ts'
+import { type UserInfo } from '../store/slices/user-slice'
 
 interface ServerAnswer {
   userInfo?: UserInfo
 }
 
-export const loginApi = api.injectEndpoints({
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['UserInfo'] })
+
+export const loginApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
     loginUser: build.mutation<ServerAnswer, unknown>({
       query: (data) => ({
@@ -15,12 +17,21 @@ export const loginApi = api.injectEndpoints({
       }),
       transformResponse: ({ data }) => data as ServerAnswer
     }),
+    logoutUser: build.mutation<ServerAnswer, undefined>({
+      query: () => ({
+        url: 'logout',
+        method: 'POST'
+      }),
+      transformResponse: ({ data }) => data as ServerAnswer,
+      invalidatesTags: ['UserInfo']
+    }),
     getUserInfo: build.query<ServerAnswer, undefined>({
       query: () => ({
         url: 'user-info',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as ServerAnswer
+      transformResponse: ({ data }) => data as ServerAnswer,
+      providesTags: ['UserInfo']
     })
   })
 })

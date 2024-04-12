@@ -1,14 +1,17 @@
-import React, { useMemo } from 'react'
-import { Box, Button, Divider, Drawer, MenuItem, Typography } from '@mui/material'
+import React, { useCallback, useMemo } from 'react'
+import { Box, Divider, Drawer } from '@mui/material'
 import { useUserInfo } from '../../utils/hooks/use-user-info'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   BusinessCenterOutlined,
-  ListAltOutlined,
+  ListAltOutlined, LoginOutlined,
   Logout,
   SportsEsportsOutlined
 } from '@mui/icons-material'
 import { MenuItemLink } from './menu-item'
+import { loginApi } from '../../services/login'
+import { userInfoSlice } from '../../store/slices/user-slice'
+import { useDispatch } from 'react-redux'
 
 interface Props {
   open: boolean
@@ -17,6 +20,16 @@ interface Props {
 
 export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
   const { isLoading, isAuth } = useUserInfo()
+  const [trigger] = loginApi.useLogoutUserMutation()
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const handleLogout = useCallback(async () => {
+    await trigger()
+    dispatch(userInfoSlice.actions.logout())
+    onClose()
+    navigate('/')
+  }, [trigger])
 
   const itemsList = useMemo(() => {
     if (isAuth) {
@@ -31,27 +44,14 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
           <MenuItemLink title='Брокеры' link='/broker/list' Icon={SportsEsportsOutlined} />
 
           <Divider />
-          <MenuItemLink title='Выйти' link='/logout' Icon={Logout} />
+          <MenuItemLink title='Выйти' Icon={Logout} onClick={handleLogout}/>
         </>
       )
     }
 
     return (
       <>
-        <Typography variant="body1">
-          Для начала работы войдите или зарегистрируйтесь.
-        </Typography>
-        <MenuItem>
-          <Button
-            color="primary"
-            variant="outlined"
-            component={Link} to='/login'
-            target="_blank"
-            sx={{ width: '100%' }}
-          >
-            Войти
-          </Button>
-        </MenuItem>
+        <MenuItemLink title='Войти' Icon={LoginOutlined} link='/login'/>
       </>
     )
   }, [isAuth])

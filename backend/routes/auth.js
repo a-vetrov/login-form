@@ -2,25 +2,25 @@ import express from 'express'
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
-import {sendError} from "../handlers/error.js";
-import {ensureLoggedIn} from "../handlers/ensure-logged-in.js";
-import {getUserByEmail, getUserById} from "../db/models/user.js";
+import { sendError } from '../handlers/error.js'
+import { ensureLoggedIn } from '../handlers/ensure-logged-in.js'
+import { getUserByEmail, getUserById } from '../db/models/user.js'
 
 const checkPassword = (userInfo, password) => {
-  const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512');
+  const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512')
   return crypto.timingSafeEqual(userInfo.password, key)
 }
 
 passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
-}, async function verify(email, password, cb) {
+}, async function verify (email, password, cb) {
   const userInfo = await getUserByEmail(email)
   if (!userInfo || !checkPassword(userInfo, password)) {
-    return cb(null, false, {message: 'Incorrect username or password.'})
+    return cb(null, false, { message: 'Incorrect username or password.' })
   }
   return cb(null, userInfo)
-}));
+}))
 
 passport.serializeUser((user, done) => done(null, user._id))
 passport.deserializeUser((id, done) => {
@@ -29,47 +29,44 @@ passport.deserializeUser((id, done) => {
     .catch(err => done(err, null))
 })
 
-export const authRouter = express.Router();
+export const authRouter = express.Router()
 
 authRouter.post('/api/login', passport.authenticate('local', {
   failureMessage: true,
-  successMessage: 'Success message',
-}), function(req, res) {
+  successMessage: 'Success message'
+}), function (req, res) {
   let data
-  if(req.user) {
-    const {name, email, role} = req.user
-    data = {userInfo: {name, email, role}}
+  if (req.user) {
+    const { name, email, role } = req.user
+    data = { userInfo: { name, email, role } }
   }
-  res.status(200).send({ success: true, data });
-});
+  res.status(200).send({ success: true, data })
+})
 
 /* POST /logout
  *
  * This route logs the user out.
  */
-authRouter.post('/api/logout', function(req, res, next) {
-  req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('/');
-  });
-});
-
+authRouter.post('/api/logout', function (req, res, next) {
+  req.logout(function (err) {
+    if (err) { return next(err) }
+    res.redirect('/')
+  })
+})
 
 /* GET /user-info
  *
  * This route returns user info if logged in.
  */
 authRouter.get('/api/user-info', ensureLoggedIn, (req, res) => {
-  if(req.user) {
-    const {name, email, role} = res.req.user
-    const data = {userInfo: {name, email, role}}
-    res.status(200).send({ success: true, data });
+  if (req.user) {
+    const { name, email, role } = res.req.user
+    const data = { userInfo: { name, email, role } }
+    res.status(200).send({ success: true, data })
   } else {
     sendError(res, 403, 'Ошибка', 'Неожиданная ошибка')
   }
-
 })
-
 
 /* POST /signup
  *
@@ -105,5 +102,3 @@ router.post('/signup', function(req, res, next) {
 });
 
  */
-
-
