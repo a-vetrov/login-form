@@ -1,13 +1,23 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { AppBar, Box, Button, Container, IconButton, MenuItem, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import IconLoader from '../icon-loader'
 import { Link } from 'react-router-dom'
 import AccountCircle from '@mui/icons-material/AccountCircle'
-import { useUserInfo } from '../../utils/hooks/use-user-info.ts'
+import { useUserInfo } from '../../utils/hooks/use-user-info'
+import { MenuDrawer } from './menu-drawer'
 
 export const MainToolbar: React.FC = () => {
   const { isLoading, isAuth } = useUserInfo()
+  const [open, setOpen] = useState(false)
+
+  const togleDrawer = useCallback(() => {
+    setOpen(!open)
+  }, [open])
+
+  const closeDrawer = useCallback(() => {
+    setOpen(false)
+  }, [])
 
   const userPart = useMemo(() => {
     if (isLoading) {
@@ -35,6 +45,7 @@ export const MainToolbar: React.FC = () => {
     <AppBar position="static">
       <Container maxWidth="lg">
         <Toolbar>
+          <MenuDrawer open={open} onClose={closeDrawer} />
           <Box
             sx={{
               flexGrow: 1,
@@ -50,6 +61,7 @@ export const MainToolbar: React.FC = () => {
               color="inherit"
               aria-label="menu"
               sx={{ mr: 2 }}
+              onClick={togleDrawer}
             >
               <IconLoader IconClass={MenuIcon} />
             </IconButton>
