@@ -42,7 +42,13 @@ export const MainToolbar: React.FC = () => {
   }, [isLoading, isAuth])
 
   return (
-    <AppBar position="static">
+    <AppBar position="static"
+            sx={{
+              bgcolor: 'rgba(0, 0, 0, 0.4)',
+              boxShadow: 'none',
+              backgroundImage: 'none',
+              borderColor: 'divider'
+            }}>
       <Container maxWidth="lg">
         <Toolbar>
           <MenuDrawer open={open} onClose={closeDrawer} />
