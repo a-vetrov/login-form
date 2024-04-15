@@ -1,13 +1,13 @@
-import React, {useCallback, useState} from 'react';
-import {useUserInfo} from '../../utils/hooks/use-user-info';
-import {Avatar, Box, Divider, Drawer, IconButton, Stack, Typography} from '@mui/material';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import {loginApi} from '../../services/login';
-import {userInfoSlice} from '../../store/slices/user-slice';
-import {useNavigate} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
-import {Logout} from '@mui/icons-material';
-import {MenuItemLink} from './menu-item';
+import React, { useCallback, useState } from 'react'
+import { useUserInfo } from '../../utils/hooks/use-user-info'
+import { Avatar, Box, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material'
+import AccountCircle from '@mui/icons-material/AccountCircle'
+import { loginApi } from '../../services/login'
+import { userInfoSlice } from '../../store/slices/user-slice'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Logout } from '@mui/icons-material'
+import { MenuItemLink } from './menu-item'
 
 export const UserDrawer: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -64,7 +64,7 @@ export const UserDrawer: React.FC = () => {
           </Avatar>
           </Stack>
           {userInfo.name && (
-            <Typography variant='body1' marginTop={4}  align='center'>{userInfo.name}</Typography>
+            <Typography variant='body1' marginTop={4} align='center'>{userInfo.name}</Typography>
           )}
           {userInfo.email && (
             <Typography variant='body2' marginTop={2} marginBottom={4} align='center'>{userInfo.email}</Typography>
@@ -72,11 +72,11 @@ export const UserDrawer: React.FC = () => {
 
           <Typography variant='body2' marginTop={2} marginBottom={4} color='text.secondary'>Тут потом будут какие-то<br/>натройки профиля и т.п.</Typography>
 
-          <Divider sx={{marginY: 4}}/>
+          <Divider sx={{ marginY: 4 }}/>
           <MenuItemLink title='Выйти' Icon={Logout} onClick={handleLogout}/>
 
         </Box>
       </Drawer>
     </>
-  );
-};
+  )
+}
