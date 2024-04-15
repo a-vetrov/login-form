@@ -16,6 +16,7 @@ import { SandboxPage } from './pages/sandbox/sandbox-page'
 import { CatalogPage } from './pages/catalog/catalog-page'
 import { DetailsPage } from './pages/details/details-page'
 import { getCustomTheme } from './theme'
+import { YandexLoginPage } from './pages/login/yandex-login'
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme(getCustomTheme())
@@ -36,6 +37,7 @@ export const App: React.FC = () => {
           <Routes>
               <Route path='/' element={<MainPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/auth/yandex" element={<YandexLoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/account" element={<AccountPage />} />
               <Route path="/portfolio" element={<PortfolioPage />} />

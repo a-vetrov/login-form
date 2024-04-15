@@ -31,6 +31,7 @@
     "mongoose": "^8.2.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "passport-yandex": "^0.0.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-redux": "9.1.0",

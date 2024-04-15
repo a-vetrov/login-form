@@ -107,6 +107,15 @@ export const LoginPage: React.FC = () => {
                   </Link>
                 </Grid>
               </Grid>
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                component={RouterLink}
+                to="/auth/yandex"
+              >
+                Войти c Яндекс ID
+              </Button>
             </Box>
           </Box>
         </Container>

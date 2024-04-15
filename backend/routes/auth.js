@@ -1,10 +1,18 @@
 import express from 'express'
 import passport from 'passport'
 import LocalStrategy from 'passport-local'
+import { Strategy as YandexStrategy } from 'passport-yandex'
 import crypto from 'crypto'
 import { sendError } from '../handlers/error.js'
 import { ensureLoggedIn } from '../handlers/ensure-logged-in.js'
-import { getUserByEmail, getUserById } from '../db/models/user.js'
+import {
+  createUserFromYandexOAuth,
+  getUserByAuthId,
+  getUserByEmail,
+  getUserById,
+  updateUserFromYandexOAuth
+} from '../db/models/user.js'
+import { credentials } from '../../credentials.js'
 
 const checkPassword = (userInfo, password) => {
   const key = crypto.pbkdf2Sync(password, userInfo.salt, 100000, 64, 'sha512')
@@ -68,37 +76,34 @@ authRouter.get('/api/user-info', ensureLoggedIn, (req, res) => {
   }
 })
 
-/* POST /signup
- *
- * This route creates a new user account.
- *
- * A desired username and password are submitted to this route via an HTML form,
- * which was rendered by the `GET /signup` route.  The password is hashed and
- * then a new user record is inserted into the database.  If the record is
- * successfully created, the user is logged in.
- */
+// Yandex OAuth
 
-/*
-router.post('/signup', function(req, res, next) {
-  var salt = crypto.randomBytes(16);
-  crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', function(err, hashedPassword) {
-    if (err) { return next(err); }
-    db.run('INSERT INTO users (username, hashed_password, salt) VALUES (?, ?, ?)', [
-      req.body.username,
-      hashedPassword,
-      salt
-    ], function(err) {
-      if (err) { return next(err); }
-      var user = {
-        id: this.lastID,
-        username: req.body.username
-      };
-      req.login(user, function(err) {
-        if (err) { return next(err); }
-        res.redirect('/');
-      });
-    });
-  });
-});
+passport.use(new YandexStrategy({ ...credentials.yandex },
+  function (accessToken, refreshToken, profile, done) {
+  // asynchronous verification, for effect...
+    process.nextTick(async function () {
+      let userInfo = await getUserByAuthId(profile.id)
 
- */
+      if (userInfo) {
+        await updateUserFromYandexOAuth(profile)
+      } else {
+        userInfo = await createUserFromYandexOAuth(profile)
+      }
+
+      return done(null, userInfo)
+    })
+  }
+))
+
+authRouter.get('/auth/yandex',
+  passport.authenticate('yandex'),
+  function (req, res) {
+    // The request will be redirected to Yandex for authentication, so this
+    // function will not be called.
+  })
+
+authRouter.get('/auth/yandex/callback',
+  passport.authenticate('yandex', { failureRedirect: '/login' }),
+  function (req, res) {
+    res.redirect('/')
+  })
