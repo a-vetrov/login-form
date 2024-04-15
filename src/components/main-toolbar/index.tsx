@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 import { useUserInfo } from '../../utils/hooks/use-user-info'
 import { MenuDrawer } from './menu-drawer'
+import {UserDrawer} from './user-drawer';
 
 export const MainToolbar: React.FC = () => {
   const { isLoading, isAuth } = useUserInfo()
@@ -26,15 +27,7 @@ export const MainToolbar: React.FC = () => {
 
     return isAuth
       ? (
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="menu-appbar"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <IconLoader IconClass={AccountCircle} />
-        </IconButton>
+        <UserDrawer />
         )
       : (
         <Button color="inherit" component={Link} to='/login'>Войти</Button>
