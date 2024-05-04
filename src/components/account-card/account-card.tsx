@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react'
-import { type Account } from '../../types/tinkoff/users.ts'
-import { Card, CardContent, Typography } from '@mui/material'
-import { getAccountAccessLevelInfo, getAccountStatusInfo, getAccountTypeInfo } from './utils.ts'
+import { type Account } from '../../types/tinkoff/users'
+import { CardContent, Typography } from '@mui/material'
+import { getAccountAccessLevelInfo, getAccountStatusInfo, getAccountTypeInfo } from './utils'
 import { format } from 'date-fns'
+import { CardStyled } from './account-card.styles'
 
 interface Props {
   account: Account
@@ -16,9 +17,9 @@ export const AccountCard: React.FC<Props> = ({ account, selected, onClick }) => 
   }, [account.id, onClick])
 
   return (
-    <Card sx={{ minWidth: 300, maxWidth: 300 }} raised={selected} onClick={handleClick}>
+    <CardStyled sx={{ minWidth: 300, maxWidth: 300 }} raised={selected} onClick={handleClick}>
       <CardContent>
-        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+        <Typography sx={{ fontSize: 14 }} color={selected ? 'primary.dark' : 'text.secondary'} gutterBottom>
           {getAccountTypeInfo(account.type)}
         </Typography>
         <Typography variant="h5">
@@ -39,6 +40,6 @@ export const AccountCard: React.FC<Props> = ({ account, selected, onClick }) => 
         )}
       </CardContent>
 
-    </Card>
+    </CardStyled>
   )
 }

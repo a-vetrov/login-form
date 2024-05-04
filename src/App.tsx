@@ -30,8 +30,9 @@ export const App: React.FC = () => {
             sx={{
               width: '100%',
               backgroundImage: `linear-gradient(#02294F, ${alpha('#090E10', 0.0)})`,
-              backgroundSize: '100% 20%',
-              backgroundRepeat: 'no-repeat'
+              backgroundSize: '100% 20vh',
+              backgroundRepeat: 'no-repeat',
+              minHeight: '100vh'
             }}
           >
           <Routes>
