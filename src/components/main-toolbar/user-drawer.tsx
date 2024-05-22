@@ -32,8 +32,6 @@ export const UserDrawer: React.FC = () => {
     navigate('/')
   }, [trigger])
 
-  console.log('userInfo', userInfo)
-
   if (!userInfo) {
     return null
   }

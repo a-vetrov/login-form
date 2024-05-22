@@ -3,10 +3,9 @@ import { AppBar, Box, Button, Container, IconButton, MenuItem, Toolbar, Typograp
 import MenuIcon from '@mui/icons-material/Menu'
 import IconLoader from '../icon-loader'
 import { Link } from 'react-router-dom'
-import AccountCircle from '@mui/icons-material/AccountCircle'
 import { useUserInfo } from '../../utils/hooks/use-user-info'
 import { MenuDrawer } from './menu-drawer'
-import {UserDrawer} from './user-drawer';
+import { UserDrawer } from './user-drawer'
 
 export const MainToolbar: React.FC = () => {
   const { isLoading, isAuth } = useUserInfo()
@@ -64,9 +63,11 @@ export const MainToolbar: React.FC = () => {
             >
               <IconLoader IconClass={MenuIcon} />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Vizify
-            </Typography>
+            <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" component={ Link } to='/' sx={{ color: 'white', textDecoration: 'none' }}>
+                  Vizify
+                </Typography>
+            </Box>
             {isAuth && (
               <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                 <MenuItem sx={{ py: '6px', px: '12px' }} component={ Link } to='/portfolio'>

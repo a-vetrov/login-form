@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 
 export const MarketWidget: React.FC = () => {
-  const container = useRef(null)
+  const container = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -148,7 +148,7 @@ export const MarketWidget: React.FC = () => {
       }
     `
     while (container.current?.hasChildNodes()) {
-      container.current?.removeChild(container.current?.firstChild)
+      container.current.removeChild(container.current.firstChild as ChildNode)
     }
     container.current?.appendChild(script)
   }, [])
