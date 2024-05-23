@@ -1,5 +1,5 @@
 import { api } from './api'
-import { type Account } from '../types/tinkoff/users.ts'
+import { type Account } from '../types/tinkoff/users'
 
 interface AccountsApiType {
   success: boolean
@@ -13,6 +13,11 @@ interface AccountsCreateApiType {
   data: {
     id: string
   }
+}
+
+interface AddMoneyParamsType {
+  id: string
+  money: number
 }
 
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts'] })
@@ -42,6 +47,13 @@ export const sandboxApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data as AccountsCreateApiType['data'],
       invalidatesTags: ['SandboxAccounts']
+    }),
+    addNewMoney: build.mutation<AccountsCreateApiType['data'], AddMoneyParamsType>({
+      query: (data) => ({
+        url: 'sandbox/accounts/add-money',
+        method: 'POST',
+        body: data
+      })
     })
   })
 })

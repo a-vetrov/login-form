@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import type { Account } from '../../../types/tinkoff/users.ts'
 import { Alert, Box, Button, Stack, Typography } from '@mui/material'
-import { AccountCard } from '../../../components/account-card/account-card.tsx'
-import { sandboxApi } from '../../../services/sandbox.ts'
+import { AccountCard } from '../../../components/account-card/account-card'
+import { sandboxApi } from '../../../services/sandbox'
+import { NewMoneyDialog } from './new-money-dialog'
 
 interface Props {
   accounts?: Account[]
@@ -13,6 +14,11 @@ interface Props {
 export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount, setSelectedAccount }) => {
   const [createTrigger, { isLoading: createIsLoading }] = sandboxApi.useCreateAccountMutation()
   const [deleteTrigger, { isLoading: deleteIsLoading }] = sandboxApi.useDeleteAccountMutation()
+  const [newMoneyOpen, setNewMoneyOpen] = useState(false)
+
+  const handleNewMoneyClose = useCallback(() => {
+    setNewMoneyOpen(false)
+  }, [setNewMoneyOpen])
 
   const addButton = useMemo(() => {
     const clickHandler = (): void => {
@@ -31,12 +37,12 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
   }, [createTrigger, createIsLoading])
 
   const deleteButton = useMemo(() => {
-    const clickHandler = (): void => {
-      deleteTrigger(selectedAccount!)
-    }
-
     if (!selectedAccount) {
       return null
+    }
+
+    const clickHandler = (): void => {
+      deleteTrigger(selectedAccount)
     }
 
     return (
@@ -50,6 +56,26 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
       </Button>
     )
   }, [selectedAccount, deleteIsLoading, deleteTrigger])
+
+  const addMoneyButton = useMemo(() => {
+    if (!selectedAccount) {
+      return null
+    }
+
+    const clickHandler = (): void => {
+      setNewMoneyOpen(true)
+    }
+
+    return (
+      <Button
+        variant="contained"
+        sx={{ mt: 2, mb: 2 }}
+        onClick={clickHandler}
+      >
+        Добавить денег
+      </Button>
+    )
+  }, [selectedAccount, setNewMoneyOpen])
 
   if (!accounts) {
     return null
@@ -70,6 +96,7 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
 
   return (
     <>
+      <NewMoneyDialog open={newMoneyOpen} onClose={handleNewMoneyClose} id={selectedAccount}/>
       <Typography variant="h3" marginTop={3}>
         Ваши счета
       </Typography>
@@ -80,6 +107,7 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
       </Stack>
       <Stack direction="row" spacing={2} marginY={2}>
         {addButton}
+        {addMoneyButton}
         {deleteButton}
       </Stack>
     </>
