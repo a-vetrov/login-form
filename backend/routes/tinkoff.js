@@ -89,7 +89,28 @@ tinkoffRouter.post('/api/sandbox/accounts/add-money', ensureLoggedIn, async (req
     const amount = api.helpers.toMoneyValue(req.body.money, 'RUB')
 
     const data = await api.sandbox.sandboxPayIn({ accountId: req.body.id, amount })
-    console.log('!!!!!!!!', data)
+    res.status(200).send({ success: true })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+tinkoffRouter.get('/api/sandbox/portfolio', ensureLoggedIn, async (req, res) => {
+  try {
+    const user = await getUserById(req.user._id)
+    const token = getFirstSandboxToken(user)
+
+    if (!token) {
+      return sendError(res, 403, 'Ошибка', 'Не удалось найти подходящий токен')
+    }
+    console.log('!!!!!!!!!!')
+    console.log(req.query.accountId)
+    //const api = new TinkoffInvestApi({ token: token.token })
+
+
+
+    //const data = await api.sandbox.sandboxPayIn({ accountId: req.body.id, amount })
     res.status(200).send({ success: true })
   } catch (error) {
     console.log('error', error)

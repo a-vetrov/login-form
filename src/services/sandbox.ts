@@ -54,6 +54,12 @@ export const sandboxApi = apiWithTag.injectEndpoints({
         method: 'POST',
         body: data
       })
+    }),
+    getSandboxPortfolio: build.query<unknown, string>({
+      query: (accountId) => ({
+        url: `sandbox/portfolio?accountId=${accountId}`,
+        method: 'GET'
+      })
     })
   })
 })
