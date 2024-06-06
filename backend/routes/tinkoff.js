@@ -104,14 +104,10 @@ tinkoffRouter.get('/api/sandbox/portfolio', ensureLoggedIn, async (req, res) => 
     if (!token) {
       return sendError(res, 403, 'Ошибка', 'Не удалось найти подходящий токен')
     }
-    console.log('!!!!!!!!!!')
-    console.log(req.query.accountId)
-    //const api = new TinkoffInvestApi({ token: token.token })
+    const api = new TinkoffInvestApi({ token: token.token })
 
-
-
-    //const data = await api.sandbox.sandboxPayIn({ accountId: req.body.id, amount })
-    res.status(200).send({ success: true })
+    const data = await api.sandbox.getSandboxPortfolio({ accountId: req.query.accountId, currency: PortfolioRequest_CurrencyRequest.RUB })
+    res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

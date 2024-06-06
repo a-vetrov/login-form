@@ -59,7 +59,8 @@ export const sandboxApi = apiWithTag.injectEndpoints({
       query: (accountId) => ({
         url: `sandbox/portfolio?accountId=${accountId}`,
         method: 'GET'
-      })
+      }),
+      transformResponse: ({ data }) => data
     })
   })
 })

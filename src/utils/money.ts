@@ -1,11 +1,17 @@
-import { type MoneyValue, type Quotation } from '../types/tinkoff/common.ts'
-import { type PortfolioPosition } from '../types/tinkoff/operations.ts'
+import { type MoneyValue, type Quotation } from '../types/tinkoff/common'
+import { type PortfolioPosition } from '../types/tinkoff/operations'
 
 const RUB = '₽'
 const USD = '$'
 const EUR = '€'
 
 const mainCurrencies = { RUB, USD, EUR }
+
+const FIGI_RUB = 'RUB000UTSTOM'
+
+const isRubCurrency = (product: PortfolioPosition): boolean => {
+  return product.figi === FIGI_RUB
+}
 
 const getCurrencySign = (currency: string): string => {
   const toUpperCase = currency.toUpperCase()
@@ -27,7 +33,7 @@ export const toMoneyString = (value?: MoneyValue): string => {
 }
 
 export const getProductTotal = (product: PortfolioPosition): number | undefined => {
-  const price = getFromMoneyValue(product.currentPrice)
+  const price = isRubCurrency(product) ? 1 : getFromMoneyValue(product.currentPrice)
   const count = getFromMoneyValue(product.quantity)
   const nkd = getFromMoneyValue(product.currentNkd) ?? 0
 
