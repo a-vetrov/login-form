@@ -1,5 +1,6 @@
 import { type MoneyValue, type Quotation } from '../types/tinkoff/common'
 import { type PortfolioPosition } from '../types/tinkoff/operations'
+import { IMask } from 'react-imask'
 
 const RUB = '₽'
 const USD = '$'
@@ -50,4 +51,17 @@ export const getProductTotalString = (product: PortfolioPosition): string | null
     return null
   }
   return `${total.toLocaleString('ru-RU')} ${RUB}`
+}
+
+export const getFromMaskedValue = (s: string): number => {
+  return IMask.pipe(
+    s,
+    {
+      mask: Number,
+      scale: 2,
+      thousandsSeparator: ' '
+    },
+    IMask.PIPE_TYPE.MASKED,
+    IMask.PIPE_TYPE.TYPED
+  )
 }

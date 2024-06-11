@@ -1,6 +1,15 @@
 import React, { useCallback } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material'
-import {sandboxApi} from '../../../services/sandbox';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material'
+import { sandboxApi } from '../../../services/sandbox'
+import { MoneyInput } from '../../../components/money-input'
+import { getFromMaskedValue } from '../../../utils/money'
 
 interface Props {
   open: boolean
@@ -18,10 +27,9 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
     }
     const formData = new FormData(event.currentTarget)
     const json = {
-      money: parseFloat(formData.get('money') as string),
+      money: getFromMaskedValue(formData.get('money') as string),
       id
     }
-    console.log('formData', json)
     addMoneyTrigger(json)
   }, [id])
 
@@ -31,7 +39,8 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
       onClose={onClose}
       PaperProps={{
         component: 'form',
-        onSubmit: handleSubmit
+        onSubmit: handleSubmit,
+        variant: 'standard'
       }}
     >
       <DialogTitle>Добавить денег</DialogTitle>
@@ -39,16 +48,14 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
         <DialogContentText>
           Добавить виртуальных денег на выбранный счет в Песочнице.
         </DialogContentText>
-        <TextField
+        <MoneyInput
+          id="formatted-text-mask-input2"
+          name="money"
+          fullWidth
           autoFocus
           required
           margin="dense"
-          id="money"
-          name="money"
           label="Введите сумму"
-          type="number"
-          fullWidth
-          variant="standard"
         />
       </DialogContent>
       <DialogActions>
