@@ -6,7 +6,9 @@ const RUB = '₽'
 const USD = '$'
 const EUR = '€'
 
-const mainCurrencies = { RUB, USD, EUR }
+export const mainCurrencies = { RUB, USD, EUR }
+
+export type CurrencyCodeType = keyof typeof mainCurrencies
 
 const FIGI_RUB = 'RUB000UTSTOM'
 
@@ -14,7 +16,7 @@ const isRubCurrency = (product: PortfolioPosition): boolean => {
   return product.figi === FIGI_RUB
 }
 
-const getCurrencySign = (currency: string): string => {
+export const getCurrencySign = (currency: string): string => {
   const toUpperCase = currency.toUpperCase()
   return mainCurrencies[toUpperCase as keyof typeof mainCurrencies] || toUpperCase
 }

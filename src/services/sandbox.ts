@@ -20,7 +20,7 @@ interface AddMoneyParamsType {
   money: number
 }
 
-const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts'] })
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts', 'CurrentAccount'] })
 
 export const sandboxApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
@@ -53,14 +53,16 @@ export const sandboxApi = apiWithTag.injectEndpoints({
         url: 'sandbox/accounts/add-money',
         method: 'POST',
         body: data
-      })
+      }),
+      invalidatesTags: ['CurrentAccount']
     }),
     getSandboxPortfolio: build.query<unknown, string>({
       query: (accountId) => ({
         url: `sandbox/portfolio?accountId=${accountId}`,
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data
+      transformResponse: ({ data }) => data,
+      providesTags: () => ['CurrentAccount']
     })
   })
 })

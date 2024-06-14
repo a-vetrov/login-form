@@ -1,15 +1,17 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle
 } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton'
 import { sandboxApi } from '../../../services/sandbox'
 import { MoneyInput } from '../../../components/money-input'
 import { getFromMaskedValue } from '../../../utils/money'
+import { ErrorAlert } from '../../../components/error-alert/error-alert'
 
 interface Props {
   open: boolean
@@ -18,7 +20,7 @@ interface Props {
 }
 
 export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
-  const [addMoneyTrigger, { isLoading: createIsLoading }] = sandboxApi.useAddNewMoneyMutation()
+  const [addMoneyTrigger, { isLoading, isSuccess, error }] = sandboxApi.useAddNewMoneyMutation()
 
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -33,15 +35,25 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
     addMoneyTrigger(json)
   }, [id])
 
+  const paperProps = useMemo(() => {
+    return {
+      component: 'form',
+      onSubmit: handleSubmit,
+      variant: 'standard'
+    }
+  }, [handleSubmit])
+
+  useEffect(() => {
+    if (isSuccess) {
+      onClose()
+    }
+  }, [isSuccess, onClose])
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        component: 'form',
-        onSubmit: handleSubmit,
-        variant: 'standard'
-      }}
+      PaperProps={paperProps}
     >
       <DialogTitle>Добавить денег</DialogTitle>
       <DialogContent>
@@ -57,10 +69,14 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
           margin="dense"
           label="Введите сумму"
         />
+        {!isLoading && <ErrorAlert error={error} />}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Отмена</Button>
-        <Button type="submit">Добавить</Button>
+        <Button onClick={onClose} disabled={isLoading}>Отмена</Button>
+
+        <LoadingButton loading={isLoading} variant="outlined" type="submit">
+          Добавить
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   )

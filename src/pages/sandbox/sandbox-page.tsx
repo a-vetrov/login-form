@@ -11,8 +11,6 @@ export const SandboxPage: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
   const { data } = sandboxApi.useGetSandboxPortfolioQuery(selectedAccount, { skip: !selectedAccount })
 
-  console.log('data?.positions', data);
-
   useEffect(() => {
     if (selectedAccount === undefined && accounts.data?.accounts[0]?.id) {
       setSelectedAccount(accounts.data.accounts[0].id)

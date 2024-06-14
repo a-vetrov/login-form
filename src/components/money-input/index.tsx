@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { IMaskInput } from 'react-imask'
-import {FormControl, Input, InputAdornment, InputLabel, TextField} from '@mui/material'
-import {TextFieldProps} from '@mui/material/TextField/TextField';
+import { InputAdornment, TextField } from '@mui/material'
+import { type TextFieldProps } from '@mui/material/TextField/TextField'
+import { type CurrencyCodeType, getCurrencySign, mainCurrencies } from '../../utils/money'
 
 interface CustomProps {
   onChange: (event: { target: { name: string, value: string } }) => void
@@ -26,18 +27,30 @@ export const TextMaskCustom = React.forwardRef<HTMLInputElement, CustomProps>(
   }
 )
 
-export const MoneyInput: React.FC<TextFieldProps> = (props) => {
+interface MoneyPropsType {
+  currency?: CurrencyCodeType
+}
+
+const inputStyle = { input: { textAlign: 'right' } }
+
+export const MoneyInput: React.FC<TextFieldProps & MoneyPropsType> = (props) => {
+  const { currency = mainCurrencies.RUB } = props
+
+  const inputProps = useMemo(() => {
+    return {
+      inputComponent: TextMaskCustom as any,
+      endAdornment: <InputAdornment position="end">{getCurrencySign(currency)}</InputAdornment>
+    }
+  }, [currency])
+
   return (
     <>
       <TextField
         label="react-number-format"
         name="numberformat"
         id="formatted-numberformat-input"
-        InputProps={{
-          inputComponent: TextMaskCustom as any,
-          endAdornment: <InputAdornment position="end">$</InputAdornment>
-        }}
-        sx={{ input: { textAlign: 'right' } }}
+        InputProps={inputProps}
+        sx={inputStyle}
         variant="standard"
         {...props}
       />
