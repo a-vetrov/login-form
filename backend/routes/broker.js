@@ -49,7 +49,7 @@ brokerRouter.put('/api/broker', ensureLoggedIn, async (req, res) => {
     } else {
       sendError(res, 403, 'Ошибка', 'Некорректный токен')
     }
-  } catch (e) {
+  } catch (error) {
     sendError(res, 403, 'Ошибка', error.details ?? 'Добавить токен не удалось')
   }
 })
