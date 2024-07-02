@@ -7,6 +7,10 @@ import { sendError } from '../handlers/error.js'
 import { TinkoffInvestApi } from 'tinkoff-invest-api'
 import { PortfolioRequest_CurrencyRequest } from 'tinkoff-invest-api/cjs/generated/operations.js'
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
+import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
+import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
+import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
+import { catalogRouter } from './catalog.js'
 
 export const tinkoffRouter = express.Router()
 
@@ -126,6 +130,30 @@ tinkoffRouter.delete('/api/sandbox/accounts/:id', ensureLoggedIn, async (req, re
 
     const data = await api.sandbox.closeSandboxAccount({ accountId: req.params.id })
     res.status(200).send({ success: true })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+catalogRouter.get('/api/last-price/:instrumentId', ensureLoggedIn, async (req, res) => {
+  try {
+    const instrumentId = req.params.instrumentId
+    if (!instrumentId) {
+      return sendError(res, 404, 'Ошибка', 'Инструмент не найден')
+    }
+    const user = await getUserById(req.user._id)
+    const token = getFirstSandboxToken(user)
+
+    if (!token) {
+      return sendError(res, 403, 'Ошибка', 'Не удалось найти подходящий токен')
+    }
+
+    const api = new TinkoffInvestApi({ token: token.token })
+
+    const data = await api.marketdata.getLastPrices({ figi: [], instrumentId: [instrumentId] })
+
+    res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

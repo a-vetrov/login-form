@@ -36,7 +36,6 @@ catalogRouter.get('/api/catalog/bonds/:isin', ensureLoggedIn, async (req, res) =
   }
 })
 
-
 catalogRouter.get('/api/catalog/stocks', ensureLoggedIn, async (req, res) => {
   try {
     const data = await CatalogStocksModel.find({})
@@ -79,10 +78,41 @@ catalogRouter.get('/api/catalog/currency/:ticker', ensureLoggedIn, async (req, r
   try {
     const ticker = req.params.ticker
     const data = await CatalogCurrenciesModel.findOne({ ticker }).lean()
-    console.log('Ticker', ticker, data, data)
     const {
       _id, __v, ...rest
     } = data
+    res.status(200).send({ success: true, data: rest })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+catalogRouter.get('/api/catalog/instrument/:isin', ensureLoggedIn, async (req, res) => {
+  try {
+    const isin = req.params.isin
+    let type = 'bond'
+    let data = await CatalogBondsModel.findOne({ isin }).lean()
+    if (!data) {
+      type = 'stock'
+      data = await CatalogStocksModel.findOne({ isin }).lean()
+    }
+    if (!data) {
+      type = 'currency'
+      data = await CatalogCurrenciesModel.findOne({ ticker: isin }).lean()
+    }
+
+    if (!data) {
+      sendError(res, 404, 'Ошибка', 'Инструмент не найден')
+      return
+    }
+
+    const {
+      _id, __v, ...rest
+    } = data
+
+    rest.type = type
+
     res.status(200).send({ success: true, data: rest })
   } catch (error) {
     console.log('error', error)

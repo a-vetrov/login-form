@@ -1,7 +1,7 @@
 import { dotDelimiter } from '../../constants'
-import {format} from 'date-fns';
-import {toMoneyString} from '../../utils/money';
-import type {MoneyValue} from '../../types/tinkoff/common';
+import { format } from 'date-fns'
+import { toMoneyString } from '../../utils/money'
+import type { MoneyValue } from '../../types/tinkoff/common'
 
 export const getIds = (data?: Record<string, string>): string | null => {
   if (!data) {
@@ -33,6 +33,8 @@ const shareTypes = [
   'Закрытый инвестиционный фонд',
   'Траст недвижимости'
 ]
+
+export const getShareType = (shareType: number): string => shareTypes[shareType]
 
 const realExchange = [
   'Тип не определён',

@@ -48,6 +48,13 @@ export const catalogApi = apiWithTag.injectEndpoints({
         method: 'GET'
       }),
       transformResponse: ({ data }) => data
+    }),
+    getInstrumentByIsin: build.query<unknown, string>({
+      query: (isin) => ({
+        url: `catalog/instrument/${isin}`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data
     })
   })
 })
