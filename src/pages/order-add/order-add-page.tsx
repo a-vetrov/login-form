@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, {useCallback, useMemo, useState} from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import {
   Box,
@@ -20,6 +20,9 @@ import { catalogApi } from '../../services/catalog'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { getInstrumentName } from './utils'
 import { LastPrice } from '../../components/last-price/last-price'
+import { sandboxApi } from '../../services/sandbox'
+import { SandboxAccountsList } from '../sandbox/components/accounts-list'
+import {getFromMaskedValue} from '../../utils/money';
 
 const inputMargin = { mb: 2, mt: 2 }
 
@@ -31,15 +34,39 @@ export const OrderAddPage: React.FC = () => {
 
   const { data, isLoading, error } = catalogApi.useGetInstrumentByIsinQuery(isin as unknown as string, { skip: !isin })
 
+  const accounts = sandboxApi.useGetAccountsQuery()
+  const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
+
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    console.log(formData)
+    const body = {
+      quantity: getFromMaskedValue(formData.get('quantity') as string),
+      price: getFromMaskedValue(formData.get('price') as string),
+      direction: 1, // Покупка
+      account_id: selectedAccount, // Покупка
+      order_type: getFromMaskedValue(formData.get('order_type') as string),
+      instrument_id: data?.uid,
+      time_in_force: 1,
+      price_type: 2
+    }
+    console.log(body)
   }, [])
 
   const handleCancel = useCallback(() => {
     navigate(-1)
   }, [])
+
+  const lotSize = useMemo(() => {
+    if (data?.lot) {
+      return (
+        <Typography variant="body1">
+          {`1 лот = ${data?.lot} шт`}
+        </Typography>
+      )
+    }
+    return null
+  }, [data?.lot])
 
   return (
     <>
@@ -58,6 +85,9 @@ export const OrderAddPage: React.FC = () => {
             <Typography variant="h3">
               {getInstrumentName(data)}
             </Typography>
+            <SandboxAccountsList accounts={accounts.data?.accounts}
+                                 selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}
+                                 titleVisible={false} controlsVisible={false}/>
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, maxWidth: '500px' }}>
             <FormControl fullWidth sx={inputMargin}>
               <InputLabel id="order-type-select-label">Тип заявки</InputLabel>
@@ -81,6 +111,7 @@ export const OrderAddPage: React.FC = () => {
               label="Количество лотов"
               sx={inputMargin}
             />
+              {lotSize}
 
             <MoneyInput
               name="price"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import { Container, Stack, Typography } from '@mui/material'
 import { sandboxApi } from '../../services/sandbox'
@@ -10,12 +10,6 @@ export const SandboxPage: React.FC = () => {
   const accounts = sandboxApi.useGetAccountsQuery()
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
   const { data } = sandboxApi.useGetSandboxPortfolioQuery(selectedAccount, { skip: !selectedAccount })
-
-  useEffect(() => {
-    if (selectedAccount === undefined && accounts.data?.accounts[0]?.id) {
-      setSelectedAccount(accounts.data.accounts[0].id)
-    }
-  }, [selectedAccount === undefined, accounts.data?.accounts[0]?.id])
 
   return (
     <>

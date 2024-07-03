@@ -55,7 +55,10 @@ export const getProductTotalString = (product: PortfolioPosition): string | null
   return `${total.toLocaleString('ru-RU')} ${RUB}`
 }
 
-export const getFromMaskedValue = (s: string): number => {
+export const getFromMaskedValue = (s: string | null): number | null => {
+  if (s === null) {
+    return null
+  }
   return IMask.pipe(
     s,
     {

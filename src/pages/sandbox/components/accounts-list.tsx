@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Account } from '../../../types/tinkoff/users.ts'
 import { Alert, Box, Button, Stack, Typography } from '@mui/material'
 import { AccountCard } from '../../../components/account-card/account-card'
@@ -9,12 +9,23 @@ interface Props {
   accounts?: Account[]
   selectedAccount: string | undefined
   setSelectedAccount: (id: string) => void
+  titleVisible?: boolean
+  controlsVisible?: boolean
 }
 
-export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount, setSelectedAccount }) => {
+export const SandboxAccountsList: React.FC<Props> = ({
+  accounts, selectedAccount,
+  setSelectedAccount, titleVisible = true, controlsVisible = true
+}) => {
   const [createTrigger, { isLoading: createIsLoading }] = sandboxApi.useCreateAccountMutation()
   const [deleteTrigger, { isLoading: deleteIsLoading }] = sandboxApi.useDeleteAccountMutation()
   const [newMoneyOpen, setNewMoneyOpen] = useState(false)
+
+  useEffect(() => {
+    if (selectedAccount === undefined && accounts?.[0]?.id) {
+      setSelectedAccount(accounts[0].id)
+    }
+  }, [selectedAccount === undefined, accounts])
 
   const handleNewMoneyClose = useCallback(() => {
     setNewMoneyOpen(false)
@@ -96,20 +107,24 @@ export const SandboxAccountsList: React.FC<Props> = ({ accounts, selectedAccount
 
   return (
     <>
-      <NewMoneyDialog open={newMoneyOpen} onClose={handleNewMoneyClose} id={selectedAccount}/>
-      <Typography variant="h3" marginTop={3}>
-        Ваши счета
-      </Typography>
+      {controlsVisible && <NewMoneyDialog open={newMoneyOpen} onClose={handleNewMoneyClose} id={selectedAccount}/>}
+      {titleVisible && (
+        <Typography variant="h3" marginTop={3}>
+          Ваши счета
+        </Typography>
+      )}
       <Stack direction="row" spacing={2} marginY={2}>
         {accounts.map((item) => (
           <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={setSelectedAccount} />
         ))}
       </Stack>
-      <Stack direction="row" spacing={2} marginY={2}>
-        {addButton}
-        {addMoneyButton}
-        {deleteButton}
-      </Stack>
+      {controlsVisible && (
+        <Stack direction="row" spacing={2} marginY={2}>
+          {addButton}
+          {addMoneyButton}
+          {deleteButton}
+        </Stack>
+      )}
     </>
   )
 }
