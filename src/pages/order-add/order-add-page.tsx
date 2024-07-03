@@ -19,7 +19,7 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { catalogApi } from '../../services/catalog'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { getInstrumentName } from './utils'
-import {marketDataApi} from '../../services/market-data';
+import { LastPrice } from '../../components/last-price/last-price'
 
 const inputMargin = { mb: 2, mt: 2 }
 
@@ -30,7 +30,6 @@ export const OrderAddPage: React.FC = () => {
   const navigate = useNavigate()
 
   const { data, isLoading, error } = catalogApi.useGetInstrumentByIsinQuery(isin as unknown as string, { skip: !isin })
-  const { data: lastPriceData, isLoading: lastPriceLoading, error: lastPriceError } = marketDataApi.useGetLastPriceQuery(data?.uid as unknown as string, { skip: !data?.uid })
 
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -90,6 +89,8 @@ export const OrderAddPage: React.FC = () => {
               label="Цена за 1 инструмент"
               sx={inputMargin}
             />
+
+              <LastPrice uid={data?.uid} />
 
             <NoSsr>
               <LoadingButton loading={isLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>

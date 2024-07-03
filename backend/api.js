@@ -1,9 +1,10 @@
 import express from 'express'
 import { sendError } from './handlers/error.js'
-import {authRouter} from "./routes/auth.js";
-import {brokerRouter} from "./routes/broker.js";
-import {tinkoffRouter} from "./routes/tinkoff.js";
-import {catalogRouter} from "./routes/catalog.js";
+import { authRouter } from './routes/auth.js'
+import { brokerRouter } from './routes/broker.js'
+import { tinkoffRouter } from './routes/tinkoff.js'
+import { catalogRouter } from './routes/catalog.js'
+import { marketDataRouter } from './routes/market-data.js'
 
 const router = express.Router()
 
@@ -20,5 +21,6 @@ export const initializeAPI = (app) => {
   app.use(brokerRouter)
   app.use(tinkoffRouter)
   app.use(catalogRouter)
+  app.use(marketDataRouter)
   app.use(router)
 }
