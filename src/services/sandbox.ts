@@ -1,5 +1,6 @@
 import { api } from './api'
 import { type Account } from '../types/tinkoff/users'
+import { getFromMaskedValue } from '../utils/money'
 
 interface AccountsApiType {
   success: boolean
@@ -18,6 +19,17 @@ interface AccountsCreateApiType {
 interface AddMoneyParamsType {
   id: string
   money: number
+}
+
+export interface PostNewOrderParamsType {
+  quantity: number
+  price: number
+  direction: number
+  account_id: string
+  order_type: number
+  instrument_id: string
+  time_in_force: number
+  price_type: number
 }
 
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts', 'CurrentAccount'] })
@@ -63,6 +75,13 @@ export const sandboxApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data,
       providesTags: () => ['CurrentAccount']
+    }),
+    postNewOrder: build.mutation<AccountsCreateApiType['data'], PostNewOrderParamsType>({
+      query: (data) => ({
+        url: 'sandbox/accounts/post-order',
+        method: 'POST',
+        body: data
+      })
     })
   })
 })

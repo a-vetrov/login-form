@@ -32,7 +32,8 @@ module.exports = {
         "tsconfigRootDir": __dirname,
     },
     "plugins": [
-        "react"
+        "react",
+        "react-hooks"
     ],
     "rules": {
         "@typescript-eslint/strict-boolean-expressions": [
@@ -46,6 +47,8 @@ module.exports = {
                 "allowNullableString": true,
                 "allowAny": false
             }
-        ]
+        ],
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
     }
 }

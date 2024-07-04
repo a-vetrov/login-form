@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useState} from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import {
   Box,
@@ -20,9 +20,9 @@ import { catalogApi } from '../../services/catalog'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { getInstrumentName } from './utils'
 import { LastPrice } from '../../components/last-price/last-price'
-import { sandboxApi } from '../../services/sandbox'
+import { type PostNewOrderParamsType, sandboxApi } from '../../services/sandbox'
 import { SandboxAccountsList } from '../sandbox/components/accounts-list'
-import {getFromMaskedValue} from '../../utils/money';
+import { getFromMaskedValue } from '../../utils/money'
 
 const inputMargin = { mb: 2, mt: 2 }
 
@@ -33,6 +33,7 @@ export const OrderAddPage: React.FC = () => {
   const navigate = useNavigate()
 
   const { data, isLoading, error } = catalogApi.useGetInstrumentByIsinQuery(isin as unknown as string, { skip: !isin })
+  const [postTrigger, { isLoading: postIsLoading, error: postError }] = sandboxApi.usePostNewOrderMutation()
 
   const accounts = sandboxApi.useGetAccountsQuery()
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
@@ -44,18 +45,19 @@ export const OrderAddPage: React.FC = () => {
       quantity: getFromMaskedValue(formData.get('quantity') as string),
       price: getFromMaskedValue(formData.get('price') as string),
       direction: 1, // Покупка
-      account_id: selectedAccount, // Покупка
+      account_id: selectedAccount,
       order_type: getFromMaskedValue(formData.get('order_type') as string),
       instrument_id: data?.uid,
       time_in_force: 1,
       price_type: 2
     }
     console.log(body)
-  }, [])
+    void postTrigger(body as PostNewOrderParamsType)
+  }, [data?.uid, postTrigger, selectedAccount])
 
   const handleCancel = useCallback(() => {
     navigate(-1)
-  }, [])
+  }, [navigate])
 
   const lotSize = useMemo(() => {
     if (data?.lot) {
@@ -89,49 +91,51 @@ export const OrderAddPage: React.FC = () => {
                                  selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}
                                  titleVisible={false} controlsVisible={false}/>
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, maxWidth: '500px' }}>
-            <FormControl fullWidth sx={inputMargin}>
-              <InputLabel id="order-type-select-label">Тип заявки</InputLabel>
-              <Select
-                labelId="order-type-select-label"
-                id="order-type-select"
-                name="order_type"
-                label="Тип заявки"
-                defaultValue={1}
-              >
-                <MenuItem value={1}>Лимитная</MenuItem>
-                <MenuItem value={2}>Рыночная</MenuItem>
-                <MenuItem value={3}>Лучшая цена</MenuItem>
-              </Select>
-            </FormControl>
+              <FormControl fullWidth sx={inputMargin}>
+                <InputLabel id="order-type-select-label">Тип заявки</InputLabel>
+                <Select
+                  labelId="order-type-select-label"
+                  id="order-type-select"
+                  name="order_type"
+                  label="Тип заявки"
+                  defaultValue={1}
+                >
+                  <MenuItem value={1}>Лимитная</MenuItem>
+                  <MenuItem value={2}>Рыночная</MenuItem>
+                  <MenuItem value={3}>Лучшая цена</MenuItem>
+                </Select>
+              </FormControl>
 
-            <NumberInput
-              name="quantity"
-              fullWidth
-              required
-              label="Количество лотов"
-              sx={inputMargin}
-            />
-              {lotSize}
+              <NumberInput
+                name="quantity"
+                fullWidth
+                required
+                label="Количество лотов"
+                sx={inputMargin}
+              />
+                {lotSize}
 
-            <MoneyInput
-              name="price"
-              fullWidth
-              required
-              label="Цена за 1 инструмент"
-              sx={inputMargin}
-            />
+              <MoneyInput
+                name="price"
+                fullWidth
+                required
+                label="Цена за 1 инструмент"
+                sx={inputMargin}
+              />
 
               <LastPrice uid={data?.uid} />
 
-            <NoSsr>
-              <LoadingButton loading={isLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
-                Создать заявку
-              </LoadingButton>
-            </NoSsr>
+              <ErrorAlert error={postError} />
 
-            <Button variant="outlined" fullWidth sx={inputMargin} onClick={handleCancel}>Отмена</Button>
+              <NoSsr>
+                <LoadingButton loading={postIsLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
+                  Создать заявку
+                </LoadingButton>
+              </NoSsr>
 
-          </Box>
+              <Button variant="outlined" fullWidth sx={inputMargin} onClick={handleCancel}>Отмена</Button>
+
+            </Box>
           </>
         )}
 
