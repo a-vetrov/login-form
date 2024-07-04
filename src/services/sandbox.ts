@@ -1,6 +1,5 @@
 import { api } from './api'
 import { type Account } from '../types/tinkoff/users'
-import { getFromMaskedValue } from '../utils/money'
 
 interface AccountsApiType {
   success: boolean
@@ -78,7 +77,7 @@ export const sandboxApi = apiWithTag.injectEndpoints({
     }),
     postNewOrder: build.mutation<AccountsCreateApiType['data'], PostNewOrderParamsType>({
       query: (data) => ({
-        url: 'sandbox/accounts/post-order',
+        url: 'sandbox/post-order',
         method: 'POST',
         body: data
       })
