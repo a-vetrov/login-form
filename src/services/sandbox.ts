@@ -24,9 +24,9 @@ export interface PostNewOrderParamsType {
   quantity: number
   price: number
   direction: number
-  account_id: string
-  order_type: number
-  instrument_id: string
+  accountId: string
+  orderType: number
+  instrumentId: string
   time_in_force: number
   price_type: number
 }

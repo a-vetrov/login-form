@@ -45,9 +45,9 @@ export const OrderAddPage: React.FC = () => {
       quantity: getFromMaskedValue(formData.get('quantity') as string),
       price: getFromMaskedValue(formData.get('price') as string),
       direction: 1, // Покупка
-      account_id: selectedAccount,
-      order_type: getFromMaskedValue(formData.get('order_type') as string),
-      instrument_id: data?.uid,
+      accountId: selectedAccount,
+      orderType: getFromMaskedValue(formData.get('order_type') as string),
+      instrumentId: data?.uid,
       time_in_force: 1,
       price_type: 2
     }

@@ -5,12 +5,9 @@ import { sendError } from '../handlers/error.js'
 // https://github.com/vitalets/tinkoff-invest-api
 // https://tinkoff.github.io/investAPI/sandbox/
 import { TinkoffInvestApi } from 'tinkoff-invest-api'
+import { v6 as uuidv6 } from 'uuid'
 import { PortfolioRequest_CurrencyRequest } from 'tinkoff-invest-api/cjs/generated/operations.js'
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
-import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
-import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
-import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
-import { catalogRouter } from './catalog.js'
 
 export const tinkoffRouter = express.Router()
 
@@ -149,9 +146,7 @@ tinkoffRouter.post('/api/sandbox/post-order', ensureLoggedIn, async (req, res) =
 
     const price = api.helpers.toQuotation(req.body.price)
 
-    const body = {figi: '', ...req.body, price, accountId: req.body.account_id, orderType: req.body.order_type}
-
-    console.log('Body !!!!!', body)
+    const body = { figi: '', ...req.body, price, orderId: uuidv6() }
 
     const data = await api.sandbox.postSandboxOrder(body)
     res.status(200).send({ success: true, data })
@@ -160,7 +155,6 @@ tinkoffRouter.post('/api/sandbox/post-order', ensureLoggedIn, async (req, res) =
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
   }
 })
-
 
 export const checkToken = async (token) => {
   let result
