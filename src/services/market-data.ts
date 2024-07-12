@@ -12,6 +12,10 @@ export interface LastPriceResponseType {
   lastPrices: LastPriceType[]
 }
 
+export interface GetCandlesRequestType {
+  instrumentId: string
+}
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['LastPrice'] })
 
 export const marketDataApi = apiWithTag.injectEndpoints({
@@ -23,6 +27,13 @@ export const marketDataApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data as LastPriceResponseType,
       providesTags: ['LastPrice']
+    }),
+    getCandles: build.query<unknown, GetCandlesRequestType>({
+      query: (data) => ({
+        url: `market-data/candles/${data.instrumentId}`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data as unknown
     })
   })
 })

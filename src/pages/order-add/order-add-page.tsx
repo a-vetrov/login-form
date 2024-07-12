@@ -23,6 +23,7 @@ import { LastPrice } from '../../components/last-price/last-price'
 import { type PostNewOrderParamsType, sandboxApi } from '../../services/sandbox'
 import { SandboxAccountsList } from '../sandbox/components/accounts-list'
 import { getFromMaskedValue } from '../../utils/money'
+import {CandleStickChart} from '../../components/candle-stick-chart/candle-stick-chart';
 
 const inputMargin = { mb: 2, mt: 2 }
 
@@ -87,6 +88,7 @@ export const OrderAddPage: React.FC = () => {
             <Typography variant="h3">
               {getInstrumentName(data)}
             </Typography>
+            {data.uid && <CandleStickChart instrumentId={data.uid} />}
             <SandboxAccountsList accounts={accounts.data?.accounts}
                                  selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}
                                  titleVisible={false} controlsVisible={false}/>
@@ -123,7 +125,7 @@ export const OrderAddPage: React.FC = () => {
                 sx={inputMargin}
               />
 
-              <LastPrice uid={data?.uid} />
+              <LastPrice uid={data.uid} />
 
               <ErrorAlert error={postError} />
 
