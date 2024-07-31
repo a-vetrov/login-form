@@ -30,3 +30,5 @@ credentials.production.json
 credentials.js
 token
 
+# Candles cache
+.cache

@@ -51,13 +51,11 @@ marketDataRouter.get('/api/market-data/candles/:instrumentId', ensureLoggedIn, a
 
     // загрузить минимум 100 последних свечей (в понедельник будут использованы данные пятницы, итп)
     const data = await candlesLoader.getCandles({
-      figi: '',
+      figi: instrumentId,
       instrumentId,
       interval: 3, // 3 - 15 минут
       minCount: 100 // <- этот параметр позволяет задать кол-во свечей в результате
     })
-
-    console.log('candles!!!', data)
 
     res.status(200).send({ success: true, data })
   } catch (error) {
