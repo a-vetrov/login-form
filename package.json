@@ -20,6 +20,7 @@
     "@mui/icons-material": "5.15.11",
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.15.11",
+    "@observablehq/plot": "^0.6.16",
     "@reduxjs/toolkit": "2.2.1",
     "axios": "1.6.7",
     "compression": "1.7.4",
