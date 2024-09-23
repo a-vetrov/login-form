@@ -1,6 +1,6 @@
 import { api } from './api'
 import { type Quotation } from '../types/tinkoff/common'
-import {HistoricCandle} from '../types/tinkoff/marketdata';
+import { type HistoricCandle } from '../types/tinkoff/marketdata'
 
 export interface LastPriceType {
   figi: string
