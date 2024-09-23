@@ -1,5 +1,6 @@
 import { api } from './api'
 import { type Quotation } from '../types/tinkoff/common'
+import {HistoricCandle} from '../types/tinkoff/marketdata';
 
 export interface LastPriceType {
   figi: string
@@ -16,6 +17,10 @@ export interface GetCandlesRequestType {
   instrumentId: string
 }
 
+export interface GetCandlesResponseType {
+  candles: HistoricCandle[]
+}
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['LastPrice'] })
 
 export const marketDataApi = apiWithTag.injectEndpoints({
@@ -28,12 +33,12 @@ export const marketDataApi = apiWithTag.injectEndpoints({
       transformResponse: ({ data }) => data as LastPriceResponseType,
       providesTags: ['LastPrice']
     }),
-    getCandles: build.query<unknown, GetCandlesRequestType>({
+    getCandles: build.query<GetCandlesResponseType, GetCandlesRequestType>({
       query: (data) => ({
         url: `market-data/candles/${data.instrumentId}`,
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as unknown
+      transformResponse: ({ data }) => data as GetCandlesResponseType
     })
   })
 })
