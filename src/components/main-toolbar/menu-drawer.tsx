@@ -6,7 +6,7 @@ import {
   BusinessCenterOutlined,
   ListAltOutlined, LoginOutlined,
   Logout,
-  SportsEsportsOutlined, TokenOutlined
+  SportsEsportsOutlined, TokenOutlined, ViewDayOutlined
 } from '@mui/icons-material'
 import { MenuItemLink } from './menu-item'
 import { loginApi } from '../../services/login'
@@ -42,6 +42,7 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
           <MenuItemLink title='Валюта' link='/catalog/currency' shifted />
           <MenuItemLink title='Песочница' link='/sandbox' Icon={SportsEsportsOutlined} />
           <MenuItemLink title='Брокеры' link='/broker/list' Icon={TokenOutlined} />
+          <MenuItemLink title='Создать интервальный бот' link='/bots/create/interval' Icon={ViewDayOutlined} />
 
           <Divider />
           <MenuItemLink title='Выйти' Icon={Logout} onClick={handleLogout}/>
