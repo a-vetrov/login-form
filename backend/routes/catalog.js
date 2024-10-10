@@ -10,6 +10,22 @@ import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
 
 export const catalogRouter = express.Router()
 
+catalogRouter.get('/api/catalog', ensureLoggedIn, async (req, res) => {
+  try {
+    const bondsData = await CatalogBondsModel.find({})
+    const stocksData = await CatalogStocksModel.find({})
+    const currencyData = await CatalogCurrenciesModel.find({})
+    const data = bondsData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'bond' }))
+      .concat(stocksData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'stock' })))
+      .concat(currencyData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'currency' })))
+
+    res.status(200).send({ success: true, data })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
 catalogRouter.get('/api/catalog/bonds', ensureLoggedIn, async (req, res) => {
   try {
     const data = await CatalogBondsModel.find({})
@@ -119,4 +135,3 @@ catalogRouter.get('/api/catalog/instrument/:isin', ensureLoggedIn, async (req, r
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
   }
 })
-

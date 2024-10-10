@@ -1,9 +1,27 @@
 import { api } from './api'
 
+export type CatalogProductType = 'bond' | 'stock' | 'currency'
+
+interface GetCatalogResponseType {
+  name: string
+  isin: string
+  figi: string
+  ticker: string
+  uid: string
+  type: CatalogProductType
+}
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks', 'CatalogCurrencies'] })
 
 export const catalogApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
+    getCatalog: build.query<GetCatalogResponseType[], undefined>({
+      query: () => ({
+        url: 'catalog',
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data as GetCatalogResponseType[]
+    }),
     getBonds: build.query<unknown, undefined>({
       query: () => ({
         url: 'catalog/bonds',
