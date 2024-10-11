@@ -2,7 +2,7 @@ import { api } from './api'
 
 export type CatalogProductType = 'bond' | 'stock' | 'currency'
 
-interface GetCatalogResponseType {
+export interface GetCatalogResponseType {
   name: string
   isin: string
   figi: string

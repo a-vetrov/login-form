@@ -1,8 +1,21 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { TextField } from '@mui/material'
-import { catalogApi } from '../../services/catalog'
+import { TextField, Typography } from '@mui/material'
+import { catalogApi, type CatalogProductType, type GetCatalogResponseType } from '../../services/catalog'
+import { CatalogCard } from './catalog-card'
 
-export const SearchProduct: React.FC = () => {
+const MAX_LIST_SIZE = 15
+
+const typeTitles: Record<CatalogProductType, string> = {
+  bond: 'Облигации',
+  stock: 'Акции',
+  currency: 'Валюта'
+}
+
+interface Props {
+  onChange: (item: GetCatalogResponseType) => void
+}
+
+export const SearchProduct: React.FC<Props> = ({ onChange }) => {
   const [filterValue, setFilterValue] = useState('')
   const { data, error, isLoading } = catalogApi.useGetCatalogQuery()
 
@@ -10,6 +23,10 @@ export const SearchProduct: React.FC = () => {
     const newValue = event.target.value
     setFilterValue(newValue)
   }, [setFilterValue])
+
+  const handleItemClick = useCallback((item: GetCatalogResponseType) => {
+    onChange(item)
+  }, [onChange])
 
   const listData = useMemo(() => {
     if (!data || !filterValue) {
@@ -21,10 +38,25 @@ export const SearchProduct: React.FC = () => {
     const filteredData = data.filter((item) => {
       return item.name.toLowerCase().includes(filterLowerCase) ||
         item.isin.toLowerCase().includes(filterLowerCase) ||
-        item.ticker?.toLowerCase().includes(filterLowerCase)
+        item.ticker?.toLowerCase().includes(filterLowerCase) ||
+        item.figi?.toLowerCase().includes(filterLowerCase)
     })
 
-    return filteredData
+    const dict: Record<CatalogProductType, GetCatalogResponseType[]> = filteredData.reduce<Record<CatalogProductType, GetCatalogResponseType[]>>((accumulator, item) => {
+      if (!accumulator[item.type]) {
+        accumulator[item.type] = []
+      }
+      if (accumulator[item.type].length < MAX_LIST_SIZE) {
+        accumulator[item.type].push(item)
+      }
+      return accumulator
+      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter,@typescript-eslint/consistent-type-assertions
+    }, {} as Record<CatalogProductType, GetCatalogResponseType[]>)
+
+    return Object.keys(dict).map((key) => ({
+      type: typeTitles[key as CatalogProductType],
+      data: dict[key as CatalogProductType]
+    }))
   }, [data, filterValue])
 
   return (
@@ -38,10 +70,15 @@ export const SearchProduct: React.FC = () => {
         onChange={handleFilterChange}
       />
 
-      {listData?.map((item) => (
-        <div key={item.uid}>
-          {item.name}
-        </div>
+      {listData?.map((category) => (
+        <React.Fragment key={category.type}>
+          <Typography variant="h3" marginTop={2}>
+            {category.type}
+          </Typography>
+          {category.data.map(item => (
+            <CatalogCard data={item} key={item.uid} onClick={handleItemClick}/>
+          ))}
+        </React.Fragment>
       ))}
     </>
   )

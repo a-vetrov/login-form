@@ -1,4 +1,4 @@
-import { getShareType } from '../details/utils'
+import { getShareType } from '../pages/details/utils'
 
 export const getInstrumentName = (data?: Record<string, unknown>): string => {
   if (!data) {
@@ -14,15 +14,15 @@ export const getInstrumentName = (data?: Record<string, unknown>): string => {
   switch (type) {
     case 'stock' : {
       if (shareType !== undefined) {
-        return `${getShareType(shareType as number)} ${name}`
+        return `${getShareType(shareType as number)} ${name as string}`
       }
-      return `Акция ${name}`
+      return `Акция ${name as string}`
     }
     case 'bond': {
-      return `Облигация ${name}`
+      return `Облигация ${name as string}`
     }
     case 'currency': {
-      return `Валюта ${name}`
+      return `Валюта ${name as string}`
     }
 
     default: return 'Название не определено'

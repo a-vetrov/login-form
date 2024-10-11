@@ -18,12 +18,12 @@ import { NumberInput } from '../../components/number-input'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { catalogApi } from '../../services/catalog'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
-import { getInstrumentName } from './utils'
 import { LastPrice } from '../../components/last-price/last-price'
 import { type PostNewOrderParamsType, sandboxApi } from '../../services/sandbox'
 import { SandboxAccountsList } from '../sandbox/components/accounts-list'
 import { getFromMaskedValue } from '../../utils/money'
-import {CandleStickChart} from '../../components/candle-stick-chart/candle-stick-chart';
+import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
+import { getInstrumentName } from '../../utils/product'
 
 const inputMargin = { mb: 2, mt: 2 }
 
