@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import * as Plot from '@observablehq/plot'
 import { marketDataApi } from '../../services/market-data'
 import { getFromMoneyValue } from '../../utils/money'
+import {CandleIntervalBar} from './interval-bar';
 
 interface Props {
   instrumentId: string
@@ -57,7 +58,8 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId }) => {
 
   return (
     <div>
-      CandleStickChart {instrumentId}
+      <p>CandleStickChart {instrumentId}</p>
+      <CandleIntervalBar />
       <div ref={containerRef}/>
     </div>
   )
