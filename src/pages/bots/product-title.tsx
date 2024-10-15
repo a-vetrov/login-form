@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { type GetCatalogResponseType } from '../../services/catalog'
 import { getInstrumentName } from '../../utils/product'
-import {Box, IconButton, Stack, Typography} from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 
 interface Props {

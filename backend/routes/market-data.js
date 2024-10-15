@@ -53,7 +53,7 @@ marketDataRouter.get('/api/market-data/candles/:instrumentId', ensureLoggedIn, a
     const data = await candlesLoader.getCandles({
       figi: instrumentId,
       instrumentId,
-      interval: 3, // 3 - 15 минут
+      interval: parseInt(req.query.interval) || 3, // 3 - 15 минут
       minCount: 100 // <- этот параметр позволяет задать кол-во свечей в результате
     })
 

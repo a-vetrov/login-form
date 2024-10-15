@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import * as Plot from '@observablehq/plot'
 import { marketDataApi } from '../../services/market-data'
 import { getFromMoneyValue } from '../../utils/money'
-import {CandleIntervalBar} from './interval-bar';
+import { CandleIntervalBar } from './interval-bar'
 
 interface Props {
   instrumentId: string
@@ -16,11 +16,13 @@ interface Props {
  */
 
 export const CandleStickChart: React.FC<Props> = ({ instrumentId }) => {
-  const containerRef = useRef(null)
-  const { data } = marketDataApi.useGetCandlesQuery({ instrumentId })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [interval, setInterval] = useState(3)
+  const { data } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
 
   useEffect(() => {
     if (!data) return
+    const lastPrice = getFromMoneyValue(data.candles[data.candles.length - 1].close)
     const plotData = data.candles.map((item) => {
       return {
         time: new Date(item.time),
@@ -35,7 +37,7 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId }) => {
       inset: 6,
       width: 928,
       grid: true,
-      color: { domain: [-1, 0, 1], range: ['#e41a1c', '#000000', '#4daf4a'] },
+      color: { domain: [-1, 0, 1], range: ['#e41a1c', '#ffffff', '#4daf4a'] },
       marks: [
         Plot.ruleX(plotData, {
           x: 'time',
@@ -49,18 +51,18 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId }) => {
           stroke: (d) => Math.sign(d.close - d.open),
           strokeWidth: 4,
           strokeLinecap: 'round'
-        })
+        }),
+        Plot.ruleY([lastPrice])
       ]
     })
-    containerRef.current?.append(plot)
+    containerRef.current?.replaceChildren(plot)
     return () => { plot.remove() }
   }, [data])
 
   return (
-    <div>
-      <p>CandleStickChart {instrumentId}</p>
-      <CandleIntervalBar />
+    <>
+      <CandleIntervalBar interval={interval} onChange={setInterval}/>
       <div ref={containerRef}/>
-    </div>
+    </>
   )
 }

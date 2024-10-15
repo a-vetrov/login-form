@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Container, Typography } from '@mui/material'
+import { Box, Container, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
 import type { GetCatalogResponseType } from '../../services/catalog'
 import { ProductTitle } from './product-title'
-import {CandleStickChart} from '../../components/candle-stick-chart/candle-stick-chart';
+import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
 
 export const CreateIntervalBot: React.FC = () => {
   const [product, setProduct] = useState<GetCatalogResponseType | null>(null)
@@ -28,7 +28,9 @@ export const CreateIntervalBot: React.FC = () => {
         {product && (
           <>
             <ProductTitle data={product} onReset={handleResetProduct}/>
-            <CandleStickChart instrumentId={product.uid}/>
+            <Box marginY={2}>
+              <CandleStickChart instrumentId={product.uid}/>
+            </Box>
           </>
         )}
       </Container>

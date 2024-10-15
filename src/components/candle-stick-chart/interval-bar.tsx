@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react'
+import React, { useCallback } from 'react'
 import { Button, ButtonGroup } from '@mui/material'
 
 const intervals = [
@@ -7,8 +7,20 @@ const intervals = [
     value: 1
   },
   {
+    key: '2м',
+    value: 6
+  },
+  {
+    key: '3м',
+    value: 7
+  },
+  {
     key: '5м',
     value: 2
+  },
+  {
+    key: '10м',
+    value: 8
   },
   {
     key: '15м',
@@ -16,45 +28,45 @@ const intervals = [
   },
   {
     key: '30м',
-    value: 4
+    value: 9
   },
   {
     key: '1ч',
-    value: 5
+    value: 4
   },
   {
     key: '4ч',
-    value: 6
+    value: 11
   },
   {
     key: 'д',
-    value: 7
+    value: 5
   },
-  {
-    key: 'н',
-    value: 8
-  },
-  {
-    key: 'мес',
-    value: 9
-  }
 ]
 
-export const CandleIntervalBar: React.FC = () => {
-  const [selected, setSelected] = useState(3)
+interface Props {
+  interval: number
+  onChange: (value: number) => void
+}
 
+export const CandleIntervalBar: React.FC<Props> = ({ interval, onChange }) => {
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement> >((event) => {
     const value = (event.currentTarget as HTMLButtonElement).dataset.value
     if (value) {
-      setSelected(parseInt(value))
+      onChange(parseInt(value))
     }
-  }, [setSelected])
+  }, [onChange])
 
   return (
     <ButtonGroup variant="outlined" size='small'>
       {
         intervals.map((item) => (
-          <Button key={item.value} data-value={item.value} variant={selected === item.value ? 'contained' : 'outlined'} onClick={handleClick}>{item.key}</Button>
+          <Button
+            key={item.value}
+            data-value={item.value}
+            variant={interval === item.value ? 'contained' : 'outlined'}
+            onClick={handleClick}>{item.key}
+          </Button>
         ))
       }
     </ButtonGroup>

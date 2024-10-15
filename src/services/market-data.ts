@@ -15,6 +15,7 @@ export interface LastPriceResponseType {
 
 export interface GetCandlesRequestType {
   instrumentId: string
+  interval: number
 }
 
 export interface GetCandlesResponseType {
@@ -36,7 +37,8 @@ export const marketDataApi = apiWithTag.injectEndpoints({
     getCandles: build.query<GetCandlesResponseType, GetCandlesRequestType>({
       query: (data) => ({
         url: `market-data/candles/${data.instrumentId}`,
-        method: 'GET'
+        method: 'GET',
+        params: { interval: data.interval }
       }),
       transformResponse: ({ data }) => data as GetCandlesResponseType
     })
