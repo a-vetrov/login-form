@@ -57,7 +57,7 @@ marketDataRouter.get('/api/market-data/candles/:instrumentId', ensureLoggedIn, a
       minCount: 100 // <- этот параметр позволяет задать кол-во свечей в результате
     })
 
-    res.status(200).send({ success: true, data })
+    res.status(200).send({ success: true, data: { ...data, candles: data.candles.slice(-100) } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

@@ -5,8 +5,10 @@ import { InputAdornment, TextField } from '@mui/material'
 import { type TextFieldProps } from '@mui/material/TextField/TextField'
 import { type CurrencyCodeType, getCurrencySign, mainCurrencies } from '../../utils/money'
 
+export type MoneyInputChangeType = (event: { target: { name: string, value: string } }) => void
+
 interface CustomProps {
-  onChange: (event: { target: { name: string, value: string } }) => void
+  onChange: MoneyInputChangeType
   name: string
 }
 
