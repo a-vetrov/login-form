@@ -27,7 +27,7 @@ export const BondsDetails: React.FC<DetailsProps> = ({ isin }) => {
 
   return (
     <>
-      <Typography variant="h2">
+      <Typography variant="h1">
         {data?.name || 'Детальная карточка'}
       </Typography>
       {ids && (

@@ -45,7 +45,7 @@ export const CatalogPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2">
+        <Typography variant="h1">
           Каталог
         </Typography>
         <Typography variant="body1">

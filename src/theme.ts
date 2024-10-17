@@ -9,20 +9,28 @@ export const getCustomTheme = (): ThemeOptions => {
     },
     typography: {
       h1: {
+        fontSize: defaultTheme.typography.pxToRem(48),
         [defaultTheme.breakpoints.down('md')]: {
-          fontSize: '2rem',
+          fontSize: defaultTheme.typography.pxToRem(32)
         },
       },
       h2: {
+        fontSize: defaultTheme.typography.pxToRem(36),
         [defaultTheme.breakpoints.down('md')]: {
-          fontSize: '2rem',
+          fontSize: defaultTheme.typography.pxToRem(24),
         },
       },
       h3: {
+        fontSize: defaultTheme.typography.pxToRem(30),
         [defaultTheme.breakpoints.down('md')]: {
-          fontSize: '1.5rem',
+          fontSize: defaultTheme.typography.pxToRem(20)
         },
-
+      },
+      h4: {
+        fontSize: defaultTheme.typography.pxToRem(24),
+        [defaultTheme.breakpoints.down('md')]: {
+          fontSize: defaultTheme.typography.pxToRem(18)
+        },
       },
 
     }

@@ -17,7 +17,7 @@ export const PortfolioPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2">
+        <Typography variant="h1">
           Ваши продукты
         </Typography>
         <Typography variant="body1">
@@ -26,7 +26,7 @@ export const PortfolioPage: React.FC = () => {
         <ErrorAlert error={error} />
         {data && (
           <>
-            <Typography variant="h3" marginTop={3}>
+            <Typography variant="h2" marginTop={3}>
               Ваши счета
             </Typography>
             <Stack direction="row" spacing={2} marginY={2}>
@@ -35,7 +35,7 @@ export const PortfolioPage: React.FC = () => {
               ))}
             </Stack>
 
-            <Typography variant="h3" marginTop={3}>
+            <Typography variant="h2" marginTop={3}>
               Ваш портфель
             </Typography>
             <Typography variant="body1" marginBottom={2}>

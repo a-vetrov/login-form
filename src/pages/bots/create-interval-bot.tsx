@@ -72,7 +72,7 @@ export const CreateIntervalBot: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2" marginBottom={1}>
+        <Typography variant="h1" marginBottom={1}>
           Создать интервальный бот
         </Typography>
         {!product && <SearchProduct onChange={handleProductChange}/>}
@@ -82,7 +82,7 @@ export const CreateIntervalBot: React.FC = () => {
 
             <FormControl fullWidth>
 
-              <Box marginY={4}>
+              <Box marginY={2}>
                 <Typography variant="body1" marginBottom={1}>
                   Границы интервала
                 </Typography>
@@ -112,7 +112,7 @@ export const CreateIntervalBot: React.FC = () => {
                 </Stack>
               </Box>
 
-              <Box marginY={4}>
+              <Box marginY={2}>
                 <Typography variant="body1" marginBottom={1}>
                   Число шагов сетки в интервале
                 </Typography>

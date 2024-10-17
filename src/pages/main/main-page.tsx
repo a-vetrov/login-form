@@ -21,14 +21,14 @@ export const MainPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2">
+        <Typography variant="h1">
           Главная страница
         </Typography>
         <Typography variant="body1">
           {greetingMessage}
         </Typography>
 
-        <Typography variant="h3" marginY={2}>
+        <Typography variant="h2" marginY={2}>
           Обзор рынков
         </Typography>
         <MarketWidget />

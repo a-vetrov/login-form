@@ -15,7 +15,7 @@ export const SandboxPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2">
+        <Typography variant="h1">
           Песочница
         </Typography>
         <Typography variant="body1">
@@ -26,7 +26,7 @@ export const SandboxPage: React.FC = () => {
         {
           selectedAccount && (
             <>
-              <Typography variant="h3" marginTop={3}>
+              <Typography variant="h2" marginTop={3}>
                 Ваш виртуальный портфель
               </Typography>
               <Stack spacing={2} marginY={4}>

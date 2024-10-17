@@ -70,7 +70,7 @@ export const BrokerListPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2" gutterBottom>
+        <Typography variant="h1" gutterBottom>
           Список токенов
         </Typography>
         {isLoading && <CircularProgress />}

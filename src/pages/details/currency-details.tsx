@@ -27,7 +27,7 @@ export const CurrencyDetails: React.FC<DetailsProps> = ({ ticker }) => {
 
   return (
     <>
-      <Typography variant="h2">
+      <Typography variant="h1">
         {data?.name || 'Детальная карточка'}
       </Typography>
       {ids && (

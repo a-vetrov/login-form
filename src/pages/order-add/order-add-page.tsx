@@ -75,7 +75,7 @@ export const OrderAddPage: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h2">
+        <Typography variant="h1">
           Выставление заявки на покупку
         </Typography>
 
@@ -85,7 +85,7 @@ export const OrderAddPage: React.FC = () => {
 
         {data !== undefined && (
           <>
-            <Typography variant="h3">
+            <Typography variant="h2">
               {getInstrumentName(data)}
             </Typography>
             {data.uid && <CandleStickChart instrumentId={data.uid} />}
