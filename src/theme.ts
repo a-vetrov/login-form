@@ -33,6 +33,28 @@ export const getCustomTheme = (): ThemeOptions => {
         },
       },
 
+    },
+    components: {
+      MuiButtonGroup: {
+        styleOverrides: {
+          grouped: {
+            variants: [
+              {
+                props: {
+                  size: 'small',
+                },
+                style: {
+                  [defaultTheme.breakpoints.down('sm')]: {
+                    padding: '3px 2px',
+                    minWidth: '30px',
+                    flexGrow: 1
+                  }
+                },
+              },
+            ]
+          }
+        }
+      }
     }
   }
 }
