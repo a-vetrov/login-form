@@ -16,11 +16,12 @@ const TextMaskCustom = React.forwardRef<HTMLInputElement, CustomProps>(
       <IMaskInput
         {...other}
         mask={Number}
-        scale={2}
+        scale={0}
         thousandsSeparator=' '
         inputRef={ref}
         onAccept={(value: any) => { onChange({ target: { name: props.name, value } }) }}
         overwrite
+        min={0}
       />
     )
   }

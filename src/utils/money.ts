@@ -55,18 +55,22 @@ export const getProductTotalString = (product: PortfolioPosition): string | null
   return `${total.toLocaleString('ru-RU')} ${RUB}`
 }
 
+const toNumberPipe = IMask.createPipe({
+  mask: Number,
+  scale: 2,
+  thousandsSeparator: ' '
+}, IMask.PIPE_TYPE.MASKED, IMask.PIPE_TYPE.TYPED)
+
 export const getFromMaskedValue = (s: string | null): number | null => {
   if (s === null) {
     return null
   }
-  return IMask.pipe(
-    s,
-    {
-      mask: Number,
-      scale: 2,
-      thousandsSeparator: ' '
-    },
-    IMask.PIPE_TYPE.MASKED,
-    IMask.PIPE_TYPE.TYPED
-  )
+
+  return toNumberPipe(s)
 }
+
+export const setMaskedValue = IMask.createPipe({
+  mask: Number,
+  scale: 2,
+  thousandsSeparator: ' '
+}, IMask.PIPE_TYPE.TYPED, IMask.PIPE_TYPE.MASKED)
