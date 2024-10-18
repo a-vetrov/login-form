@@ -8,7 +8,7 @@ import { CandleStickChart } from '../../components/candle-stick-chart/candle-sti
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
 import { getFromMaskedValue, setMaskedValue } from '../../utils/money'
-import { NumberInput } from '../../components/number-input'
+import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { getCandlesInterval } from './utils'
 
@@ -21,6 +21,8 @@ export const CreateIntervalBot: React.FC = () => {
 
   const [lowBoundary, setLowBoundary] = useState<number>()
   const [highBoundary, setHighBoundary] = useState<number>()
+
+  const [stepsCount, setStepsCount] = useState<number>()
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -65,6 +67,20 @@ export const CreateIntervalBot: React.FC = () => {
         case lowBoundaryInputName: setLowBoundary(numericValue); break
         case highBoundaryInputName: setHighBoundary(numericValue); break
       }
+    }
+  }, [])
+
+  const handleStepsCountChange = useCallback<NumberInputChangeType>((event) => {
+    const { value } = event.target
+
+    if (!value) {
+      setStepsCount(undefined)
+      return
+    }
+    const numericValue = getFromMaskedValue(value)
+
+    if (numericValue !== null) {
+      setStepsCount(numericValue)
     }
   }, [])
 
@@ -121,8 +137,9 @@ export const CreateIntervalBot: React.FC = () => {
                   required
                   label="Количество шагов"
                   defaultValue={10}
-                  error={false}
+                  error={stepsCount !== undefined && stepsCount < 2}
                   autoComplete="off"
+                  onChange={handleStepsCountChange}
                 />
               </Box>
 

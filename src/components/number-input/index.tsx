@@ -4,8 +4,10 @@ import { IMaskInput } from 'react-imask'
 import { TextField } from '@mui/material'
 import { type TextFieldProps } from '@mui/material/TextField/TextField'
 
+export type NumberInputChangeType = (event: { target: { name: string, value: string } }) => void
+
 interface CustomProps {
-  onChange: (event: { target: { name: string, value: string } }) => void
+  onChange: NumberInputChangeType
   name: string
 }
 

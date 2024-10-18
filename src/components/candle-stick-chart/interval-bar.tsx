@@ -41,7 +41,7 @@ const intervals = [
   {
     key: 'д',
     value: 5
-  },
+  }
 ]
 
 interface Props {
@@ -58,7 +58,7 @@ export const CandleIntervalBar: React.FC<Props> = ({ interval, onChange }) => {
   }, [onChange])
 
   return (
-    <ButtonGroup variant="outlined" size='small' sx={{width: '100%'}}>
+    <ButtonGroup variant="outlined" size='small' sx={{ width: '100%' }}>
       {
         intervals.map((item) => (
           <Button

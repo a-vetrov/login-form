@@ -4,6 +4,7 @@ import { marketDataApi } from '../../services/market-data'
 import { getFromMoneyValue } from '../../utils/money'
 import { CandleIntervalBar } from './interval-bar'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
+import { useMediaQuery, useTheme } from '@mui/material'
 
 interface Props {
   instrumentId: string
@@ -23,7 +24,10 @@ interface Props {
 export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowBoundary, highBoundary }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [interval, setInterval] = useState(3)
-  const { data } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
+  const { data } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 10000 })
+
+  const theme = useTheme()
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
     if (!data) return
@@ -50,7 +54,8 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowB
 
     const plot = Plot.plot({
       inset: 6,
-      width: 928,
+      width: isSmallScreen ? 600 : 1200,
+      height: isSmallScreen ? 400 : 600,
       grid: true,
       color: { domain: [-1, 0, 1], range: ['#e41a1c', '#ffffff', '#4daf4a'] },
       marks: [
@@ -72,7 +77,7 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowB
     })
     containerRef.current?.replaceChildren(plot)
     return () => { plot.remove() }
-  }, [data, highBoundary, lowBoundary])
+  }, [data, highBoundary, isSmallScreen, lowBoundary])
 
   useEffect(() => {
     if (onChange && data) {
