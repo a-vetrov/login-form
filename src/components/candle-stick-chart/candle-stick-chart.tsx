@@ -11,6 +11,7 @@ interface Props {
   onChange?: (candles: HistoricCandle[]) => void
   lowBoundary?: number
   highBoundary?: number
+  stepsCount?: number
 }
 
 /**
@@ -21,7 +22,10 @@ interface Props {
  * @constructor
  */
 
-export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowBoundary, highBoundary }) => {
+export const CandleStickChart: React.FC<Props> = ({
+  instrumentId, onChange, lowBoundary,
+  highBoundary, stepsCount
+}) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [interval, setInterval] = useState(3)
   const { data } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 10000 })
@@ -33,12 +37,20 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowB
     if (!data) return
 
     const bounds = []
-
-    if (lowBoundary !== undefined) {
-      bounds.push(Plot.ruleY([lowBoundary], { stroke: '#0000ff', strokeDasharray: '3 5' }))
-    }
-    if (highBoundary !== undefined) {
-      bounds.push(Plot.ruleY([highBoundary], { stroke: '#0000ff', strokeDasharray: '3 5' }))
+    if (stepsCount !== undefined && stepsCount > 1 && lowBoundary !== undefined && highBoundary !== undefined && lowBoundary !== highBoundary) {
+      const stepSize = (highBoundary - lowBoundary) / (stepsCount - 1)
+      const stepsData = []
+      for (let i = lowBoundary; i <= highBoundary; i += stepSize) {
+        stepsData.push(i)
+      }
+      bounds.push(Plot.ruleY(stepsData, { stroke: '#FFFF00', strokeDasharray: '3 5' }))
+    } else {
+      if (lowBoundary !== undefined) {
+        bounds.push(Plot.ruleY([lowBoundary], { stroke: '#0000ff', strokeDasharray: '3 5' }))
+      }
+      if (highBoundary !== undefined) {
+        bounds.push(Plot.ruleY([highBoundary], { stroke: '#0000ff', strokeDasharray: '3 5' }))
+      }
     }
 
     const plotData = data.candles.map((item) => {
@@ -77,7 +89,7 @@ export const CandleStickChart: React.FC<Props> = ({ instrumentId, onChange, lowB
     })
     containerRef.current?.replaceChildren(plot)
     return () => { plot.remove() }
-  }, [data, highBoundary, isSmallScreen, lowBoundary])
+  }, [data, highBoundary, isSmallScreen, lowBoundary, stepsCount])
 
   useEffect(() => {
     if (onChange && data) {

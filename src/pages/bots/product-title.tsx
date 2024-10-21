@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
 import { type GetCatalogResponseType } from '../../services/catalog'
 import { getInstrumentName } from '../../utils/product'
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
+import { getIds } from '../details/utils'
 
 interface Props {
   data: GetCatalogResponseType
@@ -11,17 +12,25 @@ interface Props {
 
 export const ProductTitle: React.FC<Props> = ({ data, onReset }) => {
   const title = useMemo(() => getInstrumentName(data as unknown as Record<string, unknown>), [data])
+  const ids = useMemo(() => getIds(data as unknown as Record<string, string>), [data])
   return (
-    <Box marginTop={2}>
+    <Box marginY={4}>
       <Typography variant="body1">
         Выбранный продукт:
       </Typography>
-      <Typography variant="h3">
-        {title}
-        <IconButton aria-label="edit" sx={{ verticalAlign: 'top', ml: 2 }} onClick={onReset}>
+      <Stack direction='row'>
+        <div>
+          <Typography variant="h3">
+            {title}
+          </Typography>
+          <Typography variant="body1">
+            {ids}
+          </Typography>
+        </div>
+        <IconButton aria-label="edit" sx={{ verticalAlign: 'top', ml: 2, height: '40px' }} onClick={onReset}>
           <EditIcon />
         </IconButton>
-      </Typography>
+      </Stack>
     </Box>
   )
 }

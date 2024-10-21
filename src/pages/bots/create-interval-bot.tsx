@@ -22,7 +22,7 @@ export const CreateIntervalBot: React.FC = () => {
   const [lowBoundary, setLowBoundary] = useState<number>()
   const [highBoundary, setHighBoundary] = useState<number>()
 
-  const [stepsCount, setStepsCount] = useState<number>()
+  const [stepsCount, setStepsCount] = useState<number>(10)
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -149,6 +149,7 @@ export const CreateIntervalBot: React.FC = () => {
                   onChange={handleCandlesChange}
                   lowBoundary={lowBoundary}
                   highBoundary={highBoundary}
+                  stepsCount={stepsCount}
                 />
               </Box>
 
