@@ -1,5 +1,5 @@
-import type { HistoricCandle } from '../../types/tinkoff/marketdata'
-import { getFromMoneyValue } from '../../utils/money'
+import type { HistoricCandle } from '../../../types/tinkoff/marketdata'
+import { getFromMoneyValue } from '../../../utils/money'
 
 interface IntervalType {
   low: number

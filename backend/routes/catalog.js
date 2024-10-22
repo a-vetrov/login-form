@@ -15,9 +15,9 @@ catalogRouter.get('/api/catalog', ensureLoggedIn, async (req, res) => {
     const bondsData = await CatalogBondsModel.find({})
     const stocksData = await CatalogStocksModel.find({})
     const currencyData = await CatalogCurrenciesModel.find({})
-    const data = bondsData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'bond' }))
-      .concat(stocksData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'stock' })))
-      .concat(currencyData.map(({ name, isin, figi, ticker, uid }) => ({ name, isin, figi, ticker, uid, type: 'currency' })))
+    const data = bondsData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'bond' }))
+      .concat(stocksData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'stock' })))
+      .concat(currencyData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'currency' })))
 
     res.status(200).send({ success: true, data })
   } catch (error) {

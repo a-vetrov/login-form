@@ -8,6 +8,7 @@ export interface GetCatalogResponseType {
   figi: string
   ticker: string
   uid: string
+  lot: number
   type: CatalogProductType
 }
 

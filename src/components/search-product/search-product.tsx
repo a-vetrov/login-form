@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { TextField, Typography } from '@mui/material'
+import { CircularProgress, TextField, Typography } from '@mui/material'
 import { catalogApi, type CatalogProductType, type GetCatalogResponseType } from '../../services/catalog'
 import { CatalogCard } from './catalog-card'
+import { ErrorAlert } from '../error-alert/error-alert'
 
 const MAX_LIST_SIZE = 15
 
@@ -58,6 +59,14 @@ export const SearchProduct: React.FC<Props> = ({ onChange }) => {
       data: dict[key as CatalogProductType]
     }))
   }, [data, filterValue])
+
+  if (isLoading) {
+    return <CircularProgress />
+  }
+
+  if (error) {
+    return <ErrorAlert error={error} />
+  }
 
   return (
     <>

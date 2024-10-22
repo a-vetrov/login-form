@@ -3,17 +3,19 @@ import { MainToolbar } from '../../components/main-toolbar'
 import { Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
 import type { GetCatalogResponseType } from '../../services/catalog'
-import { ProductTitle } from './product-title'
+import { ProductTitle } from './interval-bot/product-title'
 import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
 import { getFromMaskedValue, setMaskedValue } from '../../utils/money'
 import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { getCandlesInterval } from './utils'
+import { getCandlesInterval } from './interval-bot/utils'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
+
+const defaultStepsCount = 10
 
 export const CreateIntervalBot: React.FC = () => {
   const [product, setProduct] = useState<GetCatalogResponseType | null>(null)
@@ -22,7 +24,7 @@ export const CreateIntervalBot: React.FC = () => {
   const [lowBoundary, setLowBoundary] = useState<number>()
   const [highBoundary, setHighBoundary] = useState<number>()
 
-  const [stepsCount, setStepsCount] = useState<number>(10)
+  const [stepsCount, setStepsCount] = useState<number>(defaultStepsCount)
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -74,7 +76,7 @@ export const CreateIntervalBot: React.FC = () => {
     const { value } = event.target
 
     if (!value) {
-      setStepsCount(undefined)
+      setStepsCount(defaultStepsCount)
       return
     }
     const numericValue = getFromMaskedValue(value)
@@ -138,6 +140,20 @@ export const CreateIntervalBot: React.FC = () => {
                   label="Количество шагов"
                   defaultValue={10}
                   error={stepsCount !== undefined && stepsCount < 2}
+                  autoComplete="off"
+                  onChange={handleStepsCountChange}
+                />
+              </Box>
+
+              <Box marginY={2}>
+                <Typography variant="body1" marginBottom={1}>
+                  Количество акций в одной заявке (шаге сетки), учитывая лотность продукта {product.lot}.
+                </Typography>
+                <NumberInput
+                  name="amountPerStep"
+                  required
+                  label="Количество акций"
+                  defaultValue={10}
                   autoComplete="off"
                   onChange={handleStepsCountChange}
                 />

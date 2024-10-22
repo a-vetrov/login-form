@@ -4,7 +4,8 @@ import { marketDataApi } from '../../services/market-data'
 import { getFromMoneyValue } from '../../utils/money'
 import { CandleIntervalBar } from './interval-bar'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
-import { useMediaQuery, useTheme } from '@mui/material'
+import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
+import { ErrorAlert } from '../error-alert/error-alert'
 
 interface Props {
   instrumentId: string
@@ -28,7 +29,7 @@ export const CandleStickChart: React.FC<Props> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [interval, setInterval] = useState(3)
-  const { data } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 10000 })
+  const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 30000 })
 
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'))
@@ -96,6 +97,14 @@ export const CandleStickChart: React.FC<Props> = ({
       onChange(data.candles)
     }
   }, [onChange, data])
+
+  if (isLoading) {
+    return <CircularProgress />
+  }
+
+  if (error) {
+    return <ErrorAlert error={error} />
+  }
 
   return (
     <>
