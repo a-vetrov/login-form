@@ -7,10 +7,11 @@ import { ProductTitle } from './interval-bot/product-title'
 import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
-import { getFromMaskedValue, setMaskedValue } from '../../utils/money'
+import {fromNumberToMoneyString, getFromMaskedValue, setMaskedValue} from '../../utils/money'
 import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { getCandlesInterval } from './interval-bot/utils'
+import {calculateBudget, getCandlesInterval} from './interval-bot/utils'
+import { BudgetControl } from './interval-bot/budget-control'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -24,7 +25,8 @@ export const CreateIntervalBot: React.FC = () => {
   const [lowBoundary, setLowBoundary] = useState<number>()
   const [highBoundary, setHighBoundary] = useState<number>()
 
-  const [stepsCount, setStepsCount] = useState<number>(defaultStepsCount)
+  const [stepsCount, setStepsCount] = useState<number | undefined>(defaultStepsCount)
+  const [amountPerStep, setAmountPerStep] = useState<number>()
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -40,6 +42,7 @@ export const CreateIntervalBot: React.FC = () => {
   }, [highBoundary, lowBoundary])
 
   const handleProductChange = useCallback((item: GetCatalogResponseType) => {
+    setAmountPerStep(item.lot)
     setProduct(item)
   }, [setProduct])
 
@@ -85,6 +88,19 @@ export const CreateIntervalBot: React.FC = () => {
       setStepsCount(numericValue)
     }
   }, [])
+
+  const budget = useMemo(() => {
+    if (!product || !amountPerStep || amountPerStep % product?.lot) {
+      return 0
+    }
+    return calculateBudget({
+      lowBoundary,
+      highBoundary,
+      stepsCount,
+      amountPerStep
+    })
+  }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
+
 
   return (
     <>
@@ -146,17 +162,11 @@ export const CreateIntervalBot: React.FC = () => {
               </Box>
 
               <Box marginY={2}>
-                <Typography variant="body1" marginBottom={1}>
-                  Количество акций в одной заявке (шаге сетки), учитывая лотность продукта {product.lot}.
+                {/* eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style */}
+                <BudgetControl product={product} amountPerStep={amountPerStep as number} onChange={setAmountPerStep}/>
+                <Typography variant="body1" marginTop={2}>
+                  Необходимый бюджет {fromNumberToMoneyString(budget, 'RUB')}
                 </Typography>
-                <NumberInput
-                  name="amountPerStep"
-                  required
-                  label="Количество акций"
-                  defaultValue={10}
-                  autoComplete="off"
-                  onChange={handleStepsCountChange}
-                />
               </Box>
 
               <Box marginY={2}>

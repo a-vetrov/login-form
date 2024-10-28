@@ -16,7 +16,10 @@ const isRubCurrency = (product: PortfolioPosition): boolean => {
   return product.figi === FIGI_RUB
 }
 
-export const getCurrencySign = (currency: string): string => {
+export const getCurrencySign = (currency?: string): string => {
+  if (!currency) {
+    return ''
+  }
   const toUpperCase = currency.toUpperCase()
   return mainCurrencies[toUpperCase as keyof typeof mainCurrencies] || toUpperCase
 }
@@ -25,6 +28,8 @@ export const getFromMoneyValue = (value?: MoneyValue | Quotation): number | unde
   return (value ? value.units + value.nano / 1000000000 : undefined)
 }
 
+export const fromNumberToMoneyString = (total: number, currency?: string): string => `${total.toLocaleString('ru-RU')} ${getCurrencySign(currency)}`
+
 export const toMoneyString = (value?: MoneyValue): string => {
   const total = getFromMoneyValue(value)
 
@@ -32,7 +37,7 @@ export const toMoneyString = (value?: MoneyValue): string => {
     return ''
   }
 
-  return `${total.toLocaleString('ru-RU')} ${getCurrencySign(value.currency)}`
+  return fromNumberToMoneyString(total, value?.currency)
 }
 
 export const getProductTotal = (product: PortfolioPosition): number | undefined => {

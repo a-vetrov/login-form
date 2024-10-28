@@ -1,5 +1,6 @@
 import type { HistoricCandle } from '../../../types/tinkoff/marketdata'
 import { getFromMoneyValue } from '../../../utils/money'
+import { getMinMax } from '../../../utils/math'
 
 interface IntervalType {
   low: number
@@ -25,4 +26,24 @@ export const getCandlesInterval = (candles: HistoricCandle[]): IntervalType => {
     low: low + quarter,
     high: high - quarter
   }
+}
+
+interface CalculateBudgetProps {
+  lowBoundary?: number
+  highBoundary?: number
+  stepsCount?: number
+  amountPerStep?: number
+}
+
+export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountPerStep }: CalculateBudgetProps): number => {
+  if (lowBoundary === undefined || highBoundary === undefined || lowBoundary === highBoundary || !stepsCount || !amountPerStep) {
+    return 0
+  }
+  const { min, max } = getMinMax(lowBoundary, highBoundary)
+  const stepSize = (max - min) / (stepsCount - 1)
+  let result = 0
+  for (let i = lowBoundary; i <= highBoundary; i += stepSize) {
+    result += i * amountPerStep
+  }
+  return result
 }
