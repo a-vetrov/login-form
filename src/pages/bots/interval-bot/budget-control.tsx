@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import { Typography } from '@mui/material'
 import { NumberInput, type NumberInputChangeType } from '../../../components/number-input'
 import type { GetCatalogResponseType } from '../../../services/catalog'
-import {getFromMaskedValue, setMaskedValue} from '../../../utils/money'
+import { getFromMaskedValue, setMaskedValue } from '../../../utils/money'
 
 interface Props {
   product: GetCatalogResponseType

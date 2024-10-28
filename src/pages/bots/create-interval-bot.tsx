@@ -7,10 +7,10 @@ import { ProductTitle } from './interval-bot/product-title'
 import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
-import {fromNumberToMoneyString, getFromMaskedValue, setMaskedValue} from '../../utils/money'
+import { fromNumberToMoneyString, getFromMaskedValue, setMaskedValue } from '../../utils/money'
 import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
 import LoadingButton from '@mui/lab/LoadingButton'
-import {calculateBudget, getCandlesInterval} from './interval-bot/utils'
+import { calculateBudget, getCandlesInterval } from './interval-bot/utils'
 import { BudgetControl } from './interval-bot/budget-control'
 
 const lowBoundaryInputName = 'low-boundary-input'
@@ -100,7 +100,6 @@ export const CreateIntervalBot: React.FC = () => {
       amountPerStep
     })
   }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
-
 
   return (
     <>
