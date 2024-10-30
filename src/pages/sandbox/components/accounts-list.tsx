@@ -52,7 +52,7 @@ export const SandboxAccountsList: React.FC<Props> = ({
     }
 
     const clickHandler = (): void => {
-      deleteTrigger(selectedAccount)
+      void deleteTrigger(selectedAccount)
     }
 
     return (

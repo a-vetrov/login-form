@@ -12,6 +12,8 @@ import { NumberInput, type NumberInputChangeType } from '../../components/number
 import LoadingButton from '@mui/lab/LoadingButton'
 import { calculateBudget, getCandlesInterval } from './interval-bot/utils'
 import { BudgetControl } from './interval-bot/budget-control'
+import { AccountControl } from './interval-bot/account-control'
+import { AccountTypes } from '../../constants'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -27,6 +29,9 @@ export const CreateIntervalBot: React.FC = () => {
 
   const [stepsCount, setStepsCount] = useState<number | undefined>(defaultStepsCount)
   const [amountPerStep, setAmountPerStep] = useState<number>()
+
+  const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
+  const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -166,6 +171,16 @@ export const CreateIntervalBot: React.FC = () => {
                 <Typography variant="body1" marginTop={2}>
                   Необходимый бюджет {fromNumberToMoneyString(budget, 'RUB')}
                 </Typography>
+              </Box>
+
+              <Box marginY={2}>
+                <AccountControl
+                  accountType={accountType}
+                  onChangeAccountType={setAccountType}
+                  selectedAccount={selectedAccount}
+                  onChangeSelectedAccount={setSelectedAccount}
+                  budget={budget}
+                />
               </Box>
 
               <Box marginY={2}>
