@@ -1,11 +1,13 @@
 import { api } from './api'
 import { type Account } from '../types/tinkoff/users'
+import { type PortfolioResponse } from '../types/tinkoff/operations'
 
-interface AccountsApiType {
-  success: boolean
-  data: {
-    accounts: Account[]
-  }
+export type ExtendedAccount = Account & {
+  portfolio: PortfolioResponse
+}
+
+export interface ExtendedAccountData {
+  accounts: ExtendedAccount[]
 }
 
 interface AccountsCreateApiType {
@@ -35,12 +37,12 @@ const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['SandboxAccounts', 'Curr
 
 export const sandboxApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
-    getAccounts: build.query<AccountsApiType['data'], undefined>({
+    getAccounts: build.query<ExtendedAccountData, undefined>({
       query: () => ({
         url: 'sandbox/accounts',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as AccountsApiType['data'],
+      transformResponse: ({ data }) => data as ExtendedAccountData,
       providesTags: ['SandboxAccounts']
     }),
     createAccount: build.mutation<AccountsCreateApiType['data'], undefined>({
@@ -67,12 +69,12 @@ export const sandboxApi = apiWithTag.injectEndpoints({
       }),
       invalidatesTags: ['CurrentAccount']
     }),
-    getSandboxPortfolio: build.query<unknown, string>({
+    getSandboxPortfolio: build.query<PortfolioResponse, string>({
       query: (accountId) => ({
         url: `sandbox/portfolio?accountId=${accountId}`,
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data,
+      transformResponse: ({ data }) => data as PortfolioResponse,
       providesTags: () => ['CurrentAccount']
     }),
     postNewOrder: build.mutation<AccountsCreateApiType['data'], PostNewOrderParamsType>({

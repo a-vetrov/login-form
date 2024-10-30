@@ -1,23 +1,14 @@
 import { api } from './api'
-import { type PortfolioResponse } from '../types/tinkoff/operations.ts'
-import { type Account } from '../types/tinkoff/users.ts'
-
-interface PortfolioApiType {
-  success: boolean
-  data: {
-    portfolio: PortfolioResponse
-    accounts: Account[]
-  }
-}
+import { type ExtendedAccountData } from './sandbox'
 
 export const portfolioApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getPortfolio: build.query<PortfolioApiType['data'], undefined>({
+    getPortfolio: build.query<ExtendedAccountData, undefined>({
       query: () => ({
         url: 'portfolio',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as PortfolioApiType['data']
+      transformResponse: ({ data }) => data as ExtendedAccountData
     })
   })
 })

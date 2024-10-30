@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import type { Account } from '../../../types/tinkoff/users.ts'
 import { Alert, Box, Button, Stack, Typography } from '@mui/material'
 import { AccountCard } from '../../../components/account-card/account-card'
-import { sandboxApi } from '../../../services/sandbox'
+import { type ExtendedAccount, sandboxApi } from '../../../services/sandbox'
 import { NewMoneyDialog } from './new-money-dialog'
 
 interface Props {
-  accounts?: Account[]
+  accounts?: ExtendedAccount[]
   selectedAccount: string | undefined
   setSelectedAccount: (id: string) => void
   titleVisible?: boolean

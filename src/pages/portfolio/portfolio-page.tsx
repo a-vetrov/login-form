@@ -1,17 +1,30 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
-import { useGetPortfolioQuery } from '../../services/portfolio.ts'
-import { ProductCard } from '../../components/product-card/product-card.tsx'
-import { AccountCard } from '../../components/account-card/account-card.tsx'
+import { useGetPortfolioQuery } from '../../services/portfolio'
+import { ProductCard } from '../../components/product-card/product-card'
+import { AccountCard } from '../../components/account-card/account-card'
 import { Container, Stack, Typography } from '@mui/material'
-import { ErrorAlert } from '../../components/error-alert/error-alert.tsx'
+import { ErrorAlert } from '../../components/error-alert/error-alert'
 
 export const PortfolioPage: React.FC = () => {
   const { data, error } = useGetPortfolioQuery()
 
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
 
-  const positions = data?.portfolio.positions
+  useEffect(() => {
+    const id = data?.accounts?.[0]?.id
+    if (selectedAccount === undefined && id) {
+      setSelectedAccount(id)
+    }
+  }, [selectedAccount === undefined, data?.accounts])
+
+  const positions = useMemo(() => {
+    const account = data?.accounts.find(item => item.id === selectedAccount)
+    if (!account) {
+      return undefined
+    }
+    return account.portfolio.positions
+  }, [data?.accounts, selectedAccount])
 
   return (
     <>

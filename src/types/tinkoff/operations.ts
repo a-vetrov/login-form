@@ -188,6 +188,8 @@ export interface PortfolioResponse {
   totalAmountCurrencies: MoneyValue | undefined
   /** Общая стоимость фьючерсов в портфеле в рублях. */
   totalAmountFutures: MoneyValue | undefined
+  /** Общая стоимость портфеля в рублях. */
+  totalAmountPortfolio: MoneyValue | undefined
   /** Текущая относительная доходность портфеля, в %. */
   expectedYield: Quotation | undefined
   /** Список позиций портфеля. */

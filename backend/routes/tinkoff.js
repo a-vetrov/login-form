@@ -11,6 +11,25 @@ import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 
 export const tinkoffRouter = express.Router()
 
+const getPortfolio = async (api, id) => {
+  return await api.operations.getPortfolio({
+    accountId: id,
+    currency: PortfolioRequest_CurrencyRequest.RUB
+  })
+}
+
+const getSandboxPortfolio = async (api, id) => {
+  return await api.sandbox.getSandboxPortfolio({
+    accountId: id,
+    currency: PortfolioRequest_CurrencyRequest.RUB
+  })
+}
+
+const updateAccountProperties = async (api, account) => {
+  const portfolio = await getPortfolio(api, account.id)
+  account.portfolio = portfolio
+}
+
 tinkoffRouter.get('/api/portfolio', ensureLoggedIn, async (req, res) => {
   try {
     const user = await getUserById(req.user._id)
@@ -24,17 +43,24 @@ tinkoffRouter.get('/api/portfolio', ensureLoggedIn, async (req, res) => {
 
     const { accounts } = await api.users.getAccounts({})
 
-    const portfolio = await api.operations.getPortfolio({
-      accountId: accounts[0].id,
-      currency: PortfolioRequest_CurrencyRequest.RUB
+    const promises = []
+    accounts.forEach((account) => {
+      promises.push(updateAccountProperties(api, account))
     })
 
-    res.status(200).send({ success: true, data: { accounts, portfolio } })
+    await Promise.all(promises)
+
+    res.status(200).send({ success: true, data: { accounts } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
   }
 })
+
+const updateSandboxAccountProperties = async (api, account) => {
+  const portfolio = await getSandboxPortfolio(api, account.id)
+  account.portfolio = portfolio
+}
 
 tinkoffRouter.get('/api/sandbox/accounts', ensureLoggedIn, async (req, res) => {
   try {
@@ -48,6 +74,13 @@ tinkoffRouter.get('/api/sandbox/accounts', ensureLoggedIn, async (req, res) => {
     const api = new TinkoffInvestApi({ token: token.token })
 
     const { accounts } = await api.sandbox.getSandboxAccounts({})
+
+    const promises = []
+    accounts.forEach((account) => {
+      promises.push(updateSandboxAccountProperties(api, account))
+    })
+
+    await Promise.all(promises)
 
     res.status(200).send({ success: true, data: { accounts } })
   } catch (error) {
@@ -106,7 +139,8 @@ tinkoffRouter.get('/api/sandbox/portfolio', ensureLoggedIn, async (req, res) => 
     }
     const api = new TinkoffInvestApi({ token: token.token })
 
-    const data = await api.sandbox.getSandboxPortfolio({ accountId: req.query.accountId, currency: PortfolioRequest_CurrencyRequest.RUB })
+    const data = await getSandboxPortfolio(api, req.query.accountId)
+
     res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)
