@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { CircularProgress, Stack, ToggleButtonGroup, Typography } from '@mui/material'
+import { CircularProgress, Stack, ToggleButtonGroup, Typography, Box } from '@mui/material'
 import { AccountTypes } from '../../../constants'
 import { ToggleButton } from '@mui/lab'
 import { sandboxApi } from '../../../services/sandbox'
@@ -69,11 +69,14 @@ export const AccountControl: React.FC<Props> = ({ accountType, onChangeAccountTy
         Ваши счета:
       </Typography>
       <ErrorAlert error={accounts.error} />
-      <Stack direction="row" spacing={2} marginY={2}>
-        {accounts.data?.accounts.map((item) => (
-          <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={onChangeSelectedAccount} />
-        ))}
-      </Stack>
+      <Box sx={{overflowX: 'auto', maxWidth: '100%'}}>
+        <Stack direction="row" spacing={2} marginY={2}>
+          {accounts.data?.accounts.map((item) => (
+            <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={onChangeSelectedAccount} />
+          ))}
+        </Stack>
+      </Box>
+
       {errorMessage}
 
     </>
