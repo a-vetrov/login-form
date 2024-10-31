@@ -14,6 +14,9 @@ import { calculateBudget, getCandlesInterval } from './interval-bot/utils'
 import { BudgetControl } from './interval-bot/budget-control'
 import { AccountControl } from './interval-bot/account-control'
 import { AccountTypes } from '../../constants'
+import { getMinMax } from '../../utils/math'
+import { type AddIntervalBotData, useAddIntervalBotMutation } from '../../services/bots'
+import { ErrorAlert } from '../../components/error-alert/error-alert'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -32,6 +35,8 @@ export const CreateIntervalBot: React.FC = () => {
 
   const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
+
+  const [trigger, { isLoading, error: postError }] = useAddIntervalBotMutation()
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -106,6 +111,21 @@ export const CreateIntervalBot: React.FC = () => {
     })
   }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    const bounds = (lowBoundary !== undefined && highBoundary !== undefined) ? getMinMax(lowBoundary, highBoundary) : undefined
+
+    const result: AddIntervalBotData = {
+      product: product?.uid,
+      bounds,
+      stepsCount,
+      amountPerStep,
+      accountType,
+      selectedAccount
+    }
+    void trigger(result)
+  }
+
   return (
     <>
       <MainToolbar />
@@ -115,7 +135,7 @@ export const CreateIntervalBot: React.FC = () => {
         </Typography>
         {!product && <SearchProduct onChange={handleProductChange}/>}
         {product && (
-          <>
+          <Box component='form' onSubmit={handleSubmit}>
             <ProductTitle data={product} onReset={handleResetProduct}/>
 
             <FormControl fullWidth>
@@ -193,15 +213,17 @@ export const CreateIntervalBot: React.FC = () => {
                 />
               </Box>
 
+              <ErrorAlert error={postError} />
+
               <NoSsr>
-                <LoadingButton loading={false} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
+                <LoadingButton loading={isLoading} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
                   Создать интервальный бот
                 </LoadingButton>
               </NoSsr>
 
               <Button variant="outlined" fullWidth onClick={handleResetProduct} sx={{ my: 1 }}>Отмена</Button>
             </FormControl>
-          </>
+          </Box>
         )}
       </Container>
     </>

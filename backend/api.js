@@ -5,6 +5,7 @@ import { brokerRouter } from './routes/broker.js'
 import { tinkoffRouter } from './routes/tinkoff.js'
 import { catalogRouter } from './routes/catalog.js'
 import { marketDataRouter } from './routes/market-data.js'
+import { botsRouter } from './routes/bots.js'
 
 const router = express.Router()
 
@@ -22,5 +23,6 @@ export const initializeAPI = (app) => {
   app.use(tinkoffRouter)
   app.use(catalogRouter)
   app.use(marketDataRouter)
+  app.use(botsRouter)
   app.use(router)
 }

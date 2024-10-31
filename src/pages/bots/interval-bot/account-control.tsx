@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { CircularProgress, Stack, ToggleButtonGroup, Typography, Box } from '@mui/material'
+import {CircularProgress, Stack, ToggleButtonGroup, Typography, Box, ToggleButton} from '@mui/material'
 import { AccountTypes } from '../../../constants'
-import { ToggleButton } from '@mui/lab'
 import { sandboxApi } from '../../../services/sandbox'
 import { useGetPortfolioQuery } from '../../../services/portfolio'
 import { ErrorAlert } from '../../../components/error-alert/error-alert'
