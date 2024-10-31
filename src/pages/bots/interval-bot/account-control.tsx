@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import {CircularProgress, Stack, ToggleButtonGroup, Typography, Box, ToggleButton} from '@mui/material'
+import { CircularProgress, Stack, ToggleButtonGroup, Typography, Box, ToggleButton } from '@mui/material'
 import { AccountTypes } from '../../../constants'
 import { sandboxApi } from '../../../services/sandbox'
 import { useGetPortfolioQuery } from '../../../services/portfolio'
 import { ErrorAlert } from '../../../components/error-alert/error-alert'
 import { AccountCard } from '../../../components/account-card/account-card'
-import {getFromMoneyValue} from '../../../utils/money';
+import { getFromMoneyValue } from '../../../utils/money'
 
 interface Props {
   accountType: AccountTypes
@@ -68,7 +68,7 @@ export const AccountControl: React.FC<Props> = ({ accountType, onChangeAccountTy
         Ваши счета:
       </Typography>
       <ErrorAlert error={accounts.error} />
-      <Box sx={{overflowX: 'auto', maxWidth: '100%'}}>
+      <Box sx={{ overflowX: 'auto', maxWidth: '100%' }}>
         <Stack direction="row" spacing={2} marginY={2}>
           {accounts.data?.accounts.map((item) => (
             <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={onChangeSelectedAccount} />
