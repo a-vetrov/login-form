@@ -6,8 +6,9 @@ import {
   BusinessCenterOutlined,
   ListAltOutlined, LoginOutlined,
   Logout,
-  SportsEsportsOutlined, TokenOutlined, ViewDayOutlined
+  SportsEsportsOutlined, TokenOutlined, ViewDayOutlined, InsightsOutlined
 } from '@mui/icons-material'
+
 import { MenuItemLink } from './menu-item'
 import { loginApi } from '../../services/login'
 import { userInfoSlice } from '../../store/slices/user-slice'
@@ -29,7 +30,7 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
     dispatch(userInfoSlice.actions.logout())
     onClose()
     navigate('/')
-  }, [trigger])
+  }, [dispatch, navigate, onClose, trigger])
 
   const itemsList = useMemo(() => {
     if (isAuth) {
@@ -42,6 +43,7 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
           <MenuItemLink title='Валюта' link='/catalog/currency' shifted />
           <MenuItemLink title='Песочница' link='/sandbox' Icon={SportsEsportsOutlined} />
           <MenuItemLink title='Брокеры' link='/broker/list' Icon={TokenOutlined} />
+          <MenuItemLink title='Список ботов' link='/bots' Icon={InsightsOutlined} />
           <MenuItemLink title='Создать интервальный бот' link='/bots/create/interval' Icon={ViewDayOutlined} />
 
           <Divider />

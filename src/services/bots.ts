@@ -1,5 +1,5 @@
 import { api } from './api'
-import { type AccountTypes } from '../constants'
+import { type AccountTypes, type BotsType } from '../constants'
 
 export interface AddIntervalBotData {
   product?: string
@@ -11,6 +11,15 @@ export interface AddIntervalBotData {
   amountPerStep?: number
   accountType: AccountTypes
   selectedAccount?: string
+}
+
+export interface BotsListDataType {
+  type: BotsType
+  created: string
+  accountType: AccountTypes
+  selectedAccount: string
+  properties: Record<string, unknown>
+  id: string
 }
 
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['BotsList'] })
@@ -25,12 +34,12 @@ export const botsApi = apiWithTag.injectEndpoints({
       }),
       invalidatesTags: ['BotsList']
     }),
-    getBots: build.query<unknown, undefined>({
+    getBots: build.query<BotsListDataType[], undefined>({
       query: () => ({
         url: 'bots',
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data,
+      transformResponse: ({ data }) => data as BotsListDataType[],
       providesTags: ['BotsList']
     })
   })

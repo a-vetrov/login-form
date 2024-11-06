@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import { Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
@@ -17,6 +17,7 @@ import { AccountTypes } from '../../constants'
 import { getMinMax } from '../../utils/math'
 import { type AddIntervalBotData, useAddIntervalBotMutation } from '../../services/bots'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
+import { useNavigate } from 'react-router-dom'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -36,7 +37,15 @@ export const CreateIntervalBot: React.FC = () => {
   const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
 
-  const [trigger, { isLoading, error: postError }] = useAddIntervalBotMutation()
+  const [trigger, { isLoading, error: postError, isSuccess: isPostSuccess }] = useAddIntervalBotMutation()
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isPostSuccess) {
+      navigate('/bots')
+    }
+  }, [isPostSuccess, navigate])
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
