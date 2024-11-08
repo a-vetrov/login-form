@@ -8,6 +8,7 @@ import { redisStore } from './backend/db/redis.js'
 import passport from 'passport'
 import { updateCatalog } from './backend/utils/update-catalog.js'
 import { credentials } from './credentials.js'
+import { BotManager } from './backend/bots/bot-manager.js'
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -44,6 +45,10 @@ app.use(passport.initialize())
 app.use(passport.authenticate('session'))
 
 initializeAPI(app)
+
+// Create bot manager
+const botManager = new BotManager()
+botManager.initialize()
 
 // Add Vite or respective production middlewares
 let vite

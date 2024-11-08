@@ -2,8 +2,10 @@ import express from 'express'
 import { ensureLoggedIn } from '../handlers/ensure-logged-in.js'
 import { getUserById } from '../db/models/user.js'
 import { sendError } from '../handlers/error.js'
-import { checkToken } from './tinkoff.js'
 import { BotsModel, BotsType, getBotsByUserById } from '../db/models/bots/bots.js'
+import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
+import { BotManager } from '../bots/bot-manager.js'
+import { IntervalBot } from '../bots/interval-bot.js'
 
 export const botsRouter = express.Router()
 
@@ -16,7 +18,13 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
     const user = await getUserById(req.user._id)
     const { product, bounds, stepsCount, amountPerStep, accountType, selectedAccount } = req.body
 
-    await new BotsModel({
+    const token = accountType === 'real' ? getFirstRealToken(user) : getFirstSandboxToken(user)
+
+    if (!token) {
+      return sendError(res, 403, 'Ошибка', 'Не найден подходящий токен')
+    }
+
+    const result = await new BotsModel({
       userId: user._id,
       type: BotsType.interval,
       created: new Date(),
@@ -24,6 +32,18 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       selectedAccount,
       properties: { product, bounds, stepsCount, amountPerStep }
     }).save()
+
+    BotManager.instance.addBot(new IntervalBot({
+      token,
+      account: selectedAccount,
+      product,
+      bounds,
+      stepsCount,
+      amountPerStep,
+      id: result._id.toString()
+    }))
+
+    console.log('result', result)
 
     res.status(200).send({ success: true })
   } catch (error) {
