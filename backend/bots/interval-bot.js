@@ -20,13 +20,16 @@ export class IntervalBot {
 
   start () {
     console.log('Interval bot started!')
+    void this.buyOrder(this.bounds.min)
   }
 
   async buyOrder (price) {
+    const orderId = uuidv6()
+    console.log('price = ', price, 'orderId = ', orderId)
     const body = {
       quantity: this.amountPerStep,
-      price,
-      orderId: uuidv6(),
+      price: this.api.helpers.toQuotation(price),
+      orderId,
       direction: 1, // Покупка
       accountId: this.account,
       orderType: 1,
@@ -35,7 +38,7 @@ export class IntervalBot {
       time_in_force: 1,
       price_type: 2
     }
-    const data = await api.sandbox.postSandboxOrder(body)
+    const data = await this.api.sandbox.postSandboxOrder(body)
     console.log(data)
   }
 }

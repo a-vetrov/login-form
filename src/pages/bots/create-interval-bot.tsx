@@ -109,14 +109,15 @@ export const CreateIntervalBot: React.FC = () => {
   }, [])
 
   const budget = useMemo(() => {
-    if (!product || !amountPerStep || amountPerStep % product?.lot) {
+    if (!product || !amountPerStep) {
       return 0
     }
     return calculateBudget({
       lowBoundary,
       highBoundary,
       stepsCount,
-      amountPerStep
+      amountPerStep,
+      productLots: product.lot
     })
   }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
 

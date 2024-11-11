@@ -20,28 +20,16 @@ export const BudgetControl: React.FC<Props> = ({ product, onChange, amountPerSte
     }
   }, [onChange])
 
-  const instrumentType = useMemo<string>(() => {
-    switch (product.type) {
-      case 'stock': return 'Количество акций'
-      case 'bond': return 'Количество облигаций'
-      case 'currency' :
-      default: return 'Объем'
-    }
-  }, [product.type])
-
   const title = useMemo(() => {
-    return `${instrumentType} в одной заявке (шаге сетки), учитывая лотность продукта ${product.lot}.`
-  }, [instrumentType, product.lot])
+    return `Количество лотов в одной заявке (шаге сетки). Лотность продукта ${product.lot}.`
+  }, [product.lot])
 
   const errorMessage = useMemo(() => {
     if (amountPerStep <= 0) {
       return 'Нулевой объем.'
     }
-    if (amountPerStep % product.lot !== 0) {
-      return `Лотность продукта ${product.lot}.`
-    }
     return ''
-  }, [amountPerStep, product.lot])
+  }, [amountPerStep])
 
   return (
     <>
@@ -51,7 +39,7 @@ export const BudgetControl: React.FC<Props> = ({ product, onChange, amountPerSte
       <NumberInput
         name="amountPerStep"
         required
-        label={instrumentType}
+        label='Количество лотов'
         value={setMaskedValue(amountPerStep)}
         autoComplete="off"
         onChange={handleChange}

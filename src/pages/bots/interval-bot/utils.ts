@@ -33,17 +33,18 @@ interface CalculateBudgetProps {
   highBoundary?: number
   stepsCount?: number
   amountPerStep?: number
+  productLots?: number
 }
 
-export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountPerStep }: CalculateBudgetProps): number => {
-  if (lowBoundary === undefined || highBoundary === undefined || lowBoundary === highBoundary || !stepsCount || !amountPerStep) {
+export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountPerStep, productLots }: CalculateBudgetProps): number => {
+  if (lowBoundary === undefined || highBoundary === undefined || lowBoundary === highBoundary || !stepsCount || !amountPerStep || !productLots) {
     return 0
   }
   const { min, max } = getMinMax(lowBoundary, highBoundary)
   const stepSize = (max - min) / (stepsCount - 1)
   let result = 0
   for (let i = lowBoundary; i <= highBoundary; i += stepSize) {
-    result += i * amountPerStep
+    result += i * amountPerStep * productLots
   }
   return result
 }
