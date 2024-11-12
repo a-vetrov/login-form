@@ -20,6 +20,7 @@ import { YandexLoginPage } from './pages/login/yandex-login'
 import { OrderAddPage } from './pages/order-add/order-add-page'
 import { CreateIntervalBot } from './pages/bots/create-interval-bot'
 import { BotsList } from './pages/bots/bots-list'
+import { BotDetails } from './pages/bots/bot-details'
 
 export const App: React.FC = () => {
   const defaultTheme = createTheme(getCustomTheme())
@@ -53,6 +54,7 @@ export const App: React.FC = () => {
               <Route path="/broker/add" element={<BrokerAddPage />} />
               <Route path="/order/add/:id" element={<OrderAddPage />} />
               <Route path="/bots/create/interval" element={<CreateIntervalBot />} />
+              <Route path="/bots/:id" element={<BotDetails />} />
               <Route path="/bots" element={<BotsList />} />
               <Route path="*" element={<NotFound />} />
           </Routes>

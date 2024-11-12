@@ -33,7 +33,7 @@ export class IntervalBot {
       direction: 1, // Покупка
       accountId: this.account,
       orderType: 1,
-      instrumentId: this.product,
+      instrumentId: this.product.uid,
       figi: '',
       time_in_force: 1,
       price_type: 2

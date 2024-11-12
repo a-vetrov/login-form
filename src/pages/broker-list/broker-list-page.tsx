@@ -18,8 +18,8 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import TokenIcon from '@mui/icons-material/Token'
 import IconLoader from '../../components/icon-loader'
-import { DeleteButton } from './components/delete-button.tsx'
-import { TokenTypeLabel } from './components/token-type.tsx'
+import { DeleteButton } from './components/delete-button'
+import { TokenTypeLabel } from './components/token-type'
 
 export const BrokerListPage: React.FC = () => {
   const { data, error, isLoading } = useGetBrokerListQuery()

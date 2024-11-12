@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import {UserModel} from "../user.js";
 const { Schema } = mongoose
 
 export const BotsType = {
@@ -20,4 +19,6 @@ const botsSchema = new Schema({
 
 export const BotsModel = mongoose.model('Bots', botsSchema)
 
-export const getBotsByUserById = async (userId) => BotsModel.find({ userId })
+export const getBotsByUserId = async (userId) => BotsModel.find({ userId })
+
+export const getBotById = async (id) => BotsModel.findById(id)

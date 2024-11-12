@@ -5,6 +5,7 @@ import { getBondsData, getCurrencyData, getStocksData, mergeWithMOEXData } from 
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
+import {getInstrumentByIsin} from "../db/models/catalog/common.js";
 
 // https://www.moex.com/ru/marketdata/#/mode=groups&group=3&collection=7&boardgroup=58&data_type=current&category=main
 
@@ -107,29 +108,14 @@ catalogRouter.get('/api/catalog/currency/:ticker', ensureLoggedIn, async (req, r
 catalogRouter.get('/api/catalog/instrument/:isin', ensureLoggedIn, async (req, res) => {
   try {
     const isin = req.params.isin
-    let type = 'bond'
-    let data = await CatalogBondsModel.findOne({ isin }).lean()
-    if (!data) {
-      type = 'stock'
-      data = await CatalogStocksModel.findOne({ isin }).lean()
-    }
-    if (!data) {
-      type = 'currency'
-      data = await CatalogCurrenciesModel.findOne({ ticker: isin }).lean()
-    }
+    const data = getInstrumentByIsin(isin)
 
     if (!data) {
       sendError(res, 404, 'Ошибка', 'Инструмент не найден')
       return
     }
 
-    const {
-      _id, __v, ...rest
-    } = data
-
-    rest.type = type
-
-    res.status(200).send({ success: true, data: rest })
+    res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

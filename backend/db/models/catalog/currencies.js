@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import {MoneyValueSchema} from "./common.js";
+import { MoneyValueSchema } from './money.js'
 const { Schema } = mongoose
 
 const currenciesSchema = new Schema({
@@ -12,7 +12,7 @@ const currenciesSchema = new Schema({
   currency: String,
   realExchange: String,
   riskLevel: Number,
-  nominal: MoneyValueSchema,
+  nominal: MoneyValueSchema
 })
 
 export const CatalogCurrenciesModel = mongoose.model('CatalogCurrencies', currenciesSchema)

@@ -32,20 +32,20 @@ export const CreateIntervalBot: React.FC = () => {
   const [highBoundary, setHighBoundary] = useState<number>()
 
   const [stepsCount, setStepsCount] = useState<number | undefined>(defaultStepsCount)
-  const [amountPerStep, setAmountPerStep] = useState<number>()
+  const [amountPerStep, setAmountPerStep] = useState<number>(1)
 
   const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
 
-  const [trigger, { isLoading, error: postError, isSuccess: isPostSuccess }] = useAddIntervalBotMutation()
+  const [trigger, { isLoading, error: postError, isSuccess: isPostSuccess, data: postData }] = useAddIntervalBotMutation()
 
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (isPostSuccess) {
-      navigate('/bots')
+    if (isPostSuccess && postData?.id) {
+      navigate(`/bots/${postData.id}`)
     }
-  }, [isPostSuccess, navigate])
+  }, [isPostSuccess, navigate, postData])
 
   const boundaryLabel = useMemo(() => {
     if (lowBoundary === undefined || highBoundary === undefined || lowBoundary < highBoundary) {
@@ -61,7 +61,6 @@ export const CreateIntervalBot: React.FC = () => {
   }, [highBoundary, lowBoundary])
 
   const handleProductChange = useCallback((item: GetCatalogResponseType) => {
-    setAmountPerStep(item.lot)
     setProduct(item)
   }, [setProduct])
 
@@ -121,7 +120,7 @@ export const CreateIntervalBot: React.FC = () => {
     })
   }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const bounds = (lowBoundary !== undefined && highBoundary !== undefined) ? getMinMax(lowBoundary, highBoundary) : undefined
 
@@ -134,7 +133,7 @@ export const CreateIntervalBot: React.FC = () => {
       selectedAccount
     }
     void trigger(result)
-  }
+  }, [accountType, amountPerStep, highBoundary, lowBoundary, product?.uid, selectedAccount, stepsCount, trigger])
 
   return (
     <>

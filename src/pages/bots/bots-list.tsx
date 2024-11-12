@@ -1,7 +1,9 @@
 import React from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Container, Typography } from '@mui/material'
+import { CircularProgress, Container, Typography } from '@mui/material'
 import { useGetBotsQuery } from '../../services/bots'
+import { BotListCard } from './bots-list/bot-card'
+import { ErrorAlert } from '../../components/error-alert/error-alert'
 
 export const BotsList: React.FC = () => {
   const { data, isLoading, error } = useGetBotsQuery()
@@ -13,11 +15,10 @@ export const BotsList: React.FC = () => {
         <Typography variant="h1" marginBottom={1}>
           Список роботов
         </Typography>
+        {isLoading && <CircularProgress />}
+        <ErrorAlert error={error} />
         {data?.map((item) => (
-          <div key={item.id}>
-            <Typography variant="body1" >type: {item.type}</Typography>
-            <Typography variant="body1" >created: {item.created}</Typography>
-          </div>
+          <BotListCard data={item} key={item.id} />
         ))}
       </Container>
     </>

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { MoneyValueSchema } from './common.js'
+import { MoneyValueSchema } from './money.js'
 const { Schema } = mongoose
 
 const bondsSchema = new Schema({
