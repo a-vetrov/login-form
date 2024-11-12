@@ -6,7 +6,7 @@ import { BotsModel, BotsType, getBotById, getBotsByUserId } from '../db/models/b
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval-bot.js'
-import {getInstrumentByUid} from "../db/models/catalog/common.js";
+import { getInstrumentByUid } from '../db/models/catalog/common.js'
 
 export const botsRouter = express.Router()
 

@@ -5,7 +5,7 @@ import { getBondsData, getCurrencyData, getStocksData, mergeWithMOEXData } from 
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
-import {getInstrumentByIsin} from "../db/models/catalog/common.js";
+import { getInstrumentByIsin } from '../db/models/catalog/common.js'
 
 // https://www.moex.com/ru/marketdata/#/mode=groups&group=3&collection=7&boardgroup=58&data_type=current&category=main
 

@@ -8,7 +8,7 @@ import { getBotDetailsView } from './details/details-factory'
 export const BotDetails: React.FC = () => {
   const match = useMatch('/bots/:id')
 
-  const { data, isLoading } = useGetBotByIdQuery(match?.params.id!)
+  const { data, isLoading } = useGetBotByIdQuery(match?.params.id as unknown as string)
 
   const BotComponent = useMemo(() => {
     if (!data) {
