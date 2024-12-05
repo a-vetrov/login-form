@@ -5,7 +5,7 @@ import { sendError } from '../handlers/error.js'
 import { BotsModel, BotsType, getBotById, getBotsByUserId } from '../db/models/bots/bots.js'
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
-import { IntervalBot } from '../bots/interval-bot.js'
+import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
 
 export const botsRouter = express.Router()
@@ -41,6 +41,16 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
     }).save()
 
     const botId = result._id.toString()
+
+    console.log({
+      token,
+      account: selectedAccount,
+      product: productData,
+      bounds,
+      stepsCount,
+      amountPerStep,
+      id: botId
+    })
 
     BotManager.instance.addBot(new IntervalBot({
       token,
