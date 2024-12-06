@@ -2,7 +2,7 @@ import { IntervalBot } from './backend/bots/interval/interval-bot.js'
 
 const params = {
   token: {
-    token: '...',
+    token: 't.BwNZ6c6YR0kczcfnJ8sQPXlt2cgdI1ENcwxT7qfjHSU6QOd_-3kFS0xWTzhHjlZQrrS4DE0anbcUscExPf9zOA',
     name: '1',
     type: 'real',
     created: '2024-12-05T10:20:52.902Z'
@@ -15,7 +15,7 @@ const params = {
     name: 'Сбер Банк',
     type: 'stock'
   },
-  bounds: { min: 224, max: 228 },
+  bounds: { min: 232, max: 236 },
   stepsCount: 10,
   amountPerStep: 1,
   id: '67517f97afa8c181f4c97a06'

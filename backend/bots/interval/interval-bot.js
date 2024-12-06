@@ -12,22 +12,27 @@ export class IntervalBot {
     this.amountPerStep = amountPerStep
     this.id = id
 
+    this.streamLock = false
+
     this.api = new TinkoffInvestApi({ token: token.token })
 
     this.steps = IntervalStep.generate(this.bounds, this.stepsCount)
 
     console.log('this.steps', this.steps)
 
-    this.start()
+    void this.start()
   }
 
-  start () {
+  async start () {
     console.log('Interval bot started!')
     this.api.stream.market.on('error', this.handleStreamError)
     this.api.stream.market.on('close', this.handleStreamClose)
     // this.api.stream.trades.on('data', this.subscribeTradesHandler)
+    await this.cancelActiveOrders()
 
     void this.createLastPriceStream()
+    // void this.getActiveOrders()
+
     // void this.createTradesStream()
   }
 
@@ -40,6 +45,12 @@ export class IntervalBot {
   }
 
   subscribeLastPriceHandler = async (result) => {
+    if (this.streamLock) {
+      console.log('this.streamLock', this.streamLock)
+      return
+    }
+
+    this.streamLock = true
     console.log('subscribeLastPriceHandler', result)
 
     const price = Helpers.toNumber(result.price)
@@ -55,10 +66,13 @@ export class IntervalBot {
     })
 
     await Promise.all(promises)
-    //console.log('this.steps', this.steps)
+    await this.checkSteps()
+    this.streamLock = false
+    // console.log('this.steps', this.steps)
   }
 
   async createLastPriceStream () {
+    // TODO: надо еще когда-то отписаться от подписки
     const unsubscribeLastPrice = await this.api.stream.market.lastPrice({
       instruments: [
         {
@@ -73,11 +87,46 @@ export class IntervalBot {
     console.log('subscribeTradesHandler', result)
   }
 
+  // Почему-то не работает
   async createTradesStream () {
     console.log('this.account', this.account)
     await this.api.stream.trades.watch({
       accounts: [this.account]
     })
+  }
+
+  async getActiveOrders () {
+    const data = await this.api.sandbox.getSandboxOrders({ accountId: this.account })
+    console.log(data)
+    return data.orders
+  }
+
+  async cancelOrder (orderId) {
+    const data = await this.api.sandbox.cancelSandboxOrder({
+      accountId: this.account,
+      orderId
+    })
+    console.log('Order canceled', data)
+  }
+
+  async cancelActiveOrders () {
+    const orders = await this.getActiveOrders()
+    const promises = []
+
+    orders.forEach(({ orderId }) => {
+      promises.push(this.cancelOrder(orderId))
+    })
+
+    await Promise.all(promises)
+  }
+
+  async checkSteps () {
+    const activeOrders = await this.getActiveOrders()
+    const activeOrdersIds = activeOrders.map((order) => order.orderId)
+
+    const stepsToCheck = this.steps.filter((step) => step.orderId && !activeOrdersIds.includes(step.orderId))
+
+    console.log('stepsToCheck', stepsToCheck)
   }
 
   async buyOrder (step) {
