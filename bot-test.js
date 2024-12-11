@@ -15,7 +15,7 @@ const params = {
     name: 'Сбер Банк',
     type: 'stock'
   },
-  bounds: { min: 232, max: 236 },
+  bounds: { min: 229, max: 231 },
   stepsCount: 10,
   amountPerStep: 1,
   id: '67517f97afa8c181f4c97a06'
