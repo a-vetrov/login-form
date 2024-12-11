@@ -37,20 +37,11 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       created: new Date(),
       accountType,
       selectedAccount,
+      active: true,
       properties: { product: productData, bounds, stepsCount, amountPerStep }
     }).save()
 
     const botId = result._id.toString()
-
-    console.log({
-      token,
-      account: selectedAccount,
-      product: productData,
-      bounds,
-      stepsCount,
-      amountPerStep,
-      id: botId
-    })
 
     BotManager.instance.addBot(new IntervalBot({
       token,
@@ -77,8 +68,8 @@ botsRouter.get('/api/bots', ensureLoggedIn, async (req, res) => {
     const user = await getUserById(req.user._id)
     const bots = await getBotsByUserId(user._id)
     const data = bots.map(item => {
-      const { _id, type, created, accountType, selectedAccount, properties } = item
-      return { type, created, accountType, selectedAccount, properties, id: _id }
+      const { _id, type, created, accountType, selectedAccount, properties, active } = item
+      return { type, created, accountType, selectedAccount, properties, active, id: _id }
     })
     res.status(200).send({ success: true, data })
   } catch (error) {
@@ -97,9 +88,30 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
     if (!bot || req.user._id.toString() !== bot.userId.toString()) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
-    const { _id, type, created, accountType, selectedAccount, properties } = bot
-    const data = { type, created, accountType, selectedAccount, properties, id: _id }
+    const { _id, type, created, accountType, selectedAccount, properties, active } = bot
+    const data = { type, created, accountType, selectedAccount, properties, active, id: _id }
     res.status(200).send({ success: true, data })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+/* PUT /api/bots/:id/stop
+ *
+ * Получение информации по конкретному боту
+ */
+botsRouter.put('/api/bots/:id/stop', ensureLoggedIn, async (req, res) => {
+  try {
+    const bot = await getBotById(req.params.id)
+    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+      return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
+    }
+    BotManager.instance.stopBot(req.params.id)
+
+    bot.active = false
+    await bot.save()
+    res.status(200).send({ success: true })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

@@ -11,6 +11,7 @@ const botsSchema = new Schema({
   created: Date,
   accountType: String,
   selectedAccount: String,
+  active: Boolean,
   properties: {
     type: Map,
     of: {}

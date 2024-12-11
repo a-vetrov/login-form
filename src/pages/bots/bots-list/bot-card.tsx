@@ -18,6 +18,14 @@ export const BotListCard: React.FC<Props> = ({ data }) => {
     }
   }, [data.type])
 
+  const activeLabel = useMemo(() => {
+    if (data.active) {
+      return <Typography variant='subtitle1' color='success.main'>Активен</Typography>
+    } else {
+      return <Typography variant='subtitle1' color='error.light'>Остановлен</Typography>
+    }
+  }, [data.active])
+
   return (
     <Card >
       <CardActionArea component={Link} to={data.id} >
@@ -31,7 +39,7 @@ export const BotListCard: React.FC<Props> = ({ data }) => {
               <Typography variant='body2'>{data.id}</Typography>
             </Stack>
             <Stack spacing={0} alignItems='flex-end'>
-              <Typography variant='subtitle1' color='success.main'>Активен</Typography>
+              {activeLabel}
               <Typography variant='body2'>Создан: {data.created}</Typography>
             </Stack>
           </Stack>

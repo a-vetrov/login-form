@@ -12,6 +12,8 @@ export class IntervalBot {
     this.stepsCount = stepsCount
     this.amountPerStep = amountPerStep
     this.id = id
+    this.unsubscribeLastPrice = undefined
+    this.active = false
 
     this.streamLock = false
 
@@ -26,15 +28,21 @@ export class IntervalBot {
 
   start = async () => {
     console.log('Interval bot started!')
+    this.active = true
     this.api.stream.market.on('error', this.handleStreamError)
     this.api.stream.market.on('close', this.handleStreamClose)
-    // this.api.stream.trades.on('data', this.subscribeTradesHandler)
     await this.cancelActiveOrders()
 
-    void this.createLastPriceStream()
-    // void this.getActiveOrders()
+    // void this.createLastPriceStream()
+  }
 
-    // void this.createTradesStream()
+  stop = async () => {
+    console.log('Interval bot stopped!')
+    this.active = false
+    if (this.unsubscribeLastPrice) {
+      await this.unsubscribeLastPrice()
+    }
+    await this.cancelActiveOrders()
   }
 
   handleStreamError = (error) => {
@@ -52,13 +60,13 @@ export class IntervalBot {
     }
 
     this.streamLock = true
-    console.log('subscribeLastPriceHandler', result)
 
     const price = Helpers.toNumber(result.price)
 
     if (!price) {
       return
     }
+    console.log('subscribeLastPriceHandler', price)
 
     const stepsToBuy = this.steps.filter((item) => item.state === STATE.WAIT_ENTRY_PRICE && item.bounds.min <= price)
 
@@ -70,8 +78,7 @@ export class IntervalBot {
   }
 
   createLastPriceStream = async () => {
-    // TODO: надо еще когда-то отписаться от подписки
-    const unsubscribeLastPrice = await this.api.stream.market.lastPrice({
+    this.unsubscribeLastPrice = await this.api.stream.market.lastPrice({
       instruments: [
         {
           figi: this.product.figi,
@@ -81,21 +88,10 @@ export class IntervalBot {
     }, this.subscribeLastPriceHandler)
   }
 
-  subscribeTradesHandler = async (result) => {
-    console.log('subscribeTradesHandler', result)
-  }
-
-  // Почему-то не работает
-  async createTradesStream () {
-    console.log('this.account', this.account)
-    await this.api.stream.trades.watch({
-      accounts: [this.account]
-    })
-  }
-
   getActiveOrders = async () => {
     const data = await this.api.sandbox.getSandboxOrders({ accountId: this.account })
-    console.log('Active orders:', data)
+    console.log('Active orders:')
+    console.log(data.orders)
     return data.orders
   }
 

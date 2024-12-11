@@ -19,6 +19,7 @@ interface AddIntervalBotResponseType {
 
 export interface BotsListDataType {
   type: BotsType
+  active: boolean
   created: string
   accountType: AccountTypes
   selectedAccount: string
@@ -52,9 +53,22 @@ export const botsApi = apiWithTag.injectEndpoints({
         url: `bots/${id}`,
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data as BotsListDataType
+      transformResponse: ({ data }) => data as BotsListDataType,
+      providesTags: (result, error, id) => [{ type: 'BotsList', id }]
+    }),
+    stopBot: build.mutation<BotsListDataType, string>({
+      query: (id) => ({
+        url: `bots/${id}/stop`,
+        method: 'PUT'
+      }),
+      invalidatesTags: ['BotsList']
     })
   })
 })
 
-export const { useAddIntervalBotMutation, useGetBotsQuery, useGetBotByIdQuery } = botsApi
+export const {
+  useAddIntervalBotMutation,
+  useGetBotsQuery,
+  useGetBotByIdQuery,
+  useStopBotMutation
+} = botsApi
