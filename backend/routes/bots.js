@@ -7,6 +7,7 @@ import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
+import {getBotOrders} from "../db/models/bots/order.js";
 
 export const botsRouter = express.Router()
 
@@ -90,6 +91,7 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
     }
     const { _id, type, created, accountType, selectedAccount, properties, active } = bot
     const data = { type, created, accountType, selectedAccount, properties, active, id: _id }
+    data.orders = await getBotOrders(bot._id)
     res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)
@@ -99,7 +101,7 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
 
 /* PUT /api/bots/:id/stop
  *
- * Получение информации по конкретному боту
+ * Остановка бота
  */
 botsRouter.put('/api/bots/:id/stop', ensureLoggedIn, async (req, res) => {
   try {

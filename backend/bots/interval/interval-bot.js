@@ -2,6 +2,7 @@ import { TinkoffInvestApi, Helpers } from 'tinkoff-invest-api'
 import { v6 as uuidv6 } from 'uuid'
 import { IntervalStep, STATE } from './interval-step.js'
 import { forEachSeries } from '../../utils/promise.js'
+import { createNewOrderRecord, OrderStatus, updateOrderRecord } from '../../db/models/bots/order.js'
 
 export class IntervalBot {
   constructor ({ token, account, product, bounds, stepsCount, amountPerStep, id }) {
@@ -33,7 +34,7 @@ export class IntervalBot {
     this.api.stream.market.on('close', this.handleStreamClose)
     await this.cancelActiveOrders()
 
-    // void this.createLastPriceStream()
+    void this.createLastPriceStream()
   }
 
   stop = async () => {
@@ -100,6 +101,10 @@ export class IntervalBot {
       accountId: this.account,
       orderId
     })
+    await updateOrderRecord({
+      orderId,
+      status: OrderStatus.EXECUTION_REPORT_STATUS_CANCELLED
+    })
     console.log('Order canceled', data)
   }
 
@@ -119,6 +124,13 @@ export class IntervalBot {
 
   updateStepState = async (step) => {
     const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
+
+    if (step.orderId) {
+      await updateOrderRecord({
+        orderId: step.orderId,
+        status: data.executionReportStatus
+      })
+    }
 
     // TODO: надо решить, что делать, если заявка отклонена, отменена
     if (data.executionReportStatus !== 1) {
@@ -145,7 +157,7 @@ export class IntervalBot {
   buyOrder = async (step) => {
     const orderId = uuidv6()
     const price = step.bounds.min
-    step.update(STATE.TRY_TO_BUY, orderId)
+    step.update(STATE.TRY_TO_BUY, undefined)
     const body = {
       quantity: this.amountPerStep,
       price: Helpers.toQuotation(price),
@@ -162,13 +174,20 @@ export class IntervalBot {
     console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
     console.log(data)
     step.update(STATE.TRY_TO_BUY, data.orderId)
+    await createNewOrderRecord({
+      orderId: data.orderId,
+      botId: this.id,
+      quantity: this.amountPerStep,
+      price,
+      direction: data.direction
+    })
     return data
   }
 
   sellOrder = async (step) => {
     const orderId = uuidv6()
     const price = step.bounds.max
-    step.update(STATE.TRY_TO_SELL, orderId)
+    step.update(STATE.TRY_TO_SELL, undefined)
     const body = {
       quantity: this.amountPerStep,
       price: Helpers.toQuotation(price),
@@ -185,6 +204,13 @@ export class IntervalBot {
     console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
     console.log(data)
     step.update(STATE.TRY_TO_SELL, data.orderId)
+    await createNewOrderRecord({
+      orderId: data.orderId,
+      botId: this.id,
+      quantity: this.amountPerStep,
+      price,
+      direction: data.direction
+    })
     return data
   }
 }
