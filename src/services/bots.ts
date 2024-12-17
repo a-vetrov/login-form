@@ -56,6 +56,13 @@ export const botsApi = apiWithTag.injectEndpoints({
       transformResponse: ({ data }) => data as BotsListDataType,
       providesTags: (result, error, id) => [{ type: 'BotsList', id }]
     }),
+    getBotOrders: build.query<BotsListDataType, string>({
+      query: (id) => ({
+        url: `bots/${id}/orders`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data
+    }),
     stopBot: build.mutation<BotsListDataType, string>({
       query: (id) => ({
         url: `bots/${id}/stop`,
@@ -70,5 +77,6 @@ export const {
   useAddIntervalBotMutation,
   useGetBotsQuery,
   useGetBotByIdQuery,
+  useGetBotOrdersQuery,
   useStopBotMutation
 } = botsApi

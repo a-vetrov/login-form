@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { BotsModel, getBotById } from './bots.js'
+import { getBotById } from './bots.js'
 
 const { Schema } = mongoose
 
@@ -33,7 +33,7 @@ const orderSchema = new Schema({
 
 export const OrdersModel = mongoose.model('Orders', orderSchema)
 
-export const getOrderById = async (id) => OrdersModel.findById(id)
+export const getOrderByOrderId = async (orderId) => OrdersModel.find({ orderId })
 
 export const createNewOrderRecord = async ({ orderId, botId, quantity, price, direction }) => {
   const bot = await getBotById(botId)
@@ -57,16 +57,10 @@ export const createNewOrderRecord = async ({ orderId, botId, quantity, price, di
 }
 
 export const updateOrderRecord = async ({ orderId, status }) => {
-  const order = await getOrderById(orderId)
   console.log('updateOrderRecord', { orderId, status })
-  if (!order) {
-    return
-  }
-  order.status = status
-  order.executionDate = new Date()
-  await order.save()
+  await OrdersModel.findOneAndUpdate({ orderId }, { status, executionDate: new Date() })
 }
 
-export const getBotOrders = async ({ botId }) => {
+export const getBotOrders = async (botId) => {
   return OrdersModel.find({ botId })
 }

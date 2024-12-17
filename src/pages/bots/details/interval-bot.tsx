@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react'
-import {Box, Typography} from '@mui/material'
-import {type BotsListDataType} from '../../../services/bots'
+import { Box, Typography } from '@mui/material'
+import { type BotsListDataType } from '../../../services/bots'
 import { StopBotButton } from './stop-button'
-import {CandleStickChart} from '../../../components/candle-stick-chart/candle-stick-chart';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { CandleStickChart } from '../../../components/candle-stick-chart/candle-stick-chart'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableRow from '@mui/material/TableRow'
+import Paper from '@mui/material/Paper'
 
 interface Props {
   data: BotsListDataType
@@ -16,10 +16,10 @@ interface Props {
 
 interface IntervalBotData {
   product: {
-    isin: string,
-    figi: string,
-    uid: string,
-    name: string,
+    isin: string
+    figi: string
+    uid: string
+    name: string
     type: string
   }
   amountPerStep: number
@@ -34,7 +34,7 @@ interface IntervalBotData {
 export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
   const { id, active, properties } = data
 
-  const {product, stepsCount, bounds} = properties as unknown as IntervalBotData
+  const { product, stepsCount, bounds } = properties as unknown as IntervalBotData
 
   const activeLabel = useMemo(() => {
     if (active) {

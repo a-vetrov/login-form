@@ -99,6 +99,25 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
   }
 })
 
+/* GET /api/bots/:id/orders
+ *
+ * Получение списка ордеров по конкретному боту
+ */
+botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
+  try {
+    const bot = await getBotById(req.params.id)
+    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+      return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
+    }
+    const data = { }
+    data.orders = await getBotOrders(bot._id)
+    res.status(200).send({ success: true, data })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
 /* PUT /api/bots/:id/stop
  *
  * Остановка бота

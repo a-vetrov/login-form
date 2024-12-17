@@ -22,13 +22,10 @@ export class IntervalBot {
 
     this.steps = IntervalStep.generate(this.bounds, this.stepsCount)
 
-    console.log('this.steps', this.steps)
-
     void this.start()
   }
 
   start = async () => {
-    console.log('Interval bot started!')
     this.active = true
     this.api.stream.market.on('error', this.handleStreamError)
     this.api.stream.market.on('close', this.handleStreamClose)
@@ -38,7 +35,6 @@ export class IntervalBot {
   }
 
   stop = async () => {
-    console.log('Interval bot stopped!')
     this.active = false
     if (this.unsubscribeLastPrice) {
       await this.unsubscribeLastPrice()
@@ -56,7 +52,6 @@ export class IntervalBot {
 
   subscribeLastPriceHandler = async (result) => {
     if (this.streamLock) {
-      console.log('this.streamLock', this.streamLock)
       return
     }
 
@@ -91,8 +86,8 @@ export class IntervalBot {
 
   getActiveOrders = async () => {
     const data = await this.api.sandbox.getSandboxOrders({ accountId: this.account })
-    console.log('Active orders:')
-    console.log(data.orders)
+    // console.log('Active orders:')
+    // console.log(data.orders)
     return data.orders
   }
 
@@ -172,7 +167,7 @@ export class IntervalBot {
     }
     const data = await this.api.sandbox.postSandboxOrder(body)
     console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
-    console.log(data)
+    // console.log(data)
     step.update(STATE.TRY_TO_BUY, data.orderId)
     await createNewOrderRecord({
       orderId: data.orderId,
@@ -202,7 +197,7 @@ export class IntervalBot {
     }
     const data = await this.api.sandbox.postSandboxOrder(body)
     console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
-    console.log(data)
+    // console.log(data)
     step.update(STATE.TRY_TO_SELL, data.orderId)
     await createNewOrderRecord({
       orderId: data.orderId,
