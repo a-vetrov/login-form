@@ -51,7 +51,6 @@ export interface OrdersListDataType {
   steps?: IntervalStepInfo[]
 }
 
-
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['BotsList'] })
 
 export const botsApi = apiWithTag.injectEndpoints({

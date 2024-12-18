@@ -4,7 +4,7 @@ import { useMatch } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
 import { CircularProgress, Container } from '@mui/material'
 import { getBotDetailsView } from './details/details-factory'
-import {BotOrders} from './orders/bot-orders';
+import { BotOrders } from './orders/bot-orders'
 
 export const BotDetails: React.FC = () => {
   const match = useMatch('/bots/:id')
@@ -24,7 +24,7 @@ export const BotDetails: React.FC = () => {
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
         {isLoading && <CircularProgress />}
         {BotComponent && data && <BotComponent data={data}/>}
-        {data?.id && <BotOrders id={data?.id} />}
+        {data?.id && <BotOrders id={data?.id} active={data?.active}/>}
       </Container>
     </>
   )
