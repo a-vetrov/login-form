@@ -24,6 +24,14 @@ export class BotManager {
     return this.#bots[id]
   }
 
+  getBotInfo (id) {
+    const bot = this.getBotById(id)
+    if (!bot || !bot.getInfo) {
+      return null
+    }
+    return bot.getInfo()
+  }
+
   stopBot (id) {
     const bot = this.getBotById(id)
     if (bot) {

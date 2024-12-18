@@ -27,6 +27,31 @@ export interface BotsListDataType {
   id: string
 }
 
+export interface OrderDataType {
+  orderId: string
+  botId: string
+  status: number
+  direction: number
+  executionDate: string
+  properties: {
+    price: number
+    quantity: number
+  }
+  date: string
+}
+
+export interface IntervalStepInfo {
+  state: string
+  orderId?: string
+  bounds: { min: number, max: number }
+}
+
+export interface OrdersListDataType {
+  orders: OrderDataType[]
+  steps?: IntervalStepInfo[]
+}
+
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['BotsList'] })
 
 export const botsApi = apiWithTag.injectEndpoints({
@@ -56,12 +81,12 @@ export const botsApi = apiWithTag.injectEndpoints({
       transformResponse: ({ data }) => data as BotsListDataType,
       providesTags: (result, error, id) => [{ type: 'BotsList', id }]
     }),
-    getBotOrders: build.query<BotsListDataType, string>({
+    getBotOrders: build.query<OrdersListDataType, string>({
       query: (id) => ({
         url: `bots/${id}/orders`,
         method: 'GET'
       }),
-      transformResponse: ({ data }) => data
+      transformResponse: ({ data }) => data as OrdersListDataType
     }),
     stopBot: build.mutation<BotsListDataType, string>({
       query: (id) => ({

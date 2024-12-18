@@ -7,7 +7,7 @@ import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
-import {getBotOrders} from "../db/models/bots/order.js";
+import { getBotOrders } from '../db/models/bots/order.js'
 
 export const botsRouter = express.Router()
 
@@ -109,9 +109,9 @@ botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
     if (!bot || req.user._id.toString() !== bot.userId.toString()) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
-    const data = { }
-    data.orders = await getBotOrders(bot._id)
-    res.status(200).send({ success: true, data })
+    const orders = await getBotOrders(bot._id)
+    const info = BotManager.instance.getBotInfo(req.params.id)
+    res.status(200).send({ success: true, data: { orders, ...info } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

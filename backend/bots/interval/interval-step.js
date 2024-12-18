@@ -31,4 +31,12 @@ export class IntervalStep {
     }
     return stepsData
   }
+
+  getInfo = () => {
+    return {
+      state: this.state,
+      orderId: this.orderId,
+      bounds: this.bounds
+    }
+  }
 }

@@ -208,4 +208,9 @@ export class IntervalBot {
     })
     return data
   }
+
+  getInfo = () => {
+    const steps = this.steps.map((item) => item.getInfo())
+    return { steps }
+  }
 }

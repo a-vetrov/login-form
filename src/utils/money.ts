@@ -28,7 +28,11 @@ export const getFromMoneyValue = (value?: MoneyValue | Quotation): number | unde
   return (value ? value.units + value.nano / 1000000000 : undefined)
 }
 
-export const fromNumberToMoneyString = (total: number, currency?: string): string => `${total.toLocaleString('ru-RU')} ${getCurrencySign(currency)}`
+const localeOptions = {
+  minimumFractionDigits: 2, maximumFractionDigits: 2
+}
+
+export const fromNumberToMoneyString = (total: number, currency?: string): string => `${total.toLocaleString('ru-RU', localeOptions)} ${getCurrencySign(currency)}`
 
 export const toMoneyString = (value?: MoneyValue): string => {
   const total = getFromMoneyValue(value)
