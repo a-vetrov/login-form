@@ -21,15 +21,26 @@ export const AccountControl: React.FC<Props> = ({ accountType, onChangeAccountTy
 
   const accounts = accountType === AccountTypes.real ? realAccounts : sandboxAccounts
 
+  const hasAccounts = !!accounts.data?.accounts && accounts.data.accounts.length > 0
+
   const handleTypeChange = useCallback((_event: React.MouseEvent, value: string) => {
     onChangeAccountType(value as AccountTypes)
   }, [onChangeAccountType])
 
   useEffect(() => {
-    onChangeSelectedAccount(accounts.data?.accounts[0].id)
-  }, [accounts, onChangeSelectedAccount])
+    if (hasAccounts) {
+      onChangeSelectedAccount(accounts.data?.accounts[0].id)
+    }
+  }, [accounts, hasAccounts, onChangeSelectedAccount])
 
   const errorMessage = useMemo(() => {
+    if (accounts.data?.accounts && !hasAccounts) {
+      return (
+        <Typography variant="body1" color='error'>
+          Ни одного счета не найдено.
+        </Typography>
+      )
+    }
     const account = accounts.data?.accounts.find(({ id }) => id === selectedAccount)
     if (!account) {
       return null
@@ -42,7 +53,7 @@ export const AccountControl: React.FC<Props> = ({ accountType, onChangeAccountTy
         </Typography>
       )
     }
-  }, [accounts.data?.accounts, budget, selectedAccount])
+  }, [accounts.data?.accounts, budget, hasAccounts, selectedAccount])
 
   if (accounts.isLoading) {
     return <CircularProgress />
@@ -68,14 +79,15 @@ export const AccountControl: React.FC<Props> = ({ accountType, onChangeAccountTy
         Ваши счета:
       </Typography>
       <ErrorAlert error={accounts.error} />
-      <Box sx={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Stack direction="row" spacing={2} marginY={2}>
-          {accounts.data?.accounts.map((item) => (
-            <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={onChangeSelectedAccount} />
-          ))}
-        </Stack>
-      </Box>
-
+      {hasAccounts && (
+        <Box sx={{ overflowX: 'auto', maxWidth: '100%' }}>
+          <Stack direction="row" spacing={2} marginY={2}>
+            {accounts.data?.accounts.map((item) => (
+              <AccountCard account={item} key={item.id} selected={selectedAccount === item.id} onClick={onChangeSelectedAccount} />
+            ))}
+          </Stack>
+        </Box>
+      )}
       {errorMessage}
 
     </>
