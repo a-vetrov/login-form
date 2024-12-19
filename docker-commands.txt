@@ -13,3 +13,9 @@ docker run -dp 80:5173 --network my-bridge-network  --name vizify-app aavetrov/v
 docker rm -v $(docker ps --filter status=exited -q)
 //Clear system
 docker system prune
+
+//Show all containers
+docker ps -a
+
+//Container log
+docker logs CONTAINER
