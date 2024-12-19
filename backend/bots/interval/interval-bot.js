@@ -110,11 +110,15 @@ export class IntervalBot {
   }
 
   checkSteps = async () => {
-    const activeOrders = await this.getActiveOrders()
-    const activeOrdersIds = activeOrders.map((order) => order.orderId)
+    try {
+      const activeOrders = await this.getActiveOrders()
+      const activeOrdersIds = activeOrders.map((order) => order.orderId)
 
-    const stepsToCheck = this.steps.filter((step) => step.orderId && !activeOrdersIds.includes(step.orderId))
-    await forEachSeries(stepsToCheck, this.updateStepState)
+      const stepsToCheck = this.steps.filter((step) => step.orderId && !activeOrdersIds.includes(step.orderId))
+      await forEachSeries(stepsToCheck, this.updateStepState)
+    } catch (error) {
+      console.log('IntervalBot.checkSteps error', error)
+    }
   }
 
   updateStepState = async (step) => {
