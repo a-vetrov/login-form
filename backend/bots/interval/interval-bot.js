@@ -124,6 +124,10 @@ export class IntervalBot {
   updateStepState = async (step) => {
     const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
 
+    const status = await this.getTradingStatus()
+
+    console.log('Trading status', status)
+
     if (step.orderId) {
       await updateOrderRecord({
         orderId: step.orderId,
@@ -216,5 +220,26 @@ export class IntervalBot {
   getInfo = () => {
     const steps = this.steps.map((item) => item.getInfo())
     return { steps }
+  }
+
+  getTradingStatus = async () => {
+    const request = {
+      figi: this.product.figi,
+      instrumentId: this.product.uid
+    }
+    const data = await this.api.marketdata.getTradingStatus(request)
+
+    /*
+    dataFormat = {
+      tradingStatus: 5,
+      limitOrderAvailableFlag: true,
+      marketOrderAvailableFlag: true,
+      apiTradeAvailableFlag: true,
+      instrumentUid: 'e6123145-9665-43e0-8413-cd61b8aa9b13'
+    }
+
+     */
+
+    return data
   }
 }
