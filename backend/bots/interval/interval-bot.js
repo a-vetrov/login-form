@@ -15,6 +15,7 @@ export class IntervalBot {
     this.id = id
     this.unsubscribeLastPrice = undefined
     this.active = false
+    this.tradingStatus = true
 
     this.streamLock = false
 
@@ -22,6 +23,7 @@ export class IntervalBot {
 
     this.steps = IntervalStep.generate(this.bounds, this.stepsCount)
 
+    this.stopStatusChecking = this.startStatusChecking()
     void this.start()
   }
 
@@ -39,6 +41,9 @@ export class IntervalBot {
     if (this.unsubscribeLastPrice) {
       await this.unsubscribeLastPrice()
     }
+    if (this.stopStatusChecking) {
+      this.stopStatusChecking()
+    }
     await this.cancelActiveOrders()
   }
 
@@ -52,6 +57,10 @@ export class IntervalBot {
 
   subscribeLastPriceHandler = async (result) => {
     if (this.streamLock) {
+      return
+    }
+
+    if (!this.tradingStatus) {
       return
     }
 
@@ -124,9 +133,7 @@ export class IntervalBot {
   updateStepState = async (step) => {
     const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
 
-    const status = await this.getTradingStatus()
-
-    console.log('Trading status', status)
+    step.updateOrderStatus(data.executionReportStatus)
 
     if (step.orderId) {
       await updateOrderRecord({
@@ -135,7 +142,24 @@ export class IntervalBot {
       })
     }
 
-    // TODO: надо решить, что делать, если заявка отклонена, отменена
+    // Заявка отклонена
+    if (data.executionReportStatus === 2) {
+      switch (step.state) {
+        // Возвращаем шаг в состояние ожидания цены
+        case STATE.TRY_TO_BUY : {
+          step.update(STATE.WAIT_ENTRY_PRICE, undefined)
+          break
+        }
+
+        // Попробуем пересоздать заявку на продажу
+        case STATE.TRY_TO_SELL: {
+          await this.sellOrder(step)
+          break
+        }
+      }
+      return
+    }
+
     if (data.executionReportStatus !== 1) {
       return
     }
@@ -173,18 +197,23 @@ export class IntervalBot {
       time_in_force: 1,
       price_type: 2
     }
-    const data = await this.api.sandbox.postSandboxOrder(body)
-    console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
-    // console.log(data)
-    step.update(STATE.TRY_TO_BUY, data.orderId)
-    await createNewOrderRecord({
-      orderId: data.orderId,
-      botId: this.id,
-      quantity: this.amountPerStep,
-      price,
-      direction: data.direction
-    })
-    return data
+    try {
+      const data = await this.api.sandbox.postSandboxOrder(body)
+      console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
+      // console.log(data)
+      step.update(STATE.TRY_TO_BUY, data.orderId)
+      await createNewOrderRecord({
+        orderId: data.orderId,
+        botId: this.id,
+        quantity: this.amountPerStep,
+        price,
+        direction: data.direction
+      })
+      return data
+    } catch (e) {
+      console.log('buyOrder error', e)
+      return null
+    }
   }
 
   sellOrder = async (step) => {
@@ -203,18 +232,24 @@ export class IntervalBot {
       time_in_force: 1,
       price_type: 2
     }
-    const data = await this.api.sandbox.postSandboxOrder(body)
-    console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
-    // console.log(data)
-    step.update(STATE.TRY_TO_SELL, data.orderId)
-    await createNewOrderRecord({
-      orderId: data.orderId,
-      botId: this.id,
-      quantity: this.amountPerStep,
-      price,
-      direction: data.direction
-    })
-    return data
+
+    try {
+      const data = await this.api.sandbox.postSandboxOrder(body)
+      console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
+      // console.log(data)
+      step.update(STATE.TRY_TO_SELL, data.orderId)
+      await createNewOrderRecord({
+        orderId: data.orderId,
+        botId: this.id,
+        quantity: this.amountPerStep,
+        price,
+        direction: data.direction
+      })
+      return data
+    } catch (e) {
+      console.log('sellOrder error', e)
+      return null
+    }
   }
 
   getInfo = () => {
@@ -227,19 +262,34 @@ export class IntervalBot {
       figi: this.product.figi,
       instrumentId: this.product.uid
     }
-    const data = await this.api.marketdata.getTradingStatus(request)
-
-    /*
-    dataFormat = {
-      tradingStatus: 5,
-      limitOrderAvailableFlag: true,
-      marketOrderAvailableFlag: true,
-      apiTradeAvailableFlag: true,
-      instrumentUid: 'e6123145-9665-43e0-8413-cd61b8aa9b13'
+    let result = false
+    try {
+      const data = await this.api.marketdata.getTradingStatus(request)
+      result = data.tradingStatus === 5 && data.apiTradeAvailableFlag && data.limitOrderAvailableFlag
+    } catch (e) {
+      console.log('getTradingStatus error', e)
+      result = false
     }
 
-     */
+    return result
+  }
 
-    return data
+  updateTradingStatus = async () => {
+    if (!this.active) {
+      return
+    }
+
+    this.tradingStatus = await this.getTradingStatus()
+    console.log('updateTradingStatus', this.tradingStatus)
+  }
+
+  startStatusChecking = () => {
+    this.updateTradingStatus()
+    const interval = setInterval(this.updateTradingStatus, 120_000)
+
+    const stopStatusChecking = () => {
+      clearInterval(interval)
+    }
+    return stopStatusChecking
   }
 }

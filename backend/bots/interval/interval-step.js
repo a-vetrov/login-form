@@ -9,11 +9,16 @@ export class IntervalStep {
     this.bounds = bounds
     this.state = STATE.WAIT_ENTRY_PRICE
     this.orderId = undefined
+    this.orderStatus = undefined
   }
 
   update = (state, orderId) => {
     this.state = state
     this.orderId = orderId
+  }
+
+  updateOrderStatus = (value) => {
+    this.orderStatus = value
   }
 
   static generate (bounds, stepsCount) {
