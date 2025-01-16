@@ -16,6 +16,7 @@ export class IntervalBot {
     this.unsubscribeLastPrice = undefined
     this.active = false
     this.tradingStatus = true
+    this.isFreeze = false
 
     this.streamLock = false
 
@@ -56,7 +57,7 @@ export class IntervalBot {
   }
 
   subscribeLastPriceHandler = async (result) => {
-    if (this.streamLock) {
+    if (this.streamLock || this.isFreeze) {
       return
     }
 
@@ -119,6 +120,9 @@ export class IntervalBot {
   }
 
   checkSteps = async () => {
+    if (this.isFreeze) {
+      return
+    }
     try {
       const activeOrders = await this.getActiveOrders()
       const activeOrdersIds = activeOrders.map((order) => order.orderId)
@@ -127,10 +131,17 @@ export class IntervalBot {
       await forEachSeries(stepsToCheck, this.updateStepState)
     } catch (error) {
       console.log('IntervalBot.checkSteps error', error)
+      if (error.type === 'RESOURCE_EXHAUSTED') {
+        console.log('FREEZE!!!!')
+        this.freezeForMinute()
+      }
     }
   }
 
   updateStepState = async (step) => {
+    if (this.isFreeze) {
+      return
+    }
     const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
 
     step.updateOrderStatus(data.executionReportStatus)
@@ -142,40 +153,39 @@ export class IntervalBot {
       })
     }
 
-    // Заявка отклонена
-    if (data.executionReportStatus === 2) {
-      switch (step.state) {
-        // Возвращаем шаг в состояние ожидания цены
-        case STATE.TRY_TO_BUY : {
-          step.update(STATE.WAIT_ENTRY_PRICE, undefined)
-          break
-        }
+    // Заявка исполнена
+    if (data.executionReportStatus === 1) {
+      console.log(`${data.orderType === 1 ? 'Покупка' : 'Продажа'} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
 
-        // Попробуем пересоздать заявку на продажу
-        case STATE.TRY_TO_SELL: {
+      switch (step.state) {
+        case STATE.TRY_TO_BUY : {
+          console.log('Купили, ставим заявку на продажу.')
           await this.sellOrder(step)
           break
         }
+
+        case STATE.TRY_TO_SELL: {
+          console.log('Продали, теперь ждем цену, чтобы купить.')
+          step.update(STATE.WAIT_ENTRY_PRICE, undefined)
+          break
+        }
       }
+
       return
     }
 
-    if (data.executionReportStatus !== 1) {
-      return
-    }
-
-    console.log(`${data.orderType === 1 ? 'Покупка' : 'Продажа'} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
+    // Заявка отклонена, отменена и тп
 
     switch (step.state) {
+      // Возвращаем шаг в состояние ожидания цены
       case STATE.TRY_TO_BUY : {
-        console.log('Купили, ставим заявку на продажу.')
-        await this.sellOrder(step)
+        step.update(STATE.WAIT_ENTRY_PRICE, undefined)
         break
       }
 
+      // Попробуем пересоздать заявку на продажу
       case STATE.TRY_TO_SELL: {
-        console.log('Продали, теперь ждем цену, чтобы купить.')
-        step.update(STATE.WAIT_ENTRY_PRICE, undefined)
+        await this.sellOrder(step)
         break
       }
     }
@@ -275,7 +285,7 @@ export class IntervalBot {
   }
 
   updateTradingStatus = async () => {
-    if (!this.active) {
+    if (!this.active || this.isFreeze) {
       return
     }
 
@@ -291,5 +301,14 @@ export class IntervalBot {
       clearInterval(interval)
     }
     return stopStatusChecking
+  }
+
+  freezeForMinute = () => {
+    this.isFreeze = true
+
+    const unfreeze = () => {
+      this.isFreeze = false
+    }
+    setTimeout(unfreeze, 60_000)
   }
 }
