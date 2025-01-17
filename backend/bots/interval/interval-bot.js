@@ -22,13 +22,11 @@ export class IntervalBot {
 
     this.api = new TinkoffInvestApi({ token: token.token })
 
-    this.steps = IntervalStep.generate(this.bounds, this.stepsCount)
-
-    this.stopStatusChecking = this.startStatusChecking()
-    void this.start()
+    this.steps = IntervalStep.generate(this.bounds, this.stepsCount, this.id)
   }
 
   start = async () => {
+    this.stopStatusChecking = this.startStatusChecking()
     this.active = true
     this.api.stream.market.on('error', this.handleStreamError)
     this.api.stream.market.on('close', this.handleStreamClose)
@@ -144,7 +142,7 @@ export class IntervalBot {
     }
     const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
 
-    step.updateOrderStatus(data.executionReportStatus)
+    await step.updateOrderStatus(data.executionReportStatus)
 
     if (step.orderId) {
       await updateOrderRecord({
@@ -166,7 +164,7 @@ export class IntervalBot {
 
         case STATE.TRY_TO_SELL: {
           console.log('Продали, теперь ждем цену, чтобы купить.')
-          step.update(STATE.WAIT_ENTRY_PRICE, undefined)
+          await step.update(STATE.WAIT_ENTRY_PRICE, undefined)
           break
         }
       }
@@ -179,7 +177,7 @@ export class IntervalBot {
     switch (step.state) {
       // Возвращаем шаг в состояние ожидания цены
       case STATE.TRY_TO_BUY : {
-        step.update(STATE.WAIT_ENTRY_PRICE, undefined)
+        await step.update(STATE.WAIT_ENTRY_PRICE, undefined)
         break
       }
 
@@ -194,7 +192,7 @@ export class IntervalBot {
   buyOrder = async (step) => {
     const orderId = uuidv6()
     const price = step.bounds.min
-    step.update(STATE.TRY_TO_BUY, undefined)
+    await step.update(STATE.TRY_TO_BUY, undefined)
     const body = {
       quantity: this.amountPerStep,
       price: Helpers.toQuotation(price),
@@ -211,7 +209,7 @@ export class IntervalBot {
       const data = await this.api.sandbox.postSandboxOrder(body)
       console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
       // console.log(data)
-      step.update(STATE.TRY_TO_BUY, data.orderId)
+      await step.update(STATE.TRY_TO_BUY, data.orderId)
       await createNewOrderRecord({
         orderId: data.orderId,
         botId: this.id,
@@ -229,7 +227,7 @@ export class IntervalBot {
   sellOrder = async (step) => {
     const orderId = uuidv6()
     const price = step.bounds.max
-    step.update(STATE.TRY_TO_SELL, undefined)
+    await step.update(STATE.TRY_TO_SELL, undefined)
     const body = {
       quantity: this.amountPerStep,
       price: Helpers.toQuotation(price),
@@ -247,7 +245,7 @@ export class IntervalBot {
       const data = await this.api.sandbox.postSandboxOrder(body)
       console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
       // console.log(data)
-      step.update(STATE.TRY_TO_SELL, data.orderId)
+      await step.update(STATE.TRY_TO_SELL, data.orderId)
       await createNewOrderRecord({
         orderId: data.orderId,
         botId: this.id,

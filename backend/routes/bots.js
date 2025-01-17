@@ -44,7 +44,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
 
     const botId = result._id.toString()
 
-    BotManager.instance.addBot(new IntervalBot({
+    const intervalBot = new IntervalBot({
       token,
       account: selectedAccount,
       product: productData,
@@ -52,7 +52,13 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       stepsCount,
       amountPerStep,
       id: botId
-    }))
+    })
+
+    result.properties.set('steps', intervalBot.steps)
+    await result.save()
+
+    BotManager.instance.addBot(intervalBot)
+    await intervalBot.start()
 
     res.status(200).send({ success: true, data: { id: botId } })
   } catch (error) {
