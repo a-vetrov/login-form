@@ -44,6 +44,7 @@ export interface IntervalStepInfo {
   state: string
   orderId?: string
   bounds: { min: number, max: number }
+  orders: string[]
 }
 
 export interface OrdersListDataType {

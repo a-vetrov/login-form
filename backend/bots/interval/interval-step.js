@@ -1,4 +1,5 @@
 import {getBotById} from "../../db/models/bots/bots.js";
+import {IntervalStepModel} from "../../db/models/bots/interval-step.js";
 
 export const STATE = {
   WAIT_ENTRY_PRICE: 'WAIT_ENTRY_PRICE', // Ожидание цены, чтобы выставить заявку
@@ -10,6 +11,7 @@ export class IntervalStep {
   constructor (bounds, serialNumber, botId) {
     this.bounds = bounds
     this.state = STATE.WAIT_ENTRY_PRICE
+    this.orders = []
     this.orderId = undefined
     this.orderStatus = undefined
     this.serialNumber = serialNumber
@@ -20,24 +22,20 @@ export class IntervalStep {
     this.state = state
     this.orderId = orderId
 
-    const model = await this.getBotModel()
-    const steps = model.properties.get('steps')
-    console.log('steps', steps)
-    const step = steps[this.serialNumber]
-    step.state = state
-    step.orderId = orderId
-    model.set('properties.steps', steps)
-    await model.save()
+    const stepDocument = await this.getStepDocument()
+    stepDocument.state = state
+    if (orderId) {
+      this.orders.push(orderId)
+      stepDocument.orders.push(orderId)
+    }
+    await stepDocument.save()
   }
 
   updateOrderStatus = async (value) => {
     this.orderStatus = value
-    const model = await this.getBotModel()
-    const steps = model.properties.get('steps')
-    const step = steps[this.serialNumber]
-    step.orderStatus = value
-    model.properties.set('steps', steps.concat())
-    await model.save()
+    const stepDocument = await this.getStepDocument()
+    stepDocument.orderStatus = value
+    await stepDocument.save()
   }
 
   static generate (bounds, stepsCount, botId) {
@@ -60,11 +58,16 @@ export class IntervalStep {
     return {
       state: this.state,
       orderId: this.orderId,
-      bounds: this.bounds
+      bounds: this.bounds,
+      orders: this.orders
     }
   }
 
   getBotModel = async () => {
     return await getBotById(this.botId)
+  }
+
+  getStepDocument = async () => {
+    return IntervalStepModel.findOne({botId: this.botId, serialNumber: this.serialNumber})
   }
 }

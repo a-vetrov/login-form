@@ -8,6 +8,7 @@ import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
 import { getBotOrders } from '../db/models/bots/order.js'
+import { IntervalStepModel } from '../db/models/bots/interval-step.js'
 
 export const botsRouter = express.Router()
 
@@ -54,7 +55,15 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       id: botId
     })
 
-    result.properties.set('steps', intervalBot.steps)
+    IntervalStepModel.insertMany(intervalBot.steps.map((step) => {
+      return {
+        min: step.bounds.min,
+        max: step.bounds.max,
+        state: step.state,
+        serialNumber: step.serialNumber,
+        botId: result._id
+      }
+    }))
     await result.save()
 
     BotManager.instance.addBot(intervalBot)
