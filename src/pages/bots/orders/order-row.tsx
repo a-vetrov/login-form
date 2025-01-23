@@ -31,23 +31,30 @@ export const OrderRow: React.FC<Props> = ({ info, ordersMap }) => {
   return (
     <>
     <TableRow sx={{ '& td, & th': { border: 0 } }}>
-      <TableCell>
-        <IconButton size="small" onClick={openHandler}>
-          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-        </IconButton>
+      <TableCell>{
+        orders?.length
+          ? (
+          <IconButton size="small" onClick={openHandler}>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+            )
+          : null
+      }
       </TableCell>
       <TableCell component="th" scope="row">{info.state}</TableCell>
       <TableCell>{fromNumberToMoneyString(info.bounds.min, 'RUB')}</TableCell>
       <TableCell>{fromNumberToMoneyString(info.bounds.max, 'RUB')}</TableCell>
       <TableCell>{0}</TableCell>
     </TableRow>
-      {orders?.length && (
-        <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+      <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
+      {orders?.length
+        ? (
+
             <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="body1" gutterBottom component="div">
-                Список заявок {orders?.length}
+                Список заявок ({orders?.length} шт.)
               </Typography>
 
               <Table size="small">
@@ -74,11 +81,10 @@ export const OrderRow: React.FC<Props> = ({ info, ordersMap }) => {
               </Table>
             </Box>
             </Collapse>
-
-          </TableCell>
-        </TableRow>
-      )}
-
+          )
+        : null}
+        </TableCell>
+      </TableRow>
     </>
   )
 }

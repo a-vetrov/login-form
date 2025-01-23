@@ -147,7 +147,8 @@ export class IntervalBot {
     if (step.orderId) {
       await updateOrderRecord({
         orderId: step.orderId,
-        status: data.executionReportStatus
+        status: data.executionReportStatus,
+        data
       })
     }
 
