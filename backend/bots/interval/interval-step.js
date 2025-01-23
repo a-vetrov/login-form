@@ -59,7 +59,8 @@ export class IntervalStep {
       state: this.state,
       orderId: this.orderId,
       bounds: this.bounds,
-      orders: this.orders
+      orders: this.orders,
+      serialNumber: this.serialNumber
     }
   }
 
