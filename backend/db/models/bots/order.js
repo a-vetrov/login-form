@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 import { getBotById } from './bots.js'
+import { productSchema } from '../catalog/product.js'
+import { Helpers } from 'tinkoff-invest-api'
 
 const { Schema } = mongoose
 
@@ -20,11 +22,23 @@ export const OrderDirection = {
 
 const orderSchema = new Schema({
   orderId: String,
+  product: productSchema,
   botId: { type: Schema.Types.ObjectId, ref: 'BotsModel' },
   status: Number,
   direction: Number,
   date: { type: Date, default: Date.now },
   executionDate: { type: Date, default: null },
+  orderDate: { type: Date, default: null },
+  lotsRequested: Number,
+  lotsExecuted: Number,
+  initialOrderPrice: Number,
+  executedOrderPrice: Number,
+  totalOrderAmount: Number,
+  averagePositionPrice: Number,
+  initialCommission: Number,
+  executedCommission: Number,
+  initialSecurityPrice: Number,
+  serviceCommission: Number,
   properties: {
     type: Map,
     of: {}
@@ -35,7 +49,7 @@ export const OrdersModel = mongoose.model('Orders', orderSchema)
 
 export const getOrderByOrderId = async (orderId) => OrdersModel.find({ orderId })
 
-export const createNewOrderRecord = async ({ orderId, botId, quantity, price, direction }) => {
+export const createNewOrderRecord = async ({ orderId, botId, quantity, price, direction, product }) => {
   const bot = await getBotById(botId)
 
   if (!bot) {
@@ -49,11 +63,36 @@ export const createNewOrderRecord = async ({ orderId, botId, quantity, price, di
     botId: bot._id,
     status: OrderStatus.EXECUTION_REPORT_STATUS_NEW,
     direction,
+    product,
     properties: {
       price,
       quantity
     }
   }).save()
+}
+
+const getOrderProperties = (data) => {
+  if (!data) {
+    return null
+  }
+  const {
+    lotsRequested, lotsExecuted, orderDate, initialOrderPrice, executedOrderPrice, totalOrderAmount,
+    averagePositionPrice, initialCommission, executedCommission, initialSecurityPrice, serviceCommission
+  } = data
+
+  return {
+    lotsRequested,
+    lotsExecuted,
+    orderDate,
+    initialOrderPrice: Helpers.toNumber(initialOrderPrice),
+    executedOrderPrice: Helpers.toNumber(executedOrderPrice),
+    totalOrderAmount: Helpers.toNumber(totalOrderAmount),
+    averagePositionPrice: Helpers.toNumber(averagePositionPrice),
+    initialCommission: Helpers.toNumber(initialCommission),
+    executedCommission: Helpers.toNumber(executedCommission),
+    initialSecurityPrice: Helpers.toNumber(initialSecurityPrice),
+    serviceCommission: Helpers.toNumber(serviceCommission)
+  }
 }
 
 export const updateOrderRecord = async ({ orderId, status, data }) => {
@@ -83,7 +122,12 @@ export const updateOrderRecord = async ({ orderId, status, data }) => {
 */
 
   console.log('updateOrderRecord', { orderId, status, data })
-  await OrdersModel.findOneAndUpdate({ orderId }, { status, executionDate: new Date() })
+  await OrdersModel.findOneAndUpdate({ orderId },
+    {
+      status,
+      executionDate: new Date(),
+      ...getOrderProperties(data)
+    })
 }
 
 export const getBotOrders = async (botId) => {

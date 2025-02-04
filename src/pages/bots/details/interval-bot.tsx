@@ -9,6 +9,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
+import { IntervalDetails } from '../interval-bot/interval-details'
 
 interface Props {
   data: BotsListDataType
@@ -80,6 +81,7 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
           stepsCount={stepsCount}
         />
       </Box>
+      <IntervalDetails id={id} active={active} />
       {active && <StopBotButton id={id}/>}
     </>
   )

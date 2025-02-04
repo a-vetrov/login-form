@@ -216,7 +216,8 @@ export class IntervalBot {
         botId: this.id,
         quantity: this.amountPerStep,
         price,
-        direction: data.direction
+        direction: data.direction,
+        product: { ...this.product }
       })
       return data
     } catch (e) {
@@ -252,7 +253,8 @@ export class IntervalBot {
         botId: this.id,
         quantity: this.amountPerStep,
         price,
-        direction: data.direction
+        direction: data.direction,
+        product: { ...this.product }
       })
       return data
     } catch (e) {

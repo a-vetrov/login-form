@@ -24,7 +24,6 @@ export const BotDetails: React.FC = () => {
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
         {isLoading && <CircularProgress />}
         {BotComponent && data && <BotComponent data={data}/>}
-        {data?.id && <BotOrders id={data?.id} active={data?.active}/>}
       </Container>
     </>
   )

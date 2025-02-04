@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { type OrderDataType, useGetBotOrdersQuery } from '../../../services/bots'
+import React from 'react'
+import { useGetBotOrdersQuery } from '../../../services/bots'
 import { Accordion, AccordionDetails, AccordionSummary, TableHead, Typography } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
@@ -11,7 +11,6 @@ import TableContainer from '@mui/material/TableContainer'
 import { getOrderDirection, getOrderStatus } from './utils'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { format } from 'date-fns'
-import { OrderRow } from './order-row'
 
 interface Props {
   id: string
@@ -23,17 +22,6 @@ export const BotOrders: React.FC<Props> = ({ id, active }) => {
     pollingInterval: active ? 1000 : undefined,
     skipPollingIfUnfocused: true
   })
-
-  const ordersMap = useMemo<Record<string, OrderDataType>>(() => {
-    if (!data?.orders) {
-      return undefined
-    }
-
-    return data.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
-      accumulator[item.orderId] = item
-      return accumulator
-    }, {})
-  }, [data?.orders])
 
   return (
     <>
@@ -73,31 +61,6 @@ export const BotOrders: React.FC<Props> = ({ id, active }) => {
         </AccordionDetails>
       </Accordion>
 
-      {data?.steps && (
-        <>
-          <Typography variant="h2" marginBottom={2} marginTop={4}>
-            Статус интервалов
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell> </TableCell>
-                  <TableCell>Статус</TableCell>
-                  <TableCell>Мин</TableCell>
-                  <TableCell>Макс</TableCell>
-                  <TableCell>Прибыль</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.steps.map((item, index) => (
-                  <OrderRow info={item} ordersMap={ordersMap} key={index} />
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </>
-      )}
     </>
   )
 }

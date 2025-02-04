@@ -33,6 +33,17 @@ export interface OrderDataType {
   status: number
   direction: number
   executionDate: string
+  orderDate: string
+  lotsRequested: number
+  lotsExecuted: number
+  initialOrderPrice: number
+  executedOrderPrice: number
+  totalOrderAmount: number
+  averagePositionPrice: number
+  initialCommission: number
+  executedCommission: number
+  initialSecurityPrice: number
+  serviceCommission: number
   properties: {
     price: number
     quantity: number
