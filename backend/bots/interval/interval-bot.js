@@ -5,12 +5,13 @@ import { forEachSeries } from '../../utils/promise.js'
 import { createNewOrderRecord, OrderStatus, updateOrderRecord } from '../../db/models/bots/order.js'
 
 export class IntervalBot {
-  constructor ({ token, account, product, bounds, stepsCount, amountPerStep, id }) {
+  constructor ({ token, account, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
     this.token = token
     this.account = account
     this.product = product
     this.bounds = bounds
     this.stepsCount = stepsCount
+    this.stepProfit = stepProfit
     this.amountPerStep = amountPerStep
     this.id = id
     this.unsubscribeLastPrice = undefined
@@ -22,7 +23,7 @@ export class IntervalBot {
 
     this.api = new TinkoffInvestApi({ token: token.token })
 
-    this.steps = IntervalStep.generate(this.bounds, this.stepsCount, this.id)
+    this.steps = IntervalStep.generate(this.bounds, this.stepsCount, this.id, this.stepProfit)
   }
 
   start = async () => {

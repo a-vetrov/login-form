@@ -1,5 +1,5 @@
-import {getBotById} from "../../db/models/bots/bots.js";
-import {IntervalStepModel} from "../../db/models/bots/interval-step.js";
+import { getBotById } from '../../db/models/bots/bots.js'
+import { IntervalStepModel } from '../../db/models/bots/interval-step.js'
 
 export const STATE = {
   WAIT_ENTRY_PRICE: 'WAIT_ENTRY_PRICE', // Ожидание цены, чтобы выставить заявку
@@ -38,7 +38,7 @@ export class IntervalStep {
     await stepDocument.save()
   }
 
-  static generate (bounds, stepsCount, botId) {
+  static generate (bounds, stepsCount, botId, stepProfit) {
     const stepSize = (bounds.max - bounds.min) / (stepsCount - 1)
 
     if (!stepSize) {
@@ -48,7 +48,7 @@ export class IntervalStep {
     const stepsData = []
     for (let i = 0; i < stepsCount; i++) {
       const min = bounds.min + stepSize * i
-      const max = min + stepSize / 2
+      const max = min + stepProfit
       stepsData.push(new IntervalStep({ min, max }, i, botId))
     }
     return stepsData
@@ -69,6 +69,6 @@ export class IntervalStep {
   }
 
   getStepDocument = async () => {
-    return IntervalStepModel.findOne({botId: this.botId, serialNumber: this.serialNumber})
+    return IntervalStepModel.findOne({ botId: this.botId, serialNumber: this.serialNumber })
   }
 }

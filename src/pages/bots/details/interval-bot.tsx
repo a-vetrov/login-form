@@ -29,13 +29,14 @@ interface IntervalBotData {
     max: number
   }
   stepsCount?: number
+  stepProfit?: number
   selectedAccount: string
 }
 
 export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
   const { id, active, properties } = data
 
-  const { product, stepsCount, bounds } = properties as unknown as IntervalBotData
+  const { product, stepsCount, bounds, stepProfit } = properties as unknown as IntervalBotData
 
   const activeLabel = useMemo(() => {
     if (active) {
@@ -69,6 +70,10 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
             <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell component="th" scope="row">Количество шагов</TableCell>
               <TableCell align="right">{stepsCount}</TableCell>
+            </TableRow>
+            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <TableCell component="th" scope="row">Профит одного шага</TableCell>
+              <TableCell align="right">{stepProfit}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

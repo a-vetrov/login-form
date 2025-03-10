@@ -32,6 +32,7 @@ export const CreateIntervalBot: React.FC = () => {
   const [highBoundary, setHighBoundary] = useState<number>()
 
   const [stepsCount, setStepsCount] = useState<number | undefined>(defaultStepsCount)
+  const [stepProfit, setStepsProfit] = useState<number>(1)
   const [amountPerStep, setAmountPerStep] = useState<number>(1)
 
   const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
@@ -107,6 +108,16 @@ export const CreateIntervalBot: React.FC = () => {
     }
   }, [])
 
+  const handleStepsProfitChange = useCallback<MoneyInputChangeType>((event) => {
+    const { value } = event.target
+    let numericValue = getFromMaskedValue(value)
+    if (!numericValue || numericValue < 0.01) {
+      numericValue = 0.01
+    }
+
+    setStepsProfit(numericValue)
+  }, [])
+
   const budget = useMemo(() => {
     if (!product || !amountPerStep) {
       return 0
@@ -130,10 +141,11 @@ export const CreateIntervalBot: React.FC = () => {
       stepsCount,
       amountPerStep,
       accountType,
-      selectedAccount
+      selectedAccount,
+      stepProfit
     }
     void trigger(result)
-  }, [accountType, amountPerStep, highBoundary, lowBoundary, product?.uid, selectedAccount, stepsCount, trigger])
+  }, [accountType, amountPerStep, highBoundary, lowBoundary, product?.uid, selectedAccount, stepProfit, stepsCount, trigger])
 
   return (
     <>
@@ -195,8 +207,25 @@ export const CreateIntervalBot: React.FC = () => {
               </Box>
 
               <Box marginY={2}>
+                <Typography variant="body1" marginBottom={1}>
+                  Профит одного шага
+                </Typography>
+                <MoneyInput
+                  id="stepProfit"
+                  name="stepProfit"
+                  margin="dense"
+                  label="Профит одного шага"
+                  required
+                  autoComplete="off"
+                  defaultValue={1}
+                  onChange={handleStepsProfitChange}
+                  value={setMaskedValue(stepProfit)}
+                />
+              </Box>
+
+              <Box marginY={2}>
                 {/* eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style */}
-                <BudgetControl product={product} amountPerStep={amountPerStep as number} onChange={setAmountPerStep}/>
+                <BudgetControl product={product} amountPerStep={amountPerStep} onChange={setAmountPerStep}/>
                 <Typography variant="body1" marginTop={2}>
                   Необходимый бюджет {fromNumberToMoneyString(budget, 'RUB')}
                 </Typography>

@@ -8,6 +8,7 @@ export interface AddIntervalBotData {
     max: number
   }
   stepsCount?: number
+  stepProfit?: number
   amountPerStep?: number
   accountType: AccountTypes
   selectedAccount?: string

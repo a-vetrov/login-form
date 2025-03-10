@@ -19,7 +19,7 @@ export const botsRouter = express.Router()
 botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
   try {
     const user = await getUserById(req.user._id)
-    const { product, bounds, stepsCount, amountPerStep, accountType, selectedAccount } = req.body
+    const { product, bounds, stepsCount, stepProfit, amountPerStep, accountType, selectedAccount } = req.body
 
     const token = accountType === 'real' ? getFirstRealToken(user) : getFirstSandboxToken(user)
 
@@ -40,7 +40,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       accountType,
       selectedAccount,
       active: true,
-      properties: { product: productData, bounds, stepsCount, amountPerStep }
+      properties: { product: productData, bounds, stepsCount, amountPerStep, stepProfit }
     }).save()
 
     const botId = result._id.toString()
@@ -51,6 +51,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       product: productData,
       bounds,
       stepsCount,
+      stepProfit,
       amountPerStep,
       id: botId
     })
