@@ -19,6 +19,7 @@ export const botsRouter = express.Router()
 botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
   try {
     const user = await getUserById(req.user._id)
+
     const { product, bounds, stepsCount, stepProfit, amountPerStep, accountType, selectedAccount } = req.body
 
     const token = accountType === 'real' ? getFirstRealToken(user) : getFirstSandboxToken(user)
@@ -31,6 +32,12 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
 
     if (!productData) {
       return sendError(res, 403, 'Ошибка', 'Продукт не найден')
+    }
+
+    const bots = await getBotsByUserId(user._id)
+
+    if (bots.some((item) => item.active && item.properties.get('product').isin === productData.isin)) {
+      return sendError(res, 403, 'Ошибка', 'Бот с таким продуктом уже существует')
     }
 
     const result = await new BotsModel({

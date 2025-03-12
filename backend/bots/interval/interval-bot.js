@@ -44,6 +44,8 @@ export class IntervalBot {
     if (this.stopStatusChecking) {
       this.stopStatusChecking()
     }
+    this.api.stream.market.off('error', this.handleStreamError)
+    this.api.stream.market.off('close', this.handleStreamClose)
     await this.cancelActiveOrders()
   }
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
 import type { GetCatalogResponseType } from '../../services/catalog'
 import { ProductTitle } from './interval-bot/product-title'
@@ -15,7 +15,7 @@ import { BudgetControl } from './interval-bot/budget-control'
 import { AccountControl } from './interval-bot/account-control'
 import { AccountTypes } from '../../constants'
 import { getMinMax } from '../../utils/math'
-import { type AddIntervalBotData, useAddIntervalBotMutation } from '../../services/bots'
+import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } from '../../services/bots'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { useNavigate } from 'react-router-dom'
 
@@ -39,6 +39,7 @@ export const CreateIntervalBot: React.FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined)
 
   const [trigger, { isLoading, error: postError, isSuccess: isPostSuccess, data: postData }] = useAddIntervalBotMutation()
+  const { data: botsListData } = useGetBotsQuery()
 
   const navigate = useNavigate()
 
@@ -147,6 +148,14 @@ export const CreateIntervalBot: React.FC = () => {
     void trigger(result)
   }, [accountType, amountPerStep, highBoundary, lowBoundary, product?.uid, selectedAccount, stepProfit, stepsCount, trigger])
 
+  const sameBotIsAlreadyExists = useMemo(() => {
+    if (!product || !botsListData) {
+      return false
+    }
+
+    return botsListData.some((item) => item.active && (item.properties.product as GetCatalogResponseType).isin === product.isin)
+  }, [botsListData, product])
+
   return (
     <>
       <MainToolbar />
@@ -155,7 +164,26 @@ export const CreateIntervalBot: React.FC = () => {
           Создать интервальный бот
         </Typography>
         {!product && <SearchProduct onChange={handleProductChange}/>}
-        {product && (
+        {(product && sameBotIsAlreadyExists) && (
+          <Box marginTop={2}>
+            <Alert
+              severity="error"
+              action={
+                <Button color="inherit" size="small" onClick={handleResetProduct}>
+                  Отмена
+                </Button>
+            }>
+              <AlertTitle>Бот с таким продуктом уже существует!</AlertTitle>
+              Нельзя создать несколько ботов для одного продукта.
+              <Box marginTop={1}>
+                <Button href="/bots" color="inherit">К списку ботов</Button>
+                <Button color="inherit" onClick={handleResetProduct}>Выбрать другой продукт</Button>
+              </Box>
+            </Alert>
+          </Box>
+        )
+        }
+        {(product) && (
           <Box component='form' onSubmit={handleSubmit}>
             <ProductTitle data={product} onReset={handleResetProduct}/>
 
