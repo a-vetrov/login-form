@@ -9,7 +9,8 @@ const MAX_LIST_SIZE = 15
 const typeTitles: Record<CatalogProductType, string> = {
   bond: 'Облигации',
   stock: 'Акции',
-  currency: 'Валюта'
+  currency: 'Валюта',
+  future: 'Фьючерсы'
 }
 
 interface Props {
@@ -37,8 +38,8 @@ export const SearchProduct: React.FC<Props> = ({ onChange }) => {
     const filterLowerCase = filterValue.toLowerCase()
 
     const filteredData = data.filter((item) => {
-      return item.name.toLowerCase().includes(filterLowerCase) ||
-        item.isin.toLowerCase().includes(filterLowerCase) ||
+      return item.name?.toLowerCase().includes(filterLowerCase) ||
+        item.isin?.toLowerCase().includes(filterLowerCase) ||
         item.ticker?.toLowerCase().includes(filterLowerCase) ||
         item.figi?.toLowerCase().includes(filterLowerCase)
     })

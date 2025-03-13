@@ -1,6 +1,6 @@
 import { api } from './api'
 
-export type CatalogProductType = 'bond' | 'stock' | 'currency' | 'futures'
+export type CatalogProductType = 'bond' | 'stock' | 'currency' | 'future'
 
 export interface GetCatalogResponseType {
   name: string

@@ -39,7 +39,7 @@ export const CatalogPage: React.FC = () => {
       : data.instruments
 
     return arr.slice(0, 20)
-  }, [data, filterValue, category])
+  }, [data, filterValue])
 
   return (
     <>
