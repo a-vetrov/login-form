@@ -1,7 +1,7 @@
 import { CatalogBondsModel } from './bonds.js'
 import { CatalogStocksModel } from './stocks.js'
 import { CatalogCurrenciesModel } from './currencies.js'
-import {CatalogFuturesModel} from "./futures.js";
+import { CatalogFuturesModel } from './futures.js'
 
 export const getInstrumentByIsin = async (isin) => {
   let type = 'bond'
