@@ -73,7 +73,7 @@ export class IntervalBot {
     if (!price) {
       return
     }
-    console.log('subscribeLastPriceHandler', price)
+    console.log('subscribeLastPriceHandler', this.product.name, price)
 
     const stepsToBuy = this.steps.filter((item) => item.state === STATE.WAIT_ENTRY_PRICE && item.bounds.min <= price)
 
@@ -116,7 +116,7 @@ export class IntervalBot {
 
   cancelActiveOrders = async () => {
     const orders = await this.getActiveOrders()
-    const ids = orders.map(({ orderId }) => orderId)
+    const ids = orders.filter(({ figi }) => figi === this.product.figi).map(({ orderId }) => orderId)
     await forEachSeries(ids, this.cancelOrder)
   }
 
@@ -157,17 +157,17 @@ export class IntervalBot {
 
     // Заявка исполнена
     if (data.executionReportStatus === 1) {
-      console.log(`${data.orderType === 1 ? 'Покупка' : 'Продажа'} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
+      console.log(`${data.orderType === 1 ? 'Покупка' : 'Продажа'} ${this.product.name} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
 
       switch (step.state) {
         case STATE.TRY_TO_BUY : {
-          console.log('Купили, ставим заявку на продажу.')
+          console.log(`Купили ${this.product.name}, ставим заявку на продажу.'`)
           await this.sellOrder(step)
           break
         }
 
         case STATE.TRY_TO_SELL: {
-          console.log('Продали, теперь ждем цену, чтобы купить.')
+          console.log(`'Продали ${this.product.name}, теперь ждем цену, чтобы купить.`)
           await step.update(STATE.WAIT_ENTRY_PRICE, undefined)
           break
         }

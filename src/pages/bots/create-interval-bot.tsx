@@ -183,7 +183,7 @@ export const CreateIntervalBot: React.FC = () => {
           </Box>
         )
         }
-        {(product) && (
+        {(product && !sameBotIsAlreadyExists) && (
           <Box component='form' onSubmit={handleSubmit}>
             <ProductTitle data={product} onReset={handleResetProduct}/>
 
