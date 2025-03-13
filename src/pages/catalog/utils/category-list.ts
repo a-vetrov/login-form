@@ -1,7 +1,7 @@
 import { catalogApi } from '../../../services/catalog.ts'
 import { type UseLazyQuery } from '@reduxjs/toolkit/dist/query/react/buildHooks'
 
-export type CatalogCategoryName = 'stocks' | 'bonds' | 'currency'
+export type CatalogCategoryName = 'stocks' | 'bonds' | 'currency' | 'futures'
 
 interface CatalogCategoryType {
   name: CatalogCategoryName
@@ -28,6 +28,12 @@ export const categoriesList: CatalogCategoryType[] = [
     title: 'Валюта',
     link: '/catalog/currency',
     api: catalogApi.useLazyGetCurrenciesQuery
+  },
+  {
+    name: 'futures',
+    title: 'Фьючерсы',
+    link: '/catalog/futures',
+    api: catalogApi.useLazyGetFuturesQuery
   }
 ]
 

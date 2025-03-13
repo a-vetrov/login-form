@@ -32,8 +32,8 @@ export const CatalogPage: React.FC = () => {
 
     const arr = filterValue
       ? data.instruments.filter((item) => {
-        return item.name.toLowerCase().includes(filterLowerCase) ||
-          item.isin.toLowerCase().includes(filterLowerCase) ||
+        return item.name?.toLowerCase().includes(filterLowerCase) ||
+          item.isin?.toLowerCase().includes(filterLowerCase) ||
           item.ticker?.toLowerCase().includes(filterLowerCase)
       })
       : data.instruments

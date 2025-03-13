@@ -6,6 +6,7 @@ import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
 import { getInstrumentByIsin } from '../db/models/catalog/common.js'
+import { CatalogFuturesModel } from '../db/models/catalog/futures.js'
 
 // https://www.moex.com/ru/marketdata/#/mode=groups&group=3&collection=7&boardgroup=58&data_type=current&category=main
 
@@ -16,9 +17,11 @@ catalogRouter.get('/api/catalog', ensureLoggedIn, async (req, res) => {
     const bondsData = await CatalogBondsModel.find({})
     const stocksData = await CatalogStocksModel.find({})
     const currencyData = await CatalogCurrenciesModel.find({})
+    const futuresData = await CatalogFuturesModel.find({})
     const data = bondsData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'bond' }))
       .concat(stocksData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'stock' })))
       .concat(currencyData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'currency' })))
+      .concat(futuresData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'future' })))
 
     res.status(200).send({ success: true, data })
   } catch (error) {
@@ -95,6 +98,30 @@ catalogRouter.get('/api/catalog/currency/:ticker', ensureLoggedIn, async (req, r
   try {
     const ticker = req.params.ticker
     const data = await CatalogCurrenciesModel.findOne({ ticker }).lean()
+    const {
+      _id, __v, ...rest
+    } = data
+    res.status(200).send({ success: true, data: rest })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+catalogRouter.get('/api/catalog/futures', ensureLoggedIn, async (req, res) => {
+  try {
+    const data = await CatalogFuturesModel.find({})
+    res.status(200).send({ success: true, data: { instruments: data } })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+catalogRouter.get('/api/catalog/futures/:ticker', ensureLoggedIn, async (req, res) => {
+  try {
+    const ticker = req.params.ticker
+    const data = await CatalogFuturesModel.findOne({ ticker }).lean()
     const {
       _id, __v, ...rest
     } = data

@@ -1,6 +1,7 @@
 import { CatalogBondsModel } from './bonds.js'
 import { CatalogStocksModel } from './stocks.js'
 import { CatalogCurrenciesModel } from './currencies.js'
+import {CatalogFuturesModel} from "./futures.js";
 
 export const getInstrumentByIsin = async (isin) => {
   let type = 'bond'
@@ -12,6 +13,10 @@ export const getInstrumentByIsin = async (isin) => {
   if (!data) {
     type = 'currency'
     data = await CatalogCurrenciesModel.findOne({ ticker: isin }).lean()
+  }
+  if (!data) {
+    type = 'future'
+    data = await CatalogFuturesModel.findOne({ ticker: isin }).lean()
   }
 
   if (!data) {

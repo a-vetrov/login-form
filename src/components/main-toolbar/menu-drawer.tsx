@@ -41,6 +41,7 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
           <MenuItemLink title='Акции' link='/catalog/stocks' shifted />
           <MenuItemLink title='Облигации' link='/catalog/bonds' shifted />
           <MenuItemLink title='Валюта' link='/catalog/currency' shifted />
+          <MenuItemLink title='Фьючерсы' link='/catalog/futures' shifted />
           <MenuItemLink title='Песочница' link='/sandbox' Icon={SportsEsportsOutlined} />
           <MenuItemLink title='Брокеры' link='/broker/list' Icon={TokenOutlined} />
           <MenuItemLink title='Список ботов' link='/bots' Icon={InsightsOutlined} />

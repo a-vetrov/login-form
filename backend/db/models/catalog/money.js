@@ -7,3 +7,8 @@ export const MoneyValueSchema = new Schema({
   units: Number,
   nano: Number
 })
+
+export const QuotationSchema = new Schema({
+  units: Number,
+  nano: Number
+})

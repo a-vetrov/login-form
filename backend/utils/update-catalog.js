@@ -2,6 +2,7 @@ import { TinkoffInvestApi } from 'tinkoff-invest-api'
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
+import { CatalogFuturesModel } from '../db/models/catalog/futures.js'
 import { credentials } from '../../credentials.js'
 
 const updateBonds = async (api) => {
@@ -142,10 +143,60 @@ const updateCurrencies = async (api) => {
   }
 }
 
+const updateFutures = async (api) => {
+  try {
+    console.log('Updating Futures catalog...')
+
+    const futures = await api.instruments.futures({})
+    await Promise.all(futures.instruments.map(async (item) => {
+      const {
+        name,
+        figi,
+        uid,
+        ticker,
+        lot,
+        currency,
+        realExchange,
+        countryOfRiskName,
+        futuresType,
+        assetType,
+        basicAsset,
+        basicAssetSize,
+        sector,
+        expirationDate
+      } = item
+      const doc = await CatalogFuturesModel.findOneAndUpdate({ ticker }, {
+        name,
+        figi,
+        uid,
+        ticker,
+        lot,
+        currency,
+        realExchange,
+        countryOfRiskName,
+        futuresType,
+        assetType,
+        basicAsset,
+        basicAssetSize,
+        sector,
+        expirationDate
+      }, {
+        new: true,
+        upsert: true // Make this update into an upsert
+      })
+      await doc.save()
+    }))
+    console.log('Done.')
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export const updateCatalog = async () => {
   const token = credentials.tinkoff.token
   const api = new TinkoffInvestApi({ token })
   await updateBonds(api)
   await updateStocks(api)
   await updateCurrencies(api)
+  await updateFutures(api)
 }

@@ -1,6 +1,6 @@
 import { api } from './api'
 
-export type CatalogProductType = 'bond' | 'stock' | 'currency'
+export type CatalogProductType = 'bond' | 'stock' | 'currency' | 'futures'
 
 export interface GetCatalogResponseType {
   name: string
@@ -12,7 +12,7 @@ export interface GetCatalogResponseType {
   type: CatalogProductType
 }
 
-const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks', 'CatalogCurrencies'] })
+const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks', 'CatalogCurrencies', 'CatalogFutures'] })
 
 export const catalogApi = apiWithTag.injectEndpoints({
   endpoints: (build) => ({
@@ -64,6 +64,21 @@ export const catalogApi = apiWithTag.injectEndpoints({
     getCurrencyByTicker: build.query<unknown, string>({
       query: (ticker) => ({
         url: `catalog/currency/${ticker}`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data
+    }),
+    getFutures: build.query<unknown, undefined>({
+      query: () => ({
+        url: 'catalog/futures',
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data,
+      providesTags: ['CatalogFutures']
+    }),
+    getFutureByTicker: build.query<unknown, string>({
+      query: (ticker) => ({
+        url: `catalog/futures/${ticker}`,
         method: 'GET'
       }),
       transformResponse: ({ data }) => data
