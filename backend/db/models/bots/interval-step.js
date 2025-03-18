@@ -15,3 +15,7 @@ const intervalStepSchema = new Schema({
 })
 
 export const IntervalStepModel = mongoose.model('IntervalSteps', intervalStepSchema)
+
+export const getBotSteps = async (botId) => {
+  return IntervalStepModel.find({ botId })
+}

@@ -8,7 +8,7 @@ import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
 import { getBotOrders } from '../db/models/bots/order.js'
-import { IntervalStepModel } from '../db/models/bots/interval-step.js'
+import { getBotSteps, IntervalStepModel } from '../db/models/bots/interval-step.js'
 
 export const botsRouter = express.Router()
 
@@ -133,7 +133,11 @@ botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
     const orders = await getBotOrders(bot._id)
-    const info = BotManager.instance.getBotInfo(req.params.id)
+    const info = {}
+    if (bot.type === BotsType.interval) {
+      const dbSteps = await getBotSteps(bot._id)
+      info.steps = dbSteps.map(({ botId, min, max, orders, serialNumber, state }) => ({ botId, bounds: { min, max }, orders, serialNumber, state }))
+    }
     res.status(200).send({ success: true, data: { orders, ...info } })
   } catch (error) {
     console.log('error', error)

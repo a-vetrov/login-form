@@ -8,6 +8,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
 import { OrderRow } from '../orders/order-row'
+import { IntervalStats } from './interval-stats'
 
 interface Props {
   id: string
@@ -33,12 +34,15 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
 
   return (
     <>
-      <Typography variant="h2" marginBottom={2} marginTop={4}>
-        Сводка по боту
-      </Typography>
-      <Typography variant="body1">
-        Посчитаем тут статистику
-      </Typography>
+      {data?.orders && (
+        <>
+          <Typography variant="h2" marginBottom={2} marginTop={4}>
+            Сводка по боту
+          </Typography>
+          <IntervalStats orders={data.orders} />
+        </>
+      )}
+
       {data?.steps && (
         <>
           <Typography variant="h2" marginBottom={2} marginTop={4}>
