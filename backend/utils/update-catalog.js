@@ -4,6 +4,7 @@ import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
 import { CatalogFuturesModel } from '../db/models/catalog/futures.js'
 import { credentials } from '../../credentials.js'
+import { isProduction } from '../config.js'
 
 const updateBonds = async (api) => {
   try {
@@ -193,6 +194,13 @@ const updateFutures = async (api) => {
 }
 
 export const updateCatalog = async () => {
+  if (!isProduction()) {
+    const bondsLength = await CatalogBondsModel.countDocuments()
+    if (bondsLength) {
+      return
+    }
+  }
+
   const token = credentials.tinkoff.token
   const api = new TinkoffInvestApi({ token })
   await updateBonds(api)

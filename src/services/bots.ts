@@ -64,6 +64,19 @@ export interface OrdersListDataType {
   steps?: IntervalStepInfo[]
 }
 
+export interface BotStatisticsType {
+  commission?: number
+  currentPrice?: number
+  executedOrdersLength?: number
+  lastPrice?: number
+  lots?: number
+  lotsBuy?: number
+  lotsSell?: number
+  priceBuy?: number
+  priceSell?: number
+  serviceCommission?: number
+}
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['BotsList'] })
 
 export const botsApi = apiWithTag.injectEndpoints({
@@ -100,6 +113,13 @@ export const botsApi = apiWithTag.injectEndpoints({
       }),
       transformResponse: ({ data }) => data as OrdersListDataType
     }),
+    getBotStatistics: build.query<BotStatisticsType, string>({
+      query: (id) => ({
+        url: `bots/${id}/stats`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data as BotStatisticsType
+    }),
     stopBot: build.mutation<BotsListDataType, string>({
       query: (id) => ({
         url: `bots/${id}/stop`,
@@ -115,5 +135,7 @@ export const {
   useGetBotsQuery,
   useGetBotByIdQuery,
   useGetBotOrdersQuery,
+  useLazyGetBotOrdersQuery,
+  useGetBotStatisticsQuery,
   useStopBotMutation
 } = botsApi

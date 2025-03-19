@@ -133,3 +133,45 @@ export const updateOrderRecord = async ({ orderId, status, data }) => {
 export const getBotOrders = async (botId) => {
   return OrdersModel.find({ botId })
 }
+
+export const getBotStatistics = async (botId) => {
+  const orders = await OrdersModel.find({ botId, status: 1 })
+  const executedOrdersLength = orders.length
+  let lots = 0
+  let lotsBuy = 0
+  let priceBuy = 0
+  let lotsSell = 0
+  let priceSell = 0
+  let commission = 0
+  let serviceCommission = 0
+
+  orders.forEach((order) => {
+    const { direction, lotsExecuted, executedCommission, executedOrderPrice } = order
+
+    if (direction === 1) {
+      lotsBuy += lotsExecuted
+      lots += lotsExecuted
+      if (executedOrderPrice) {
+        priceBuy += executedOrderPrice
+      }
+    } else {
+      lotsSell += lotsExecuted
+      lots -= lotsExecuted
+      if (executedOrderPrice) {
+        priceSell += executedOrderPrice
+      }
+    }
+
+    if (executedCommission) {
+      commission += executedCommission
+    }
+
+    if (order.serviceCommission) {
+      serviceCommission += order.serviceCommission
+    }
+  })
+
+  return {
+    executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell
+  }
+}

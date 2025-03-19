@@ -3,6 +3,7 @@ import { v6 as uuidv6 } from 'uuid'
 import { IntervalStep, STATE } from './interval-step.js'
 import { forEachSeries } from '../../utils/promise.js'
 import { createNewOrderRecord, OrderStatus, updateOrderRecord } from '../../db/models/bots/order.js'
+import {updateBotProperties} from "../../db/models/bots/bots.js";
 
 export class IntervalBot {
   constructor ({ token, account, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
@@ -74,6 +75,7 @@ export class IntervalBot {
       return
     }
     console.log('subscribeLastPriceHandler', this.product.name, price)
+    await updateBotProperties(this.id, { lastPrice: price })
 
     const stepsToBuy = this.steps.filter((item) => item.state === STATE.WAIT_ENTRY_PRICE && item.bounds.min <= price)
 

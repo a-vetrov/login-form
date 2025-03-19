@@ -1,5 +1,9 @@
-import React, { useMemo } from 'react'
-import { type OrderDataType, useGetBotOrdersQuery } from '../../../services/bots'
+import React, { useEffect, useMemo } from 'react'
+import {
+  type OrderDataType,
+  useGetBotStatisticsQuery,
+  useLazyGetBotOrdersQuery
+} from '../../../services/bots'
 import { TableHead, Typography } from '@mui/material'
 import TableContainer from '@mui/material/TableContainer'
 import Paper from '@mui/material/Paper'
@@ -16,34 +20,40 @@ interface Props {
 }
 
 export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
-  const { data, error } = useGetBotOrdersQuery(id, {
+  const [getOrders, { data: ordersData }] = useLazyGetBotOrdersQuery()
+
+  const { data: statData, error: statError } = useGetBotStatisticsQuery(id, {
     pollingInterval: active ? 1000 : undefined,
     skipPollingIfUnfocused: true
   })
 
+  useEffect(() => {
+    void getOrders(id)
+  }, [statData?.executedOrdersLength, getOrders, id])
+
   const ordersMap = useMemo<Record<string, OrderDataType>>(() => {
-    if (!data?.orders) {
+    if (!ordersData?.orders) {
       return undefined
     }
 
-    return data.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
+    return ordersData.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
       accumulator[item.orderId] = item
       return accumulator
     }, {})
-  }, [data?.orders])
+  }, [ordersData?.orders])
 
   return (
     <>
-      {data?.orders && (
+      {statData && (
         <>
           <Typography variant="h2" marginBottom={2} marginTop={4}>
             Сводка по боту
           </Typography>
-          <IntervalStats orders={data.orders} />
+          <IntervalStats data={statData} />
         </>
       )}
 
-      {data?.steps && (
+      {ordersData?.steps && (
         <>
           <Typography variant="h2" marginBottom={2} marginTop={4}>
             Статус интервалов
@@ -61,7 +71,7 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.steps.map((item, index) => (
+                {ordersData.steps.map((item, index) => (
                   <OrderRow info={item} ordersMap={ordersMap} key={index} />
                 ))}
               </TableBody>
