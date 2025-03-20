@@ -1,23 +1,9 @@
 import React, { useMemo } from 'react'
 import { type BotStatisticsType } from '../../../services/bots'
 import { fromNumberToMoneyString } from '../../../utils/money'
-import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableCell from '@mui/material/TableCell'
 import TableBody from '@mui/material/TableBody'
-import TableContainer from '@mui/material/TableContainer'
-import { styled } from '@mui/material/styles'
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}))
+import { BlueTable } from '../../../components/blue-table'
 
 const dict = [
   {
@@ -72,6 +58,15 @@ const dict = [
   }
 ]
 
+const getColorSx = (value?: number) => {
+  if (!value) {
+    return null
+  }
+  return {
+    color: value > 0 ? 'success.main' : 'error.light'
+  }
+}
+
 interface Props {
   data: BotStatisticsType
 }
@@ -97,36 +92,34 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
 
   return (
     <>
-    <TableContainer component={Paper}>
       <Table>
         <TableBody>
           {dict.map((item) => {
             const value = data[item.key as keyof BotStatisticsType] as unknown as number
             if (value !== undefined) {
               return (
-                <StyledTableRow key={item.key}>
-                  <TableCell>{item.title}</TableCell>
-                  <TableCell align="right">{item.type === 'money' ? fromNumberToMoneyString(value, 'RUB') : value}</TableCell>
-                </StyledTableRow>
+                <BlueTable.Row key={item.key}>
+                  <BlueTable.Cell>{item.title}</BlueTable.Cell>
+                  <BlueTable.Cell align="right">{item.type === 'money' ? fromNumberToMoneyString(value, 'RUB') : value}</BlueTable.Cell>
+                </BlueTable.Row>
               )
             }
             return null
           })}
           {income?.last !== undefined && (
-            <StyledTableRow>
-              <TableCell>{income.current !== undefined ? 'Прибыль по последней цене' : 'Прибыль'}</TableCell>
-              <TableCell align="right">{fromNumberToMoneyString(income.last, 'RUB')}</TableCell>
-            </StyledTableRow>
+            <BlueTable.Row>
+              <BlueTable.Cell>{income.current !== undefined ? 'Прибыль по последней цене' : 'Прибыль'}</BlueTable.Cell>
+              <BlueTable.Cell align="right" sx={getColorSx(income.last)}>{fromNumberToMoneyString(income.last, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
           )}
           {income?.current !== undefined && (
-            <StyledTableRow>
-              <TableCell>{'Прибыль по текущей цене'}</TableCell>
-              <TableCell align="right">{fromNumberToMoneyString(income.current, 'RUB')}</TableCell>
-            </StyledTableRow>
+            <BlueTable.Row>
+              <BlueTable.Cell>{'Прибыль по текущей цене'}</BlueTable.Cell>
+              <BlueTable.Cell align="right" sx={getColorSx(income.last)}>{fromNumberToMoneyString(income.current, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
           )}
         </TableBody>
       </Table>
-    </TableContainer>
     </>
   )
 }

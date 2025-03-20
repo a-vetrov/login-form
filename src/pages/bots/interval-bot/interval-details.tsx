@@ -5,8 +5,6 @@ import {
   useLazyGetBotOrdersQuery
 } from '../../../services/bots'
 import { TableHead, Typography } from '@mui/material'
-import TableContainer from '@mui/material/TableContainer'
-import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
@@ -61,7 +59,6 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
           <Typography variant="h2" marginBottom={2} marginTop={4}>
             Статус интервалов
           </Typography>
-          <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -79,10 +76,8 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
         </>
       )}
-
     </>
   )
 }

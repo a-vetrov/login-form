@@ -5,11 +5,9 @@ import { StopBotButton } from './stop-button'
 import { CandleStickChart } from '../../../components/candle-stick-chart/candle-stick-chart'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableRow from '@mui/material/TableRow'
-import Paper from '@mui/material/Paper'
 import { IntervalDetails } from '../interval-bot/interval-details'
+import { BlueTable } from '../../../components/blue-table'
+import { fromNumberToMoneyString } from '../../../utils/money'
 
 interface Props {
   data: BotsListDataType
@@ -52,32 +50,30 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
         Интервальный бот
       </Typography>
       {activeLabel}
-      <TableContainer component={Paper}>
         <Table>
           <TableBody>
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">Продукт</TableCell>
-              <TableCell align="right">{product.name}</TableCell>
-            </TableRow>
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">Верхняя граница</TableCell>
-              <TableCell align="right">{bounds.max}</TableCell>
-            </TableRow>
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">Нижняя граница</TableCell>
-              <TableCell align="right">{bounds.min}</TableCell>
-            </TableRow>
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">Количество шагов</TableCell>
-              <TableCell align="right">{stepsCount}</TableCell>
-            </TableRow>
-            <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-              <TableCell component="th" scope="row">Профит одного шага</TableCell>
-              <TableCell align="right">{stepProfit}</TableCell>
-            </TableRow>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Продукт</BlueTable.Cell>
+              <BlueTable.Cell align="right">{product.name}</BlueTable.Cell>
+            </BlueTable.Row>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Верхняя граница</BlueTable.Cell>
+              <BlueTable.Cell align="right">{bounds.max}</BlueTable.Cell>
+            </BlueTable.Row>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Нижняя граница</BlueTable.Cell>
+              <BlueTable.Cell align="right">{bounds.min}</BlueTable.Cell>
+            </BlueTable.Row>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Количество шагов</BlueTable.Cell>
+              <BlueTable.Cell align="right">{stepsCount}</BlueTable.Cell>
+            </BlueTable.Row>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Профит одного шага</BlueTable.Cell>
+              <BlueTable.Cell align="right">{fromNumberToMoneyString(stepProfit ?? 0, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
           </TableBody>
         </Table>
-      </TableContainer>
       <Box marginY={2}>
         <CandleStickChart
           instrumentId={product.uid}
