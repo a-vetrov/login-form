@@ -158,6 +158,7 @@ botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
     }
     const statistics = await getBotStatistics(bot._id)
     statistics.lastPrice = bot.properties.get('lastPrice')
+    statistics.product = bot.properties.get('product')
 
     if (!bot.active) {
       const user = await getUserById(req.user._id)

@@ -77,7 +77,23 @@ interface Props {
 }
 
 export const IntervalStats: React.FC<Props> = ({ data }) => {
-  const income = 0
+  const income = useMemo(() => {
+    const { priceSell, priceBuy, lastPrice, currentPrice, product, lots } = data
+    if (priceSell === undefined || priceBuy === undefined) {
+      return undefined
+    }
+    const sum = priceSell - priceBuy
+    const result: { last: number, current?: number } = { last: sum }
+
+    if (lots && lastPrice !== undefined && product?.lot !== undefined) {
+      result.last = sum + (lots * product.lot * lastPrice)
+    }
+
+    if (lots && currentPrice !== undefined && product?.lot !== undefined) {
+      result.current = sum + (lots * product.lot * currentPrice)
+    }
+    return result
+  }, [data])
 
   return (
     <>
@@ -85,7 +101,7 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
       <Table>
         <TableBody>
           {dict.map((item) => {
-            const value = data[item.key as keyof BotStatisticsType]
+            const value = data[item.key as keyof BotStatisticsType] as unknown as number
             if (value !== undefined) {
               return (
                 <StyledTableRow key={item.key}>
@@ -96,10 +112,18 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
             }
             return null
           })}
-          <StyledTableRow>
-            <TableCell>Прибыль</TableCell>
-            <TableCell align="right">{income}</TableCell>
-          </StyledTableRow>
+          {income?.last !== undefined && (
+            <StyledTableRow>
+              <TableCell>{income.current !== undefined ? 'Прибыль по последней цене' : 'Прибыль'}</TableCell>
+              <TableCell align="right">{fromNumberToMoneyString(income.last, 'RUB')}</TableCell>
+            </StyledTableRow>
+          )}
+          {income?.current !== undefined && (
+            <StyledTableRow>
+              <TableCell>{'Прибыль по текущей цене'}</TableCell>
+              <TableCell align="right">{fromNumberToMoneyString(income.current, 'RUB')}</TableCell>
+            </StyledTableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

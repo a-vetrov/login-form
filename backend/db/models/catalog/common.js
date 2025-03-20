@@ -43,14 +43,18 @@ export const getInstrumentByUid = async (uid) => {
     type = 'currency'
     data = await CatalogCurrenciesModel.findOne({ uid }).lean()
   }
+  if (!data) {
+    type = 'future'
+    data = await CatalogFuturesModel.findOne({ uid }).lean()
+  }
 
   if (!data) {
     return null
   }
 
   const {
-    isin, figi, name
+    isin, figi, name, lot
   } = data
 
-  return { isin, figi, uid, name, type }
+  return { isin, figi, uid, name, type, lot }
 }

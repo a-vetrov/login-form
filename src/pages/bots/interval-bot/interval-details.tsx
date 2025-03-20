@@ -28,7 +28,10 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
   })
 
   useEffect(() => {
-    void getOrders(id)
+    if (statData) {
+      void getOrders(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statData?.executedOrdersLength, getOrders, id])
 
   const ordersMap = useMemo<Record<string, OrderDataType>>(() => {

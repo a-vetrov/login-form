@@ -75,6 +75,14 @@ export interface BotStatisticsType {
   priceBuy?: number
   priceSell?: number
   serviceCommission?: number
+  product: {
+    isin: string
+    figi: string
+    uid: string
+    name: string
+    type: string
+    lot: number
+  }
 }
 
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['BotsList'] })
