@@ -4,6 +4,8 @@ import { fromNumberToMoneyString } from '../../../utils/money'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import { BlueTable } from '../../../components/blue-table'
+import { type SxProps } from '@mui/system'
+import { type Theme } from '@mui/material'
 
 const dict = [
   {
@@ -58,7 +60,7 @@ const dict = [
   }
 ]
 
-const getColorSx = (value?: number) => {
+const getColorSx = (value?: number): SxProps<Theme> | null => {
   if (!value) {
     return null
   }
