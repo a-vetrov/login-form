@@ -26,7 +26,6 @@ export const getBotById = async (id) => BotsModel.findById(id)
 
 export const updateBotProperties = async (id, properties) => {
   try {
-    console.log('updateBotProperties', id)
     const bot = await getBotById(id)
 
     Object.keys(properties).forEach((key) => {
@@ -37,3 +36,5 @@ export const updateBotProperties = async (id, properties) => {
     console.log('Не получилось обновить свойства бота', id, e)
   }
 }
+
+export const getAllActiveBots = async () => BotsModel.find({ active: true })

@@ -31,6 +31,15 @@ export class IntervalStep {
     await stepDocument.save()
   }
 
+  updateFromBD = async () => {
+    const stepDocument = await this.getStepDocument()
+    this.state = stepDocument.state
+    this.orders = stepDocument.orders.concat()
+    if (this.state !== STATE.WAIT_ENTRY_PRICE) {
+      this.orderId = this.orders[this.orders.length - 1]
+    }
+  }
+
   updateOrderStatus = async (value) => {
     this.orderStatus = value
     const stepDocument = await this.getStepDocument()

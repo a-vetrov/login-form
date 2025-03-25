@@ -48,7 +48,7 @@ initializeAPI(app)
 
 // Create bot manager
 const botManager = new BotManager()
-botManager.initialize()
+void botManager.initialize()
 
 // Add Vite or respective production middlewares
 let vite

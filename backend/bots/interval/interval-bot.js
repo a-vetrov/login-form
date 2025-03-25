@@ -32,7 +32,7 @@ export class IntervalBot {
     this.active = true
     this.api.stream.market.on('error', this.handleStreamError)
     this.api.stream.market.on('close', this.handleStreamClose)
-    await this.cancelActiveOrders()
+    // await this.cancelActiveOrders()
 
     void this.createLastPriceStream()
   }
@@ -48,6 +48,12 @@ export class IntervalBot {
     this.api.stream.market.off('error', this.handleStreamError)
     this.api.stream.market.off('close', this.handleStreamClose)
     await this.cancelActiveOrders()
+  }
+
+  updateStepsFromDB = async () => {
+    for (const x of this.steps) {
+      await x.updateFromBD()
+    }
   }
 
   handleStreamError = (error) => {
