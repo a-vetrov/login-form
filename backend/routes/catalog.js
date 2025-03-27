@@ -7,6 +7,9 @@ import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
 import { getInstrumentByIsin } from '../db/models/catalog/common.js'
 import { CatalogFuturesModel } from '../db/models/catalog/futures.js'
+import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
+import { getUserById } from '../db/models/user.js'
+import { getFirstSandboxToken } from '../utils/tokens.js'
 
 // https://www.moex.com/ru/marketdata/#/mode=groups&group=3&collection=7&boardgroup=58&data_type=current&category=main
 
@@ -14,13 +17,13 @@ export const catalogRouter = express.Router()
 
 catalogRouter.get('/api/catalog', ensureLoggedIn, async (req, res) => {
   try {
-    const bondsData = await CatalogBondsModel.find({})
+    // const bondsData = await CatalogBondsModel.find({})
     const stocksData = await CatalogStocksModel.find({})
-    const currencyData = await CatalogCurrenciesModel.find({})
+    // const currencyData = await CatalogCurrenciesModel.find({})
     const futuresData = await CatalogFuturesModel.find({})
-    const data = bondsData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'bond' }))
-      .concat(stocksData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'stock' })))
-      .concat(currencyData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'currency' })))
+    const data = stocksData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'stock' }))
+      // .concat(bondsData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'bond' })))
+      // .concat(currencyData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'currency' })))
       .concat(futuresData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'future' })))
 
     res.status(200).send({ success: true, data })
@@ -129,6 +132,44 @@ catalogRouter.get('/api/catalog/futures/:ticker', ensureLoggedIn, async (req, re
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
+  }
+})
+
+catalogRouter.get('/api/catalog/futures/:ticker/margin', ensureLoggedIn, async (req, res) => {
+  try {
+    const user = await getUserById(req.user._id)
+
+    const token = getFirstSandboxToken(user)
+
+    if (!token) {
+      return sendError(res, 403, 'Ошибка', 'Не найден подходящий токен')
+    }
+
+    const ticker = req.params.ticker
+    const productData = await getInstrumentByIsin(ticker)
+
+    if (!productData) {
+      return sendError(res, 403, 'Ошибка', 'Продукт не найден')
+    }
+
+    if (productData.type !== 'future') {
+      return sendError(res, 403, 'Ошибка', 'Продукт не является фьючерсом')
+    }
+
+    const api = new TinkoffInvestApi({ token: token.token })
+    const response = await api.instruments.getFuturesMargin({ figi: productData.figi, instrumentId: productData.uid })
+
+    const data = {
+      initialMarginOnBuy: Helpers.toNumber(response.initialMarginOnBuy),
+      initialMarginOnSell: Helpers.toNumber(response.initialMarginOnSell),
+      minPriceIncrement: Helpers.toNumber(response.minPriceIncrement),
+      minPriceIncrementAmount: Helpers.toNumber(response.minPriceIncrementAmount)
+    }
+
+    res.status(200).send({ success: true, data })
+  } catch (error) {
+    console.log('error', error)
+    sendError(res, 403, 'Ошибка', error.details ?? 'Ошибка при получении параметров фьюча')
   }
 })
 

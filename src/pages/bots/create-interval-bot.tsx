@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { MainToolbar } from '../../components/main-toolbar'
 import { Alert, AlertTitle, Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
-import type { GetCatalogResponseType } from '../../services/catalog'
+import { catalogApi, type GetCatalogResponseType } from '../../services/catalog'
 import { ProductTitle } from './interval-bot/product-title'
 import { CandleStickChart } from '../../components/candle-stick-chart/candle-stick-chart'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
@@ -40,6 +40,8 @@ export const CreateIntervalBot: React.FC = () => {
 
   const [trigger, { isLoading, error: postError, isSuccess: isPostSuccess, data: postData }] = useAddIntervalBotMutation()
   const { data: botsListData } = useGetBotsQuery()
+
+  const { data: marginData } = catalogApi.useGetFutureMarginByTickerQuery(product?.ticker ?? '', { skip: product?.type !== 'future' })
 
   const navigate = useNavigate()
 
@@ -128,9 +130,10 @@ export const CreateIntervalBot: React.FC = () => {
       highBoundary,
       stepsCount,
       amountPerStep,
-      productLots: product.lot
+      productLots: product.lot,
+      initialMarginOnBuy: marginData?.initialMarginOnBuy
     })
-  }, [amountPerStep, highBoundary, lowBoundary, product, stepsCount])
+  }, [amountPerStep, highBoundary, lowBoundary, marginData, product, stepsCount])
 
   const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

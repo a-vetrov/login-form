@@ -25,6 +25,10 @@ export const getInstrumentName = (data?: Record<string, unknown>): string => {
       return `Валюта ${name as string}`
     }
 
-    default: return 'Название не определено'
+    case 'future': {
+      return `Фьючерс ${name as string}`
+    }
+
+    default: return name as string
   }
 }

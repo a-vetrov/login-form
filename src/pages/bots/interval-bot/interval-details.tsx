@@ -25,12 +25,15 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
     skipPollingIfUnfocused: true
   })
 
+  /* Убрал пока статистику по интервалам
   useEffect(() => {
     if (statData) {
       void getOrders(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statData?.executedOrdersLength, getOrders, id])
+
+   */
 
   const ordersMap = useMemo<Record<string, OrderDataType>>(() => {
     if (!ordersData?.orders) {

@@ -39,13 +39,15 @@ export const MenuDrawer: React.FC<Props> = ({ open, onClose }) => {
           <MenuItemLink title='Портфель' link='/portfolio' Icon={BusinessCenterOutlined} />
           <MenuItemLink title='Каталог' link='/catalog' Icon={ListAltOutlined} />
           <MenuItemLink title='Акции' link='/catalog/stocks' shifted />
+          {/*
           <MenuItemLink title='Облигации' link='/catalog/bonds' shifted />
           <MenuItemLink title='Валюта' link='/catalog/currency' shifted />
+          */}
           <MenuItemLink title='Фьючерсы' link='/catalog/futures' shifted />
           <MenuItemLink title='Песочница' link='/sandbox' Icon={SportsEsportsOutlined} />
           <MenuItemLink title='Брокеры' link='/broker/list' Icon={TokenOutlined} />
           <MenuItemLink title='Список ботов' link='/bots' Icon={InsightsOutlined} />
-          <MenuItemLink title='Создать интервальный бот' link='/bots/create/interval' Icon={ViewDayOutlined} />
+          <MenuItemLink title='Создать интервальный бот' link='/bots/create/interval' Icon={ViewDayOutlined} shifted />
 
           <Divider />
           <MenuItemLink title='Выйти' Icon={Logout} onClick={handleLogout}/>

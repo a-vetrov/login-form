@@ -34,12 +34,18 @@ interface CalculateBudgetProps {
   stepsCount?: number
   amountPerStep?: number
   productLots?: number
+  initialMarginOnBuy?: number
 }
 
-export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountPerStep, productLots }: CalculateBudgetProps): number => {
+export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountPerStep, productLots, initialMarginOnBuy }: CalculateBudgetProps): number => {
   if (lowBoundary === undefined || highBoundary === undefined || lowBoundary === highBoundary || !stepsCount || !amountPerStep || !productLots) {
     return 0
   }
+
+  if (initialMarginOnBuy) {
+    return initialMarginOnBuy * stepsCount
+  }
+
   const { min, max } = getMinMax(lowBoundary, highBoundary)
   const stepSize = (max - min) / (stepsCount - 1)
   let result = 0

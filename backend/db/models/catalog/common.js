@@ -1,19 +1,22 @@
-import { CatalogBondsModel } from './bonds.js'
+// import { CatalogBondsModel } from './bonds.js'
 import { CatalogStocksModel } from './stocks.js'
-import { CatalogCurrenciesModel } from './currencies.js'
+// import { CatalogCurrenciesModel } from './currencies.js'
 import { CatalogFuturesModel } from './futures.js'
 
 export const getInstrumentByIsin = async (isin) => {
-  let type = 'bond'
-  let data = await CatalogBondsModel.findOne({ isin }).lean()
+  let type = 'stock'
+  let data = await CatalogStocksModel.findOne({ isin }).lean()
+  /* Пока отключим бонды и валюту
   if (!data) {
-    type = 'stock'
-    data = await CatalogStocksModel.findOne({ isin }).lean()
+    type = 'bond'
+    data = await CatalogBondsModel.findOne({ isin }).lean()
   }
   if (!data) {
     type = 'currency'
     data = await CatalogCurrenciesModel.findOne({ ticker: isin }).lean()
   }
+
+   */
   if (!data) {
     type = 'future'
     data = await CatalogFuturesModel.findOne({ ticker: isin }).lean()
@@ -33,16 +36,20 @@ export const getInstrumentByIsin = async (isin) => {
 }
 
 export const getInstrumentByUid = async (uid) => {
-  let type = 'bond'
-  let data = await CatalogBondsModel.findOne({ uid }).lean()
+  let type = 'stock'
+  let data = await CatalogStocksModel.findOne({ uid }).lean()
+
+  /* Пока отключим бонды и валюту
   if (!data) {
-    type = 'stock'
-    data = await CatalogStocksModel.findOne({ uid }).lean()
+    type = 'bond'
+    data = await CatalogBondsModel.findOne({ uid }).lean()
   }
   if (!data) {
     type = 'currency'
     data = await CatalogCurrenciesModel.findOne({ uid }).lean()
   }
+   */
+
   if (!data) {
     type = 'future'
     data = await CatalogFuturesModel.findOne({ uid }).lean()

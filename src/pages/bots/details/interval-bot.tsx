@@ -8,6 +8,7 @@ import TableBody from '@mui/material/TableBody'
 import { IntervalDetails } from '../interval-bot/interval-details'
 import { BlueTable } from '../../../components/blue-table'
 import { fromNumberToMoneyString } from '../../../utils/money'
+import { getInstrumentName } from '../../../utils/product'
 
 interface Props {
   data: BotsListDataType
@@ -34,7 +35,7 @@ interface IntervalBotData {
 export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
   const { id, active, properties } = data
 
-  const { product, stepsCount, bounds, stepProfit } = properties as unknown as IntervalBotData
+  const { product, stepsCount, bounds, stepProfit, amountPerStep } = properties as unknown as IntervalBotData
 
   const activeLabel = useMemo(() => {
     if (active) {
@@ -54,19 +55,23 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
           <TableBody>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Продукт</BlueTable.Cell>
-              <BlueTable.Cell align="right">{product.name}</BlueTable.Cell>
+              <BlueTable.Cell align="right">{getInstrumentName(product)}</BlueTable.Cell>
             </BlueTable.Row>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Верхняя граница</BlueTable.Cell>
-              <BlueTable.Cell align="right">{bounds.max}</BlueTable.Cell>
+              <BlueTable.Cell align="right">{fromNumberToMoneyString(bounds.max, 'RUB')}</BlueTable.Cell>
             </BlueTable.Row>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Нижняя граница</BlueTable.Cell>
-              <BlueTable.Cell align="right">{bounds.min}</BlueTable.Cell>
+              <BlueTable.Cell align="right">{fromNumberToMoneyString(bounds.min, 'RUB')}</BlueTable.Cell>
             </BlueTable.Row>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Количество шагов</BlueTable.Cell>
               <BlueTable.Cell align="right">{stepsCount}</BlueTable.Cell>
+            </BlueTable.Row>
+            <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+              <BlueTable.Cell component="th" scope="row">Количество лотов в шаге сетки</BlueTable.Cell>
+              <BlueTable.Cell align="right">{amountPerStep}</BlueTable.Cell>
             </BlueTable.Row>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Профит одного шага</BlueTable.Cell>

@@ -82,6 +82,8 @@ export interface BotStatisticsType {
     name: string
     type: string
     lot: number
+    minPriceIncrement?: number
+    minPriceIncrementAmount?: number
   }
 }
 

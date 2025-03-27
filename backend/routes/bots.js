@@ -41,6 +41,15 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       return sendError(res, 403, 'Ошибка', 'Бот с таким продуктом уже существует')
     }
 
+    if (productData.type === 'future') {
+      const api = new TinkoffInvestApi({ token: token.token })
+      const response = await api.instruments.getFuturesMargin({ figi: productData.figi, instrumentId: productData.uid })
+      productData.initialMarginOnBuy = Helpers.toNumber(response.initialMarginOnBuy)
+      productData.initialMarginOnSell = Helpers.toNumber(response.initialMarginOnSell)
+      productData.minPriceIncrement = Helpers.toNumber(response.minPriceIncrement)
+      productData.minPriceIncrementAmount = Helpers.toNumber(response.minPriceIncrementAmount)
+    }
+
     const result = await new BotsModel({
       userId: user._id,
       type: BotsType.interval,
@@ -80,6 +89,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
 
     res.status(200).send({ success: true, data: { id: botId } })
   } catch (error) {
+    console.log(error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
   }
 })

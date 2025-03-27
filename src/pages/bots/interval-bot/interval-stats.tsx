@@ -82,12 +82,18 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
     const sum = priceSell - priceBuy
     const result: { last: number, current?: number } = { last: sum }
 
+    let priceMultiplier = 1
+
+    if (product.type === 'future' && product.minPriceIncrement && product.minPriceIncrementAmount) {
+      priceMultiplier = product.minPriceIncrementAmount / product.minPriceIncrement
+    }
+
     if (lots && lastPrice !== undefined && product?.lot !== undefined) {
-      result.last = sum + (lots * product.lot * lastPrice)
+      result.last = sum + (lots * product.lot * lastPrice * priceMultiplier)
     }
 
     if (lots && currentPrice !== undefined && product?.lot !== undefined) {
-      result.current = sum + (lots * product.lot * currentPrice)
+      result.current = sum + (lots * product.lot * currentPrice * priceMultiplier)
     }
     return result
   }, [data])

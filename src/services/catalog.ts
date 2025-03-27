@@ -12,6 +12,13 @@ export interface GetCatalogResponseType {
   type: CatalogProductType
 }
 
+export interface GetFutureMarginType {
+  initialMarginOnBuy: number
+  initialMarginOnSell: number
+  minPriceIncrement: number
+  minPriceIncrementAmount: number
+}
+
 const apiWithTag = api.enhanceEndpoints({ addTagTypes: ['CatalogBonds', 'CatalogStocks', 'CatalogCurrencies', 'CatalogFutures'] })
 
 export const catalogApi = apiWithTag.injectEndpoints({
@@ -82,6 +89,13 @@ export const catalogApi = apiWithTag.injectEndpoints({
         method: 'GET'
       }),
       transformResponse: ({ data }) => data
+    }),
+    getFutureMarginByTicker: build.query<GetFutureMarginType, string>({
+      query: (ticker) => ({
+        url: `catalog/futures/${ticker}/margin`,
+        method: 'GET'
+      }),
+      transformResponse: ({ data }) => data as GetFutureMarginType
     }),
     getInstrumentByIsin: build.query<unknown, string>({
       query: (isin) => ({
