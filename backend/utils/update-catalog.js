@@ -1,4 +1,4 @@
-import {Helpers, TinkoffInvestApi} from 'tinkoff-invest-api'
+import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
@@ -94,7 +94,7 @@ const updateStocks = async (api) => {
         sector,
         shareType,
         nominal,
-        minPriceIncrement: Helpers.toNumber(minPriceIncrement),
+        minPriceIncrement: Helpers.toNumber(minPriceIncrement)
       }, {
         new: true,
         upsert: true // Make this update into an upsert
@@ -184,7 +184,7 @@ const updateFutures = async (api) => {
         basicAssetSize,
         sector,
         expirationDate,
-        minPriceIncrement: Helpers.toNumber(minPriceIncrement),
+        minPriceIncrement: Helpers.toNumber(minPriceIncrement)
       }, {
         new: true,
         upsert: true // Make this update into an upsert
