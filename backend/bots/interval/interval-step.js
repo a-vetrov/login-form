@@ -1,5 +1,6 @@
 import { getBotById } from '../../db/models/bots/bots.js'
 import { IntervalStepModel } from '../../db/models/bots/interval-step.js'
+import round from 'lodash.round'
 
 export const STATE = {
   WAIT_ENTRY_PRICE: 'WAIT_ENTRY_PRICE', // Ожидание цены, чтобы выставить заявку
@@ -56,8 +57,9 @@ export class IntervalStep {
 
     const stepsData = []
     for (let i = 0; i < stepsCount; i++) {
-      const min = bounds.min + stepSize * i
-      const max = min + stepProfit
+      const min = round(bounds.min + stepSize * i, 4)
+      const max = round(min + stepProfit, 4)
+      console.log({ min, max })
       stepsData.push(new IntervalStep({ min, max }, i, botId))
     }
     return stepsData

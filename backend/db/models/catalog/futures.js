@@ -16,7 +16,8 @@ const futuresSchema = new Schema({
   basicAsset: String,
   basicAssetSize: QuotationSchema,
   sector: String,
-  expirationDate: String
+  expirationDate: String,
+  minPriceIncrement: Number
 })
 
 export const CatalogFuturesModel = mongoose.model('CatalogFutures', futuresSchema)

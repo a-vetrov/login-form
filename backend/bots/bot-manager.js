@@ -27,6 +27,7 @@ export class BotManager {
         botInstance = new IntervalBot({
           token,
           account: bot.selectedAccount,
+          accountType: bot.accountType,
           product: bot.properties.get('product'),
           bounds: bot.properties.get('bounds'),
           stepsCount: bot.properties.get('stepsCount'),

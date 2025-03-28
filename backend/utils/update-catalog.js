@@ -1,4 +1,4 @@
-import { TinkoffInvestApi } from 'tinkoff-invest-api'
+import {Helpers, TinkoffInvestApi} from 'tinkoff-invest-api'
 import { CatalogBondsModel } from '../db/models/catalog/bonds.js'
 import { CatalogStocksModel } from '../db/models/catalog/stocks.js'
 import { CatalogCurrenciesModel } from '../db/models/catalog/currencies.js'
@@ -77,7 +77,8 @@ const updateStocks = async (api) => {
         countryOfRiskName,
         sector,
         shareType,
-        nominal
+        nominal,
+        minPriceIncrement
       } = item
       const doc = await CatalogStocksModel.findOneAndUpdate({ isin }, {
         name,
@@ -92,7 +93,8 @@ const updateStocks = async (api) => {
         countryOfRiskName,
         sector,
         shareType,
-        nominal
+        nominal,
+        minPriceIncrement: Helpers.toNumber(minPriceIncrement),
       }, {
         new: true,
         upsert: true // Make this update into an upsert
@@ -164,7 +166,8 @@ const updateFutures = async (api) => {
         basicAsset,
         basicAssetSize,
         sector,
-        expirationDate
+        expirationDate,
+        minPriceIncrement
       } = item
       const doc = await CatalogFuturesModel.findOneAndUpdate({ ticker }, {
         name,
@@ -180,7 +183,8 @@ const updateFutures = async (api) => {
         basicAsset,
         basicAssetSize,
         sector,
-        expirationDate
+        expirationDate,
+        minPriceIncrement: Helpers.toNumber(minPriceIncrement),
       }, {
         new: true,
         upsert: true // Make this update into an upsert
@@ -203,8 +207,8 @@ export const updateCatalog = async () => {
 
   const token = credentials.tinkoff.token
   const api = new TinkoffInvestApi({ token })
-  await updateBonds(api)
+  // await updateBonds(api)
   await updateStocks(api)
-  await updateCurrencies(api)
+  // await updateCurrencies(api)
   await updateFutures(api)
 }

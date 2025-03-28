@@ -65,6 +65,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
     const intervalBot = new IntervalBot({
       token,
       account: selectedAccount,
+      accountType,
       product: productData,
       bounds,
       stepsCount,

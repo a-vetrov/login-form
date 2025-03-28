@@ -1,14 +1,18 @@
-import { TinkoffInvestApi, Helpers } from 'tinkoff-invest-api'
+import { Helpers } from 'tinkoff-invest-api'
 import { v6 as uuidv6 } from 'uuid'
 import { IntervalStep, STATE } from './interval-step.js'
 import { forEachSeries } from '../../utils/promise.js'
 import { createNewOrderRecord, OrderStatus, updateOrderRecord } from '../../db/models/bots/order.js'
 import { updateBotProperties } from '../../db/models/bots/bots.js'
+import { TinkoffSandboxAccount } from '../../broker/tinkoff-sandbox.js'
+import { TinkoffRealAccount } from '../../broker/tinkoff-real.js'
 
 export class IntervalBot {
-  constructor ({ token, account, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
+  constructor ({ token, account, accountType, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
     this.token = token
-    this.account = account
+    this.account = accountType === 'sandbox' ? new TinkoffSandboxAccount({ token, account }) : new TinkoffRealAccount({ token, account })
+    this.accountType = accountType
+
     this.product = product
     this.bounds = bounds
     this.stepsCount = stepsCount
@@ -22,7 +26,7 @@ export class IntervalBot {
 
     this.streamLock = false
 
-    this.api = new TinkoffInvestApi({ token: token.token })
+    this.api = this.account.api
 
     this.steps = IntervalStep.generate(this.bounds, this.stepsCount, this.id, this.stepProfit)
   }
@@ -103,18 +107,8 @@ export class IntervalBot {
     }, this.subscribeLastPriceHandler)
   }
 
-  getActiveOrders = async () => {
-    const data = await this.api.sandbox.getSandboxOrders({ accountId: this.account })
-    // console.log('Active orders:')
-    // console.log(data.orders)
-    return data.orders
-  }
-
   cancelOrder = async (orderId) => {
-    const data = await this.api.sandbox.cancelSandboxOrder({
-      accountId: this.account,
-      orderId
-    })
+    const data = await this.account.cancelOrder(orderId)
     await updateOrderRecord({
       orderId,
       status: OrderStatus.EXECUTION_REPORT_STATUS_CANCELLED
@@ -123,7 +117,7 @@ export class IntervalBot {
   }
 
   cancelActiveOrders = async () => {
-    const orders = await this.getActiveOrders()
+    const orders = await this.account.getActiveOrders()
     const ids = orders.filter(({ figi }) => figi === this.product.figi).map(({ orderId }) => orderId)
     await forEachSeries(ids, this.cancelOrder)
   }
@@ -133,7 +127,7 @@ export class IntervalBot {
       return
     }
     try {
-      const activeOrders = await this.getActiveOrders()
+      const activeOrders = await this.account.getActiveOrders()
       const activeOrdersIds = activeOrders.map((order) => order.orderId)
 
       const stepsToCheck = this.steps.filter((step) => step.orderId && !activeOrdersIds.includes(step.orderId))
@@ -151,7 +145,7 @@ export class IntervalBot {
     if (this.isFreeze) {
       return
     }
-    const data = await this.api.sandbox.getSandboxOrderState({ accountId: this.account, orderId: step.orderId })
+    const data = await this.account.getOrderState(step.orderId)
 
     await step.updateOrderStatus(data.executionReportStatus)
 
@@ -210,7 +204,6 @@ export class IntervalBot {
       price: Helpers.toQuotation(price),
       orderId,
       direction: 1, // Покупка
-      accountId: this.account,
       orderType: 1,
       instrumentId: this.product.uid,
       figi: '',
@@ -218,7 +211,7 @@ export class IntervalBot {
       price_type: 2
     }
     try {
-      const data = await this.api.sandbox.postSandboxOrder(body)
+      const data = await this.account.postOrder(body)
       console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
       // console.log(data)
       await step.update(STATE.TRY_TO_BUY, data.orderId)
@@ -246,7 +239,6 @@ export class IntervalBot {
       price: Helpers.toQuotation(price),
       orderId,
       direction: 2, // Продажа
-      accountId: this.account,
       orderType: 1,
       instrumentId: this.product.uid,
       figi: '',
@@ -255,7 +247,7 @@ export class IntervalBot {
     }
 
     try {
-      const data = await this.api.sandbox.postSandboxOrder(body)
+      const data = await this.account.postOrder(body)
       console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
       // console.log(data)
       await step.update(STATE.TRY_TO_SELL, data.orderId)
