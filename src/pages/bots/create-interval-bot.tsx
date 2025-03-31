@@ -18,6 +18,7 @@ import { getMinMax } from '../../utils/math'
 import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } from '../../services/bots'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { useNavigate } from 'react-router-dom'
+import { DecimalInput } from '../../components/decimal-input'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -32,7 +33,7 @@ export const CreateIntervalBot: React.FC = () => {
   const [highBoundary, setHighBoundary] = useState<number>()
 
   const [stepsCount, setStepsCount] = useState<number | undefined>(defaultStepsCount)
-  const [stepProfit, setStepsProfit] = useState<number>(1)
+  const [stepProfit, setStepsProfit] = useState<number | null>(1)
   const [amountPerStep, setAmountPerStep] = useState<number>(1)
 
   const [accountType, setAccountType] = useState<AccountTypes>(AccountTypes.sandbox)
@@ -63,6 +64,13 @@ export const CreateIntervalBot: React.FC = () => {
       high: 'Нижняя граница'
     }
   }, [highBoundary, lowBoundary])
+
+  const stepSize = useMemo(() => {
+    if (lowBoundary === undefined || highBoundary === undefined || !stepsCount) {
+      return undefined
+    }
+    return (highBoundary - lowBoundary) / stepsCount
+  }, [lowBoundary, highBoundary, stepsCount])
 
   const handleProductChange = useCallback((item: GetCatalogResponseType) => {
     setProduct(item)
@@ -113,10 +121,7 @@ export const CreateIntervalBot: React.FC = () => {
 
   const handleStepsProfitChange = useCallback<MoneyInputChangeType>((event) => {
     const { value } = event.target
-    let numericValue = getFromMaskedValue(value)
-    if (!numericValue || numericValue < 0.01) {
-      numericValue = 0.01
-    }
+    const numericValue = getFromMaskedValue(value)
 
     setStepsProfit(numericValue)
   }, [])
@@ -233,25 +238,32 @@ export const CreateIntervalBot: React.FC = () => {
                   defaultValue={10}
                   error={stepsCount !== undefined && stepsCount < 2}
                   autoComplete="off"
+                  value={setMaskedValue(stepsCount)}
                   onChange={handleStepsCountChange}
                 />
               </Box>
+
+              {stepSize !== undefined && stepSize > 0 && (
+                <Typography variant="body1" marginY={2}>
+                  Размер шага сетки {fromNumberToMoneyString(stepSize, 'RUB')}
+                </Typography>
+              )}
 
               <Box marginY={2}>
                 <Typography variant="body1" marginBottom={1}>
                   Профит одного шага
                 </Typography>
-                <MoneyInput
-                  id="stepProfit"
-                  name="stepProfit"
-                  margin="dense"
-                  label="Профит одного шага"
-                  required
-                  autoComplete="off"
-                  defaultValue={1}
-                  onChange={handleStepsProfitChange}
-                  value={setMaskedValue(stepProfit)}
-                />
+                  <DecimalInput
+                    id="stepProfit"
+                    name="stepProfit"
+                    margin="dense"
+                    label="В единицах размера шага"
+                    required
+                    autoComplete="off"
+                    defaultValue={1}
+                    onChange={handleStepsProfitChange}
+                    error={!stepProfit || stepProfit <= 0}
+                  />
               </Box>
 
               <Box marginY={2}>

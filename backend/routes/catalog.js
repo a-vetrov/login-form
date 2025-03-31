@@ -21,10 +21,10 @@ catalogRouter.get('/api/catalog', ensureLoggedIn, async (req, res) => {
     const stocksData = await CatalogStocksModel.find({})
     // const currencyData = await CatalogCurrenciesModel.find({})
     const futuresData = await CatalogFuturesModel.find({})
-    const data = stocksData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'stock' }))
+    const data = stocksData.map(({ name, isin, figi, ticker, uid, lot, minPriceIncrement }) => ({ name, isin, figi, ticker, uid, lot, minPriceIncrement, type: 'stock' }))
       // .concat(bondsData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'bond' })))
       // .concat(currencyData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'currency' })))
-      .concat(futuresData.map(({ name, isin, figi, ticker, uid, lot }) => ({ name, isin, figi, ticker, uid, lot, type: 'future' })))
+      .concat(futuresData.map(({ name, isin, figi, ticker, uid, lot, minPriceIncrement }) => ({ name, isin, figi, ticker, uid, lot, minPriceIncrement, type: 'future' })))
 
     res.status(200).send({ success: true, data })
   } catch (error) {

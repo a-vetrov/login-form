@@ -13,7 +13,8 @@ const stocksSchema = new Schema({
   riskLevel: Number,
   countryOfRiskName: String,
   sector: String,
-  shareType: Number
+  shareType: Number,
+  minPriceIncrement: Number
 })
 
 export const CatalogStocksModel = mongoose.model('CatalogStocks', stocksSchema)

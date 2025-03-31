@@ -60,8 +60,8 @@ export const getInstrumentByUid = async (uid) => {
   }
 
   const {
-    isin, figi, name, lot
+    isin, figi, name, lot, minPriceIncrement
   } = data
 
-  return { isin, figi, uid, name, type, lot }
+  return { isin, figi, uid, name, type, lot, minPriceIncrement }
 }

@@ -199,8 +199,8 @@ const updateFutures = async (api) => {
 
 export const updateCatalog = async () => {
   if (!isProduction()) {
-    const bondsLength = await CatalogBondsModel.countDocuments()
-    if (bondsLength) {
+    const length = await CatalogStocksModel.countDocuments()
+    if (length) {
       return
     }
   }

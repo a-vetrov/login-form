@@ -2,6 +2,8 @@ import { type MoneyValue, type Quotation } from '../types/tinkoff/common'
 import { type PortfolioPosition } from '../types/tinkoff/operations'
 import { IMask } from 'react-imask'
 
+import round from 'lodash.round'
+
 const RUB = '₽'
 const USD = '$'
 const EUR = '€'
@@ -83,3 +85,11 @@ export const setMaskedValue = IMask.createPipe({
   scale: 2,
   thousandsSeparator: ' '
 }, IMask.PIPE_TYPE.TYPED, IMask.PIPE_TYPE.MASKED)
+
+export const roundToMinPriceIncrement = (value: number, minPriceIncrement?: number): number => {
+  if (!minPriceIncrement) {
+    return round(value, 2)
+  }
+  const n = Math.round(value / minPriceIncrement)
+  return round(n * minPriceIncrement, 4)
+}
