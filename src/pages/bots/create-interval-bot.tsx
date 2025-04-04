@@ -67,10 +67,10 @@ export const CreateIntervalBot: React.FC = () => {
   }, [highBoundary, lowBoundary])
 
   const stepSize = useMemo(() => {
-    if (lowBoundary === undefined || highBoundary === undefined || !stepsCount) {
+    if (lowBoundary === undefined || highBoundary === undefined || !stepsCount || stepsCount <= 1) {
       return undefined
     }
-    return (highBoundary - lowBoundary) / stepsCount
+    return (highBoundary - lowBoundary) / (stepsCount - 1)
   }, [lowBoundary, highBoundary, stepsCount])
 
   const handleProductChange = useCallback((item: GetCatalogResponseType) => {
