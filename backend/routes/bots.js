@@ -126,7 +126,11 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
     }
     const { _id, type, created, accountType, selectedAccount, properties, active } = bot
     const data = { type, created, accountType, selectedAccount, properties, active, id: _id }
-    data.orders = await getBotOrders(bot._id)
+    // data.orders = await getBotOrders(bot._id)
+    if (type === 'interval') {
+      const steps = await getBotSteps(_id)
+      data.steps = steps.map(({ serialNumber, min, max }) => ({ serialNumber, min, max }))
+    }
     res.status(200).send({ success: true, data })
   } catch (error) {
     console.log('error', error)

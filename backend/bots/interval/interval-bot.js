@@ -28,7 +28,14 @@ export class IntervalBot {
 
     this.api = this.account.api
 
-    this.steps = IntervalStep.generate(this.bounds, this.stepsCount, this.id, this.stepProfit)
+    this.steps = IntervalStep.generate(
+      {
+        bounds: this.bounds,
+        stepsCount: this.stepsCount,
+        botId: this.id,
+        stepProfit: this.stepProfit,
+        minPriceIncrement: this.product.minPriceIncrement
+      })
   }
 
   start = async () => {

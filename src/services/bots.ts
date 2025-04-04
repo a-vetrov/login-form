@@ -18,6 +18,12 @@ interface AddIntervalBotResponseType {
   id: string
 }
 
+export interface IntervalBotStepParams {
+  min: number
+  max: number
+  serialNumber: number
+}
+
 export interface BotsListDataType {
   type: BotsType
   active: boolean
@@ -26,6 +32,7 @@ export interface BotsListDataType {
   selectedAccount: string
   properties: Record<string, unknown>
   id: string
+  steps?: IntervalBotStepParams[]
 }
 
 export interface OrderDataType {

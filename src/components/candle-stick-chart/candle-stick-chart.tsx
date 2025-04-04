@@ -6,13 +6,12 @@ import { CandleIntervalBar } from './interval-bar'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert'
+import { type IntervalBotStepParams } from '../../services/bots'
 
 interface Props {
   instrumentId: string
   onChange?: (candles: HistoricCandle[]) => void
-  lowBoundary?: number
-  highBoundary?: number
-  stepsCount?: number
+  steps?: IntervalBotStepParams[]
 }
 
 /**
@@ -24,8 +23,7 @@ interface Props {
  */
 
 export const CandleStickChart: React.FC<Props> = ({
-  instrumentId, onChange, lowBoundary,
-  highBoundary, stepsCount
+  instrumentId, onChange, steps
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [interval, setInterval] = useState(3)
@@ -38,6 +36,13 @@ export const CandleStickChart: React.FC<Props> = ({
     if (!data) return
 
     const bounds = []
+
+    if (steps) {
+      const stepsData = steps.map(({min}) => min)
+      bounds.push(Plot.ruleY(stepsData, { stroke: '#FFFF00', strokeDasharray: '3 5' }))
+    }
+
+    /*
     if (stepsCount !== undefined && stepsCount > 1 && lowBoundary !== undefined && highBoundary !== undefined && lowBoundary !== highBoundary) {
       const stepSize = (highBoundary - lowBoundary) / (stepsCount - 1)
       const stepsData = []
@@ -53,6 +58,8 @@ export const CandleStickChart: React.FC<Props> = ({
         bounds.push(Plot.ruleY([highBoundary], { stroke: '#0000ff', strokeDasharray: '3 5' }))
       }
     }
+
+     */
 
     const plotData = data.candles.map((item) => {
       return {
@@ -90,7 +97,7 @@ export const CandleStickChart: React.FC<Props> = ({
     })
     containerRef.current?.replaceChildren(plot)
     return () => { plot.remove() }
-  }, [data, highBoundary, isSmallScreen, lowBoundary, stepsCount])
+  }, [data, isSmallScreen, steps])
 
   useEffect(() => {
     if (onChange && data) {

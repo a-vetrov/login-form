@@ -9,6 +9,7 @@ export interface GetCatalogResponseType {
   ticker: string
   uid: string
   lot: number
+  minPriceIncrement?: number
   type: CatalogProductType
 }
 

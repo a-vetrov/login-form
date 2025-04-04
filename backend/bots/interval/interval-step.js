@@ -1,6 +1,7 @@
 import { getBotById } from '../../db/models/bots/bots.js'
 import { IntervalStepModel } from '../../db/models/bots/interval-step.js'
 import round from 'lodash.round'
+import {roundToMinPriceIncrement} from "../../utils/money.js";
 
 export const STATE = {
   WAIT_ENTRY_PRICE: 'WAIT_ENTRY_PRICE', // Ожидание цены, чтобы выставить заявку
@@ -48,7 +49,7 @@ export class IntervalStep {
     await stepDocument.save()
   }
 
-  static generate (bounds, stepsCount, botId, stepProfit) {
+  static generate ({ bounds, stepsCount, botId, stepProfit, minPriceIncrement }) {
     const stepSize = (bounds.max - bounds.min) / (stepsCount - 1)
 
     if (!stepSize) {
@@ -57,9 +58,8 @@ export class IntervalStep {
 
     const stepsData = []
     for (let i = 0; i < stepsCount; i++) {
-      const min = round(bounds.min + stepSize * i, 4)
-      const max = round(min + stepProfit, 4)
-      console.log({ min, max })
+      const min = roundToMinPriceIncrement(bounds.min + stepSize * i, minPriceIncrement)
+      const max = roundToMinPriceIncrement(min + (stepProfit * stepSize), minPriceIncrement)
       stepsData.push(new IntervalStep({ min, max }, i, botId))
     }
     return stepsData

@@ -32,8 +32,9 @@ interface IntervalBotData {
   selectedAccount: string
 }
 
+
 export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
-  const { id, active, properties } = data
+  const { id, active, properties, steps } = data
 
   const { product, stepsCount, bounds, stepProfit, amountPerStep } = properties as unknown as IntervalBotData
 
@@ -80,12 +81,7 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
           </TableBody>
         </Table>
       <Box marginY={2}>
-        <CandleStickChart
-          instrumentId={product.uid}
-          lowBoundary={bounds.min}
-          highBoundary={bounds.max}
-          stepsCount={stepsCount}
-        />
+        <CandleStickChart instrumentId={product.uid} steps={steps} />
       </Box>
       <IntervalDetails id={id} active={active} />
       {active && <StopBotButton id={id}/>}

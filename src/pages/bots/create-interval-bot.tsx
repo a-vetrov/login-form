@@ -19,6 +19,7 @@ import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } f
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { useNavigate } from 'react-router-dom'
 import { DecimalInput } from '../../components/decimal-input'
+import {roundToMinPriceIncrement} from '../../../backend/utils/money';
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -125,6 +126,21 @@ export const CreateIntervalBot: React.FC = () => {
 
     setStepsProfit(numericValue)
   }, [])
+
+  const steps = useMemo(() => {
+    if (!product || !stepsCount || !lowBoundary || !stepSize) {
+      return undefined
+    }
+    const profit = stepProfit || 1
+    const minPriceIncrement = product.minPriceIncrement || 0.01
+    const stepsData = []
+    for (let i = 0; i < stepsCount; i++) {
+      const min = roundToMinPriceIncrement(lowBoundary + stepSize * i, minPriceIncrement)
+      const max = roundToMinPriceIncrement(min + (profit * stepSize), minPriceIncrement)
+      stepsData.push({ min, max, serialNumber: i })
+    }
+    return stepsData
+  }, [lowBoundary, product, stepProfit, stepSize, stepsCount])
 
   const budget = useMemo(() => {
     if (!product || !amountPerStep) {
@@ -285,13 +301,7 @@ export const CreateIntervalBot: React.FC = () => {
               </Box>
 
               <Box marginY={2}>
-                <CandleStickChart
-                  instrumentId={product.uid}
-                  onChange={handleCandlesChange}
-                  lowBoundary={lowBoundary}
-                  highBoundary={highBoundary}
-                  stepsCount={stepsCount}
-                />
+                <CandleStickChart instrumentId={product.uid} onChange={handleCandlesChange} steps={steps} />
               </Box>
 
               <ErrorAlert error={postError} />
