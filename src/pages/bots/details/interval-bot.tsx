@@ -75,7 +75,7 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
             </BlueTable.Row>
             <BlueTable.Row sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <BlueTable.Cell component="th" scope="row">Профит одного шага</BlueTable.Cell>
-              <BlueTable.Cell align="right">{fromNumberToMoneyString(stepProfit ?? 0, 'RUB')}</BlueTable.Cell>
+              <BlueTable.Cell align="right">{stepProfit}</BlueTable.Cell>
             </BlueTable.Row>
           </TableBody>
         </Table>
