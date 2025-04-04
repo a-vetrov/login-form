@@ -19,7 +19,7 @@ import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } f
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { useNavigate } from 'react-router-dom'
 import { DecimalInput } from '../../components/decimal-input'
-import {roundToMinPriceIncrement} from '../../../backend/utils/money';
+import { roundToMinPriceIncrement } from '../../../backend/utils/money'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'

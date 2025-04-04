@@ -32,7 +32,6 @@ interface IntervalBotData {
   selectedAccount: string
 }
 
-
 export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
   const { id, active, properties, steps } = data
 
