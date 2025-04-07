@@ -80,7 +80,7 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
       return undefined
     }
     const sum = priceSell - priceBuy
-    const result: { last: number, current?: number, unrealized?: number, unrealizedCurrent?: number, balance?: number , balanceCurrent?: number } = { last: sum }
+    const result: { last: number, current?: number, unrealized?: number, unrealizedCurrent?: number, balance?: number, balanceCurrent?: number } = { last: sum }
 
     let priceMultiplier = 1
 
