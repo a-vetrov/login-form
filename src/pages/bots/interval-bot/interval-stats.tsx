@@ -75,12 +75,12 @@ interface Props {
 
 export const IntervalStats: React.FC<Props> = ({ data }) => {
   const income = useMemo(() => {
-    const { priceSell, priceBuy, lastPrice, currentPrice, product, lots } = data
+    const { priceSell, priceBuy, lastPrice, currentPrice, product, lots, commission } = data
     if (priceSell === undefined || priceBuy === undefined) {
       return undefined
     }
     const sum = priceSell - priceBuy
-    const result: { last: number, current?: number } = { last: sum }
+    const result: { last: number, current?: number, unrealized?: number, unrealizedCurrent?: number, balance?: number , balanceCurrent?: number } = { last: sum }
 
     let priceMultiplier = 1
 
@@ -89,11 +89,19 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
     }
 
     if (lots && lastPrice !== undefined && product?.lot !== undefined) {
-      result.last = sum + (lots * product.lot * lastPrice * priceMultiplier)
+      result.unrealized = (lots * product.lot * lastPrice * priceMultiplier)
+      result.last = sum + result.unrealized
+      if (commission) {
+        result.balance = result.last - commission
+      }
     }
 
     if (lots && currentPrice !== undefined && product?.lot !== undefined) {
-      result.current = sum + (lots * product.lot * currentPrice * priceMultiplier)
+      result.unrealizedCurrent = (lots * product.lot * currentPrice * priceMultiplier)
+      result.current = sum + result.unrealizedCurrent
+      if (commission) {
+        result.balanceCurrent = result.current - commission
+      }
     }
     return result
   }, [data])
@@ -114,6 +122,18 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
             }
             return null
           })}
+          {income?.unrealized !== undefined && (
+            <BlueTable.Row>
+              <BlueTable.Cell>{income.current !== undefined ? 'Стоимость открытых позиций по последней цене' : 'Стоимость открытых позиций'}</BlueTable.Cell>
+              <BlueTable.Cell align="right">{fromNumberToMoneyString(income.unrealized, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
+          )}
+          {income?.unrealizedCurrent !== undefined && (
+            <BlueTable.Row>
+              <BlueTable.Cell>Стоимость открытых позиций по теккущей цене</BlueTable.Cell>
+              <BlueTable.Cell align="right">{fromNumberToMoneyString(income.unrealizedCurrent, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
+          )}
           {income?.last !== undefined && (
             <BlueTable.Row>
               <BlueTable.Cell>{income.current !== undefined ? 'Прибыль по последней цене' : 'Прибыль'}</BlueTable.Cell>
@@ -123,7 +143,19 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
           {income?.current !== undefined && (
             <BlueTable.Row>
               <BlueTable.Cell>{'Прибыль по текущей цене'}</BlueTable.Cell>
-              <BlueTable.Cell align="right" sx={getColorSx(income.last)}>{fromNumberToMoneyString(income.current, 'RUB')}</BlueTable.Cell>
+              <BlueTable.Cell align="right" sx={getColorSx(income.current)}>{fromNumberToMoneyString(income.current, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
+          )}
+          {income?.balance !== undefined && (
+            <BlueTable.Row>
+              <BlueTable.Cell>{income.current !== undefined ? 'Баланс с учетом комиссии по последней цене' : 'Баланс с учетом комиссии'}</BlueTable.Cell>
+              <BlueTable.Cell align="right" sx={getColorSx(income.balance)}>{fromNumberToMoneyString(income.balance, 'RUB')}</BlueTable.Cell>
+            </BlueTable.Row>
+          )}
+          {income?.balanceCurrent !== undefined && (
+            <BlueTable.Row>
+              <BlueTable.Cell>{'Баланс с учетом комиссии по текущей цене'}</BlueTable.Cell>
+              <BlueTable.Cell align="right" sx={getColorSx(income.balanceCurrent)}>{fromNumberToMoneyString(income.balanceCurrent, 'RUB')}</BlueTable.Cell>
             </BlueTable.Row>
           )}
         </TableBody>

@@ -6,6 +6,7 @@ import { createNewOrderRecord, OrderStatus, updateOrderRecord } from '../../db/m
 import { updateBotProperties } from '../../db/models/bots/bots.js'
 import { TinkoffSandboxAccount } from '../../broker/tinkoff-sandbox.js'
 import { TinkoffRealAccount } from '../../broker/tinkoff-real.js'
+import { OrderUpdater } from '../utils/order-updater.js'
 
 export class IntervalBot {
   constructor ({ token, account, accountType, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
@@ -36,6 +37,8 @@ export class IntervalBot {
         stepProfit: this.stepProfit,
         minPriceIncrement: this.product.minPriceIncrement
       })
+
+    this.orderUpdater = new OrderUpdater({ botId: this.id, account: this.account })
   }
 
   start = async () => {
@@ -138,6 +141,9 @@ export class IntervalBot {
       const activeOrdersIds = activeOrders.map((order) => order.orderId)
 
       const stepsToCheck = this.steps.filter((step) => step.orderId && !activeOrdersIds.includes(step.orderId))
+      if (stepsToCheck.length) {
+        await this.orderUpdater.updateOrders()
+      }
       await forEachSeries(stepsToCheck, this.updateStepState)
     } catch (error) {
       console.log('IntervalBot.checkSteps error', error)

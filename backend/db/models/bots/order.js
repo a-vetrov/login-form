@@ -146,7 +146,7 @@ export const getBotStatistics = async (botId) => {
   let serviceCommission = 0
 
   orders.forEach((order) => {
-    const { direction, lotsExecuted, executedCommission, executedOrderPrice } = order
+    const { direction, lotsExecuted, executedCommission, executedOrderPrice, initialCommission } = order
 
     if (direction === 1) {
       lotsBuy += lotsExecuted
@@ -164,6 +164,8 @@ export const getBotStatistics = async (botId) => {
 
     if (executedCommission) {
       commission += executedCommission
+    } else if (initialCommission) {
+      commission += initialCommission
     }
 
     if (order.serviceCommission) {
