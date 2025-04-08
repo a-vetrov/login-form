@@ -196,7 +196,7 @@ export const checkToken = async (token) => {
   if (token.type === TokenType.real) {
     result = await api.users.getAccounts({})
   } else {
-    result = await api.sandbox.getSandboxAccounts()
+    result = await api.sandbox.getSandboxAccounts({})
   }
   return result !== null
 }
