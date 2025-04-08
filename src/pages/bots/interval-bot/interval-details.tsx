@@ -1,16 +1,11 @@
 import React, { useEffect, useMemo } from 'react'
 import {
-  type OrderDataType,
   useGetBotStatisticsQuery,
   useLazyGetBotOrdersQuery
 } from '../../../services/bots'
-import { TableHead, Typography } from '@mui/material'
-import Table from '@mui/material/Table'
-import TableRow from '@mui/material/TableRow'
-import TableCell from '@mui/material/TableCell'
-import TableBody from '@mui/material/TableBody'
-import { OrderRow } from '../orders/order-row'
+import { Typography } from '@mui/material'
 import { IntervalStats } from './interval-stats'
+import { BotOrders } from '../orders/bot-orders'
 
 interface Props {
   id: string
@@ -25,26 +20,12 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
     skipPollingIfUnfocused: true
   })
 
-  /* Убрал пока статистику по интервалам
   useEffect(() => {
     if (statData) {
       void getOrders(id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statData?.executedOrdersLength, getOrders, id])
-
-   */
-
-  const ordersMap = useMemo<Record<string, OrderDataType>>(() => {
-    if (!ordersData?.orders) {
-      return undefined
-    }
-
-    return ordersData.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
-      accumulator[item.orderId] = item
-      return accumulator
-    }, {})
-  }, [ordersData?.orders])
 
   return (
     <>
@@ -56,31 +37,8 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
           <IntervalStats data={statData} />
         </>
       )}
+      {ordersData && <BotOrders data={ordersData} /> }
 
-      {ordersData?.steps && (
-        <>
-          <Typography variant="h2" marginBottom={2} marginTop={4}>
-            Статус интервалов
-          </Typography>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell> </TableCell>
-                  <TableCell>Статус</TableCell>
-                  <TableCell>Мин ⇔ Макс</TableCell>
-                  <TableCell>Прибыль</TableCell>
-                  <TableCell>Фактическая комиссия</TableCell>
-                  <TableCell>Сервисная комиссия</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {ordersData.steps.map((item, index) => (
-                  <OrderRow info={item} ordersMap={ordersMap} key={index} />
-                ))}
-              </TableBody>
-            </Table>
-        </>
-      )}
     </>
   )
 }

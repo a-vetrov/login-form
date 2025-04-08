@@ -1,4 +1,4 @@
-import type {OrderDataType} from '../../../services/bots';
+import type { OrderDataType } from '../../../services/bots'
 
 export const getOrderDirection = (direction: number): string => {
   switch (direction) {

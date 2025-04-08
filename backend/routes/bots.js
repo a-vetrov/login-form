@@ -7,7 +7,7 @@ import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
-import { getBotOrders, getBotStatistics } from '../db/models/bots/order.js'
+import {getBotOrders, getBotStatistics, getBotSuccessOrders} from '../db/models/bots/order.js'
 import { getBotSteps, IntervalStepModel } from '../db/models/bots/interval-step.js'
 import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
 
@@ -148,7 +148,7 @@ botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
     if (!bot || req.user._id.toString() !== bot.userId.toString()) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
-    const orders = await getBotOrders(bot._id)
+    const orders = await getBotSuccessOrders(bot._id)
     const info = {}
     if (bot.type === BotsType.interval) {
       const dbSteps = await getBotSteps(bot._id)

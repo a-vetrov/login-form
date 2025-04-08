@@ -134,6 +134,10 @@ export const getBotOrders = async (botId) => {
   return OrdersModel.find({ botId })
 }
 
+export const getBotSuccessOrders = async (botId) => {
+  return OrdersModel.find({ botId, status: 1 })
+}
+
 export const getBotStatistics = async (botId) => {
   const orders = await OrdersModel.find({ botId, status: 1 })
   const executedOrdersLength = orders.length

@@ -91,9 +91,10 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
     if (lots && lastPrice !== undefined && product?.lot !== undefined) {
       result.unrealized = (lots * product.lot * lastPrice * priceMultiplier)
       result.last = sum + result.unrealized
-      if (commission) {
-        result.balance = result.last - commission
-      }
+    }
+
+    if (commission) {
+      result.balance = result.last - commission
     }
 
     if (lots && currentPrice !== undefined && product?.lot !== undefined) {
