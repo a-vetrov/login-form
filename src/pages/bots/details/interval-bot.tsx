@@ -9,8 +9,8 @@ import { IntervalDetails } from '../interval-bot/interval-details'
 import { BlueTable } from '../../../components/blue-table'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { getInstrumentName } from '../../../utils/product'
-import {getBotOrders} from '../../../store/selectors/orders';
-import {useSelector} from 'react-redux';
+import { getBotOrders } from '../../../store/selectors/orders'
+import { useSelector } from 'react-redux'
 
 interface Props {
   data: BotsListDataType

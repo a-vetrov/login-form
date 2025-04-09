@@ -11,7 +11,7 @@ import TableContainer from '@mui/material/TableContainer'
 import { getColorSx, sortByDate } from './utils'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { format } from 'date-fns'
-import {OrderStatus} from './order-status';
+import { OrderStatus } from './order-status'
 
 interface Props {
   data: OrdersListDataType
