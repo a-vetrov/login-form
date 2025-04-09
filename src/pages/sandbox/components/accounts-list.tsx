@@ -7,7 +7,7 @@ import { NewMoneyDialog } from './new-money-dialog'
 interface Props {
   accounts?: ExtendedAccount[]
   selectedAccount: string | undefined
-  setSelectedAccount: (id: string) => void
+  setSelectedAccount: (id: string | undefined) => void
   titleVisible?: boolean
   controlsVisible?: boolean
 }
@@ -21,10 +21,16 @@ export const SandboxAccountsList: React.FC<Props> = ({
   const [newMoneyOpen, setNewMoneyOpen] = useState(false)
 
   useEffect(() => {
-    if (selectedAccount === undefined && accounts?.[0]?.id) {
+    if (!accounts?.length) {
+      return
+    }
+
+    const exists = accounts.some(({id}) => id === selectedAccount)
+
+    if (!exists && accounts[0].id) {
       setSelectedAccount(accounts[0].id)
     }
-  }, [selectedAccount === undefined, accounts])
+  }, [selectedAccount, accounts, setSelectedAccount])
 
   const handleNewMoneyClose = useCallback(() => {
     setNewMoneyOpen(false)
@@ -65,7 +71,7 @@ export const SandboxAccountsList: React.FC<Props> = ({
         Удалить выбранный счет
       </Button>
     )
-  }, [selectedAccount, deleteIsLoading, deleteTrigger])
+  }, [selectedAccount, deleteIsLoading, deleteTrigger, setSelectedAccount])
 
   const addMoneyButton = useMemo(() => {
     if (!selectedAccount) {
