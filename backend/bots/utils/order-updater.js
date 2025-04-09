@@ -20,12 +20,16 @@ export class OrderUpdater {
   }
 
   updateOrderStatus = async (order) => {
-    const data = await this.account.getOrderState(order.orderId)
-    await updateOrderRecord({
-      orderId: order.orderId,
-      status: data.executionReportStatus,
-      data
-    })
+    try {
+      const data = await this.account.getOrderState(order.orderId)
+      await updateOrderRecord({
+        orderId: order.orderId,
+        status: data.executionReportStatus,
+        data
+      })
+    } catch (error) {
+      console.log('updateOrderStatus error', error)
+    }
   }
 
   updateOrders = async () => {
@@ -35,7 +39,6 @@ export class OrderUpdater {
     this.readyForUpdate = false
     try {
       const orders = await OrdersModel.find({ botId: this.botId, status: 1, executedCommission: 0 })
-      console.log('!!!!!!!updateOrders', orders.length)
       await forEachSeries(orders, this.updateOrderStatus)
     } catch (e) {
       console.log('updateOrders error', e)
