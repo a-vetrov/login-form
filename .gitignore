@@ -32,3 +32,6 @@ token
 
 # Candles cache
 .cache
+
+#DB data
+db

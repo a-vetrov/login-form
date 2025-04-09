@@ -1,8 +1,12 @@
 docker network create my-bridge-network
 docker run -d --rm -p 127.0.0.1:27017:27017 --network my-bridge-network  --name vizify-mongo mongo
+docker run -d --rm -p 127.0.0.1:27017:27017 --network my-bridge-network  -v /Users/developer/WebstormProjects/login-form/db/mongo:/data/db --name vizify-mongo mongo
+docker run -d --rm -p 127.0.0.1:27017:27017 --network my-bridge-network  -v /db/mongo:/data/db --name vizify-mongo mongo
 
 
 docker run -d --rm -p 127.0.0.1:6379:6379 --network my-bridge-network  --name vizify-redis redis
+docker run -d --rm -p 127.0.0.1:6379:6379 --network my-bridge-network  -v /Users/developer/WebstormProjects/login-form/db/redis:/data --name vizify-redis redis
+docker run -d --rm -p 127.0.0.1:6379:6379 --network my-bridge-network  -v /db/redis:/data --name vizify-redis redis
 
 docker build -t aavetrov/vizify-login-form .
 docker run -dp 3000:5173 --network my-bridge-network  vizify-app
