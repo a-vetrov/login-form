@@ -25,7 +25,7 @@ export const SandboxAccountsList: React.FC<Props> = ({
       return
     }
 
-    const exists = accounts.some(({id}) => id === selectedAccount)
+    const exists = accounts.some(({ id }) => id === selectedAccount)
 
     if (!exists && accounts[0].id) {
       setSelectedAccount(accounts[0].id)
@@ -71,7 +71,7 @@ export const SandboxAccountsList: React.FC<Props> = ({
         Удалить выбранный счет
       </Button>
     )
-  }, [selectedAccount, deleteIsLoading, deleteTrigger, setSelectedAccount])
+  }, [selectedAccount, deleteIsLoading, deleteTrigger])
 
   const addMoneyButton = useMemo(() => {
     if (!selectedAccount) {
