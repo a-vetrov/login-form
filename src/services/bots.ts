@@ -64,6 +64,7 @@ export interface IntervalStepInfo {
   orderId?: string
   bounds: { min: number, max: number }
   orders: string[]
+  serialNumber: number
 }
 
 export interface OrdersListDataType {

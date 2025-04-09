@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import TableContainer from '@mui/material/TableContainer'
-import { getOrderDirection } from './utils'
+import { getColorSx, getOrderDirection, sortByDate } from './utils'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { format } from 'date-fns'
 
@@ -18,15 +18,7 @@ interface Props {
 
 const accordionMargin = { marginY: 4 }
 
-const sortByDate = (a: OrderDataType, b: OrderDataType): number => {
-  const dateA = new Date(a.executionDate)
-  const dateB = new Date(b.executionDate)
-  return dateA - dateB
-}
-
 export const BotOrders: React.FC<Props> = ({ data }) => {
-  const a = 1
-
   const orderStepMap = useMemo(() => {
     if (!data?.steps) {
       return undefined
@@ -40,23 +32,43 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
     }, {})
   }, [data?.steps])
 
-  const orders = useMemo(() => {
+  const ordersMap = useMemo(() => {
     if (!data?.orders) {
       return undefined
     }
 
+    return data.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
+      accumulator[item.orderId] = item
+      return accumulator
+    }, {})
+  }, [data?.orders])
+
+  const orders = useMemo(() => {
+    if (!data?.steps || !data.orders || !orderStepMap || !ordersMap) {
+      return undefined
+    }
+
     return data.orders.slice().sort(sortByDate).map((item) => {
+      const commission = item.executedCommission || item.initialCommission
       let profit: number | undefined
-      if (item.direction === 2) {
-        profit = 0
-      }
+      try {
+        if (item.direction === 2) {
+          const serialNumber = orderStepMap[item.orderId]
+          const arr = data.steps[serialNumber].orders
+          const index = arr.indexOf(item.orderId) - 1
+          const prevId = arr[index]
+          const prevOrder = ordersMap[prevId]
+          profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission
+        }
+      } catch (e) {}
 
       return {
         ...item,
-        profit
+        profit,
+        commission
       }
     })
-  }, [data?.orders])
+  }, [data, orderStepMap, ordersMap])
 
   return (
       <Accordion sx={accordionMargin}>
@@ -86,8 +98,8 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
                     <TableCell>{orderStepMap?.[order.orderId]}</TableCell>
                     <TableCell>{getOrderDirection(order.direction)}</TableCell>
                     <TableCell>{fromNumberToMoneyString(order.executedOrderPrice, 'RUB')}</TableCell>
-                    <TableCell>{fromNumberToMoneyString(order.executedCommission || order.initialCommission, 'RUB')}</TableCell>
-                    <TableCell>{ order.profit !== undefined && fromNumberToMoneyString(order.profit, 'RUB')}</TableCell>
+                    <TableCell>{fromNumberToMoneyString(order.commission, 'RUB')}</TableCell>
+                    <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined && fromNumberToMoneyString(order.profit, 'RUB')}</TableCell>
                     <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm') : ''}</TableCell>
                   </TableRow>
                 ))}

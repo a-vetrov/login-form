@@ -1,4 +1,6 @@
-import type { OrderDataType } from '../../../services/bots'
+import {IntervalStepInfo, OrderDataType} from '../../../services/bots'
+import type {SxProps} from '@mui/system';
+import type {Theme} from '@mui/material';
 
 export const getOrderDirection = (direction: number): string => {
   switch (direction) {
@@ -24,4 +26,19 @@ export const getOrderProfit = (order: OrderDataType): number => {
     return 0
   }
   return order.direction === 1 ? -order.executedOrderPrice : order.executedOrderPrice
+}
+
+export const sortByDate = (a: OrderDataType, b: OrderDataType): number => {
+  const dateA = new Date(a.executionDate)
+  const dateB = new Date(b.executionDate)
+  return dateA - dateB
+}
+
+export const getColorSx = (value?: number): SxProps<Theme> | null => {
+  if (!value) {
+    return null
+  }
+  return {
+    color: value > 0 ? 'success.main' : 'error.light'
+  }
 }
