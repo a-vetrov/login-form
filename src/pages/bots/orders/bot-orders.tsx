@@ -8,9 +8,10 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import TableContainer from '@mui/material/TableContainer'
-import { getColorSx, getOrderDirection, sortByDate } from './utils'
+import { getColorSx, sortByDate } from './utils'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { format } from 'date-fns'
+import {OrderStatus} from './order-status';
 
 interface Props {
   data: OrdersListDataType
@@ -58,7 +59,8 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
           const index = arr.indexOf(item.orderId) - 1
           const prevId = arr[index]
           const prevOrder = ordersMap[prevId]
-          profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission
+          const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission
+          profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission - prevCommission
         }
       } catch (e) {}
 
@@ -84,23 +86,23 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Шаг</TableCell>
+                  <TableCell>Дата исполнения</TableCell>
                   <TableCell>Тип</TableCell>
                   <TableCell>Цена</TableCell>
                   <TableCell>Комиссия</TableCell>
                   <TableCell>Профит</TableCell>
-                  <TableCell>Дата исполнения</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {orders?.map((order) => (
                   <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} key={order.orderId}>
-                    <TableCell>{orderStepMap?.[order.orderId]}</TableCell>
-                    <TableCell>{getOrderDirection(order.direction)}</TableCell>
+                    <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm') : ''}</TableCell>
+                    <TableCell>
+                      <OrderStatus order={order}/>
+                    </TableCell>
                     <TableCell>{fromNumberToMoneyString(order.executedOrderPrice, 'RUB')}</TableCell>
                     <TableCell>{fromNumberToMoneyString(order.commission, 'RUB')}</TableCell>
                     <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined && fromNumberToMoneyString(order.profit, 'RUB')}</TableCell>
-                    <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm') : ''}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

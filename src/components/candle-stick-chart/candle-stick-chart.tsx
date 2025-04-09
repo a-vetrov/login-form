@@ -6,12 +6,13 @@ import { CandleIntervalBar } from './interval-bar'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert'
-import { type IntervalBotStepParams } from '../../services/bots'
+import { type IntervalBotStepParams, type OrderDataType } from '../../services/bots'
 
 interface Props {
   instrumentId: string
   onChange?: (candles: HistoricCandle[]) => void
   steps?: IntervalBotStepParams[]
+  orders?: OrderDataType[]
 }
 
 /**
@@ -23,7 +24,7 @@ interface Props {
  */
 
 export const CandleStickChart: React.FC<Props> = ({
-  instrumentId, onChange, steps
+  instrumentId, onChange, steps, orders
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [interval, setInterval] = useState(3)
@@ -34,12 +35,26 @@ export const CandleStickChart: React.FC<Props> = ({
 
   useEffect(() => {
     if (!data) return
+    console.log('Data changed')
 
     const bounds = []
 
     if (steps) {
       const stepsData = steps.map(({ min }) => min)
       bounds.push(Plot.ruleY(stepsData, { stroke: '#FFFF00', strokeDasharray: '3 5' }))
+    }
+
+    if (orders?.length) {
+      try {
+        const arr = orders.map(({ executionDate, averagePositionPrice, direction }) => (
+          {
+            x: new Date(executionDate),
+            y: averagePositionPrice,
+            fill: direction === 1 ? '#FF0000' : '#00FF00',
+            rotate: direction === 1 ? 180 : 0
+          }))
+        bounds.push(Plot.dot(arr, { x: 'x', y: 'y', fill: 'fill', symbol: 'triangle', rotate: 'rotate', stroke: 'none', r: 4 }))
+      } catch (e) {}
     }
 
     const plotData = data.candles.map((item) => {
@@ -78,7 +93,7 @@ export const CandleStickChart: React.FC<Props> = ({
     })
     containerRef.current?.replaceChildren(plot)
     return () => { plot.remove() }
-  }, [data, isSmallScreen, steps])
+  }, [data, isSmallScreen, orders, steps])
 
   useEffect(() => {
     if (onChange && data) {

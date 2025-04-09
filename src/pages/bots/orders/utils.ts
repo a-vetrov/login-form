@@ -1,6 +1,6 @@
-import {IntervalStepInfo, OrderDataType} from '../../../services/bots'
-import type {SxProps} from '@mui/system';
-import type {Theme} from '@mui/material';
+import { type OrderDataType } from '../../../services/bots'
+import type { SxProps } from '@mui/system'
+import type { Theme } from '@mui/material'
 
 export const getOrderDirection = (direction: number): string => {
   switch (direction) {

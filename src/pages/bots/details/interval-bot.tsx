@@ -9,6 +9,8 @@ import { IntervalDetails } from '../interval-bot/interval-details'
 import { BlueTable } from '../../../components/blue-table'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { getInstrumentName } from '../../../utils/product'
+import {getBotOrders} from '../../../store/selectors/orders';
+import {useSelector} from 'react-redux';
 
 interface Props {
   data: BotsListDataType
@@ -45,6 +47,8 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
     }
   }, [active])
 
+  const orders = useSelector(getBotOrders(id))
+
   return (
     <>
       <Typography variant="h1" marginBottom={1}>
@@ -80,7 +84,7 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
           </TableBody>
         </Table>
       <Box marginY={2}>
-        <CandleStickChart instrumentId={product.uid} steps={steps} />
+        <CandleStickChart instrumentId={product.uid} steps={steps} orders={orders} />
       </Box>
       <IntervalDetails id={id} active={active} />
       {active && <StopBotButton id={id}/>}
