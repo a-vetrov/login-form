@@ -67,7 +67,7 @@ export const sandboxApi = apiWithTag.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['CurrentAccount']
+      invalidatesTags: ['CurrentAccount', 'SandboxAccounts']
     }),
     getSandboxPortfolio: build.query<PortfolioResponse, string>({
       query: (accountId) => ({
