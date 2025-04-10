@@ -22,6 +22,7 @@ export const OrderDirection = {
 
 const orderSchema = new Schema({
   orderId: String,
+  previousOrderId: String,
   product: productSchema,
   botId: { type: Schema.Types.ObjectId, ref: 'BotsModel' },
   status: Number,
@@ -49,7 +50,7 @@ export const OrdersModel = mongoose.model('Orders', orderSchema)
 
 export const getOrderByOrderId = async (orderId) => OrdersModel.find({ orderId })
 
-export const createNewOrderRecord = async ({ orderId, botId, quantity, price, direction, product }) => {
+export const createNewOrderRecord = async ({ orderId, botId, quantity, price, direction, product, previousOrderId }) => {
   const bot = await getBotById(botId)
 
   if (!bot) {
@@ -60,6 +61,7 @@ export const createNewOrderRecord = async ({ orderId, botId, quantity, price, di
 
   await new OrdersModel({
     orderId,
+    previousOrderId,
     botId: bot._id,
     status: OrderStatus.EXECUTION_REPORT_STATUS_NEW,
     direction,
@@ -148,9 +150,17 @@ export const getBotStatistics = async (botId) => {
   let priceSell = 0
   let commission = 0
   let serviceCommission = 0
+  let closedPositions = 0
+
+  const ordersMap = orders.reduce((accumulator, item) => {
+    accumulator[item.orderId] = item
+    return accumulator
+  }, {})
 
   orders.forEach((order) => {
-    const { direction, lotsExecuted, executedCommission, executedOrderPrice, initialCommission } = order
+    const { direction, lotsExecuted, executedCommission, executedOrderPrice, initialCommission, previousOrderId } = order
+
+    const localCommission = executedCommission || initialCommission || 0
 
     if (direction === 1) {
       lotsBuy += lotsExecuted
@@ -163,14 +173,16 @@ export const getBotStatistics = async (botId) => {
       lots -= lotsExecuted
       if (executedOrderPrice) {
         priceSell += executedOrderPrice
+        const prevOrder = ordersMap[previousOrderId]
+        if (prevOrder && prevOrder.executedOrderPrice) {
+          const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission || 0
+          const localProfit = executedOrderPrice - prevOrder.executedOrderPrice - localCommission - prevCommission
+          closedPositions += localProfit
+        }
       }
     }
 
-    if (executedCommission) {
-      commission += executedCommission
-    } else if (initialCommission) {
-      commission += initialCommission
-    }
+    commission += localCommission
 
     if (order.serviceCommission) {
       serviceCommission += order.serviceCommission
@@ -178,6 +190,6 @@ export const getBotStatistics = async (botId) => {
   })
 
   return {
-    executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell
+    executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell, closedPositions
   }
 }

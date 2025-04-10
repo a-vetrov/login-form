@@ -57,6 +57,12 @@ const dict = [
     key: 'currentPrice',
     title: 'Текущая цена продукта',
     type: 'money'
+  },
+  {
+    key: 'closedPositions',
+    title: 'Профит по закрытым позициям',
+    type: 'money',
+    colorize: true
   }
 ]
 
@@ -117,7 +123,7 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
               return (
                 <BlueTable.Row key={item.key}>
                   <BlueTable.Cell>{item.title}</BlueTable.Cell>
-                  <BlueTable.Cell align="right">{item.type === 'money' ? fromNumberToMoneyString(value, 'RUB') : value}</BlueTable.Cell>
+                  <BlueTable.Cell align="right" sx={getColorSx(item.colorize ? value : undefined)}>{item.type === 'money' ? fromNumberToMoneyString(value, 'RUB') : value}</BlueTable.Cell>
                 </BlueTable.Row>
               )
             }
@@ -133,18 +139,6 @@ export const IntervalStats: React.FC<Props> = ({ data }) => {
             <BlueTable.Row>
               <BlueTable.Cell>Стоимость открытых позиций по теккущей цене</BlueTable.Cell>
               <BlueTable.Cell align="right">{fromNumberToMoneyString(income.unrealizedCurrent, 'RUB')}</BlueTable.Cell>
-            </BlueTable.Row>
-          )}
-          {income?.last !== undefined && (
-            <BlueTable.Row>
-              <BlueTable.Cell>{income.current !== undefined ? 'Прибыль по последней цене' : 'Прибыль'}</BlueTable.Cell>
-              <BlueTable.Cell align="right" sx={getColorSx(income.last)}>{fromNumberToMoneyString(income.last, 'RUB')}</BlueTable.Cell>
-            </BlueTable.Row>
-          )}
-          {income?.current !== undefined && (
-            <BlueTable.Row>
-              <BlueTable.Cell>{'Прибыль по текущей цене'}</BlueTable.Cell>
-              <BlueTable.Cell align="right" sx={getColorSx(income.current)}>{fromNumberToMoneyString(income.current, 'RUB')}</BlueTable.Cell>
             </BlueTable.Row>
           )}
           {income?.balance !== undefined && (

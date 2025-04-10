@@ -93,6 +93,7 @@ export interface BotStatisticsType {
   priceBuy?: number
   priceSell?: number
   serviceCommission?: number
+  closedPositions?: number
   product: {
     isin: string
     figi: string

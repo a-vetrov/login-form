@@ -82,4 +82,11 @@ export class IntervalStep {
   getStepDocument = async () => {
     return IntervalStepModel.findOne({ botId: this.botId, serialNumber: this.serialNumber })
   }
+
+  getLastOrder = () => {
+    if (!this.orders.length) {
+      return undefined
+    }
+    return this.orders[this.orders.length - 1]
+  }
 }

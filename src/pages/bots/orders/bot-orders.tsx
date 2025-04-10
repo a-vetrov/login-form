@@ -96,7 +96,7 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
               <TableBody>
                 {orders?.map((order) => (
                   <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} key={order.orderId}>
-                    <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm') : ''}</TableCell>
+                    <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm:ss') : ''}</TableCell>
                     <TableCell>
                       <OrderStatus order={order}/>
                     </TableCell>

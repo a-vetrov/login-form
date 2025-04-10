@@ -234,10 +234,11 @@ export class IntervalBot {
     try {
       const data = await this.account.postOrder(body)
       console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
-      // console.log(data)
+      const previousOrderId = step.getLastOrder()
       await step.update(STATE.TRY_TO_BUY, data.orderId)
       await createNewOrderRecord({
         orderId: data.orderId,
+        previousOrderId,
         botId: this.id,
         quantity: this.amountPerStep,
         price,
@@ -270,10 +271,11 @@ export class IntervalBot {
     try {
       const data = await this.account.postOrder(body)
       console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
-      // console.log(data)
+      const previousOrderId = step.getLastOrder()
       await step.update(STATE.TRY_TO_SELL, data.orderId)
       await createNewOrderRecord({
         orderId: data.orderId,
+        previousOrderId,
         botId: this.id,
         quantity: this.amountPerStep,
         price,

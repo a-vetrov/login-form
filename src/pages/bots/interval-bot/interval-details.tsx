@@ -16,7 +16,7 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
   const [getOrders, { data: ordersData }] = useLazyGetBotOrdersQuery()
 
   const { data: statData, error: statError } = useGetBotStatisticsQuery(id, {
-    pollingInterval: active ? 1000 : undefined,
+    pollingInterval: active ? 5000 : undefined,
     skipPollingIfUnfocused: true
   })
 
