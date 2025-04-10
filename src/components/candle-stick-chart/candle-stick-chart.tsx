@@ -7,6 +7,7 @@ import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert'
 import { type IntervalBotStepParams, type OrderDataType } from '../../services/bots'
+import {getPriceMultiplier} from './utils';
 
 interface Props {
   instrumentId: string
@@ -35,7 +36,6 @@ export const CandleStickChart: React.FC<Props> = ({
 
   useEffect(() => {
     if (!data) return
-    console.log('Data changed')
 
     const bounds = []
 
@@ -46,12 +46,12 @@ export const CandleStickChart: React.FC<Props> = ({
 
     if (orders?.length) {
       try {
-        const arr = orders.map(({ executionDate, averagePositionPrice, direction }) => (
+        const arr = orders.map(({ executionDate, averagePositionPrice, direction, product }) => (
           {
             x: new Date(executionDate),
-            y: averagePositionPrice,
-            fill: direction === 1 ? '#FF0000' : '#00FF00',
-            rotate: direction === 1 ? 180 : 0
+            y: averagePositionPrice * getPriceMultiplier(product),
+            fill: direction === 1 ? '#00FF00' : '#FF0000',
+            rotate: direction === 1 ? 0 : 180
           }))
         bounds.push(Plot.dot(arr, { x: 'x', y: 'y', fill: 'fill', symbol: 'triangle', rotate: 'rotate', stroke: 'none', r: 4 }))
       } catch (e) {}

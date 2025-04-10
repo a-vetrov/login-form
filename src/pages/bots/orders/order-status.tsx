@@ -10,9 +10,9 @@ interface Props {
 }
 
 export const OrderStatus: React.FC<Props> = ({ order }) => {
-  const IconClass = order.direction === 1 ? FileDownloadIcon : FileUploadIcon
+  const IconClass = order.direction === 2 ? FileDownloadIcon : FileUploadIcon
 
-  const color = order.direction === 1 ? 'error' : 'success'
+  const color = order.direction === 1 ? 'success' : 'error'
 
   const title = useMemo(() => {
     return getOrderDirection(order.direction)

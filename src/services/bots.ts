@@ -57,6 +57,16 @@ export interface OrderDataType {
     quantity: number
   }
   date: string
+  product: {
+    isin: string
+    figi: string
+    uid: string
+    name: string
+    type: string
+    lot: number
+    minPriceIncrement?: number
+    minPriceIncrementAmount?: number
+  }
 }
 
 export interface IntervalStepInfo {

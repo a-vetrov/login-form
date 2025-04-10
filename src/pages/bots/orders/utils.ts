@@ -31,7 +31,7 @@ export const getOrderProfit = (order: OrderDataType): number => {
 export const sortByDate = (a: OrderDataType, b: OrderDataType): number => {
   const dateA = new Date(a.executionDate)
   const dateB = new Date(b.executionDate)
-  return dateA - dateB
+  return dateB - dateA
 }
 
 export const getColorSx = (value?: number): SxProps<Theme> | null => {
