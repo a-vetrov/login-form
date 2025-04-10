@@ -118,18 +118,26 @@ export class IntervalBot {
   }
 
   cancelOrder = async (orderId) => {
-    const data = await this.account.cancelOrder(orderId)
-    await updateOrderRecord({
-      orderId,
-      status: OrderStatus.EXECUTION_REPORT_STATUS_CANCELLED
-    })
-    console.log('Order canceled', data)
+    try {
+      const data = await this.account.cancelOrder(orderId)
+      await updateOrderRecord({
+        orderId,
+        status: OrderStatus.EXECUTION_REPORT_STATUS_CANCELLED
+      })
+      console.log('Order canceled', data)
+    } catch (error) {
+      console.log('cancelOrder error', error)
+    }
   }
 
   cancelActiveOrders = async () => {
-    const orders = await this.account.getActiveOrders()
-    const ids = orders.filter(({ figi }) => figi === this.product.figi).map(({ orderId }) => orderId)
-    await forEachSeries(ids, this.cancelOrder)
+    try {
+      const orders = await this.account.getActiveOrders()
+      const ids = orders.filter(({ figi }) => figi === this.product.figi).map(({ orderId }) => orderId)
+      await forEachSeries(ids, this.cancelOrder)
+    } catch (error) {
+      console.log('cancelActiveOrders error', error)
+    }
   }
 
   checkSteps = async () => {
