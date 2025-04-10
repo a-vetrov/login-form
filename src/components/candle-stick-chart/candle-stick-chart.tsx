@@ -7,7 +7,7 @@ import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { CircularProgress, useMediaQuery, useTheme } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert'
 import { type IntervalBotStepParams, type OrderDataType } from '../../services/bots'
-import {getPriceMultiplier} from './utils';
+import { getPriceMultiplier } from './utils'
 
 interface Props {
   instrumentId: string
