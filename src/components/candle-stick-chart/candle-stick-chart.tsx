@@ -41,7 +41,7 @@ export const CandleStickChart: React.FC<Props> = ({
 
     if (steps) {
       const stepsData = steps.map(({ min }) => min)
-      bounds.push(Plot.ruleY(stepsData, { stroke: '#FFFF00', strokeDasharray: '3 5' }))
+      bounds.push(Plot.ruleY(stepsData, { stroke: '#FFFF00', strokeWidth: 0.7, strokeOpacity: 0.5, strokeDasharray: '3 5' }))
     }
 
     if (orders?.length) {
