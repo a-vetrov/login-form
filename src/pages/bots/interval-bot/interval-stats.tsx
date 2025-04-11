@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react'
-import { type BotStatisticsType } from '../../../services/bots'
+import { type BotStatisticsType, type OrderDataType } from '../../../services/bots'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import { BlueTable } from '../../../components/blue-table'
-import { type SxProps } from '@mui/system'
-import { type Theme } from '@mui/material'
+import { getColorSx } from './utils'
 
 const dict = [
   {
@@ -65,15 +64,6 @@ const dict = [
     colorize: true
   }
 ]
-
-const getColorSx = (value?: number): SxProps<Theme> | null => {
-  if (!value) {
-    return null
-  }
-  return {
-    color: value > 0 ? 'success.main' : 'error.light'
-  }
-}
 
 interface Props {
   data: BotStatisticsType

@@ -7,7 +7,7 @@ import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
-import {getBotOrders, getBotStatistics, getBotSuccessOrders} from '../db/models/bots/order.js'
+import { getBotOrders, getBotStatistics, getBotSuccessOrders, OrdersModel } from '../db/models/bots/order.js'
 import { getBotSteps, IntervalStepModel } from '../db/models/bots/interval-step.js'
 import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
 
@@ -171,9 +171,11 @@ botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
     if (!bot || req.user._id.toString() !== bot.userId.toString()) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
-    const statistics = await getBotStatistics(bot._id)
-    statistics.lastPrice = bot.properties.get('lastPrice')
-    statistics.product = bot.properties.get('product')
+
+    const info = {
+      lastPrice: bot.properties.get('lastPrice'),
+      product: bot.properties.get('product')
+    }
 
     if (!bot.active) {
       const user = await getUserById(req.user._id)
@@ -185,12 +187,16 @@ botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
         const data = await api.marketdata.getLastPrices({ figi: [], instrumentId: [instrumentId] })
         const price = data.lastPrices.find((item => item.instrumentUid === instrumentId))?.price
         if (price) {
-          statistics.currentPrice = Helpers.toNumber(price)
+          info.currentPrice = Helpers.toNumber(price)
         }
       }
     }
 
-    res.status(200).send({ success: true, data: { ...statistics } })
+    const orders = await OrdersModel.find({ botId: bot._id, status: 1 })
+
+    const statistics = getBotStatistics(orders, info)
+
+    res.status(200).send({ success: true, data: { ...statistics, ...info } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')

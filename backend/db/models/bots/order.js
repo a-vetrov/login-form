@@ -140,8 +140,7 @@ export const getBotSuccessOrders = async (botId) => {
   return OrdersModel.find({ botId, status: 1 })
 }
 
-export const getBotStatistics = async (botId) => {
-  const orders = await OrdersModel.find({ botId, status: 1 })
+export const getBotStatistics = (orders, { lastPrice, product, currentPrice }) => {
   const executedOrdersLength = orders.length
   let lots = 0
   let lotsBuy = 0
@@ -151,11 +150,15 @@ export const getBotStatistics = async (botId) => {
   let commission = 0
   let serviceCommission = 0
   let closedPositions = 0
+  let unrealizedProfit = 0
+  let unrealizedProfitCurrent = 0
 
   const ordersMap = orders.reduce((accumulator, item) => {
     accumulator[item.orderId] = item
     return accumulator
   }, {})
+
+  const openOrders = new Set()
 
   orders.forEach((order) => {
     const { direction, lotsExecuted, executedCommission, executedOrderPrice, initialCommission, previousOrderId } = order
@@ -168,6 +171,7 @@ export const getBotStatistics = async (botId) => {
       if (executedOrderPrice) {
         priceBuy += executedOrderPrice
       }
+      openOrders.add(order)
     } else {
       lotsSell += lotsExecuted
       lots -= lotsExecuted
@@ -178,6 +182,9 @@ export const getBotStatistics = async (botId) => {
           const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission || 0
           const localProfit = executedOrderPrice - prevOrder.executedOrderPrice - localCommission - prevCommission
           closedPositions += localProfit
+          if (openOrders.has(prevOrder)) {
+            openOrders.delete(prevOrder)
+          }
         }
       }
     }
@@ -189,7 +196,23 @@ export const getBotStatistics = async (botId) => {
     }
   })
 
+  let priceMultiplier = 1
+
+  if (product.type === 'future' && product.minPriceIncrement && product.minPriceIncrementAmount) {
+    priceMultiplier = product.minPriceIncrementAmount / product.minPriceIncrement
+  }
+
+  openOrders.forEach(({ direction, lotsExecuted, executedCommission, executedOrderPrice, initialCommission, previousOrderId }) => {
+    const openCommission = executedCommission || initialCommission || 0
+    const last = (lotsExecuted * product.lot * lastPrice * priceMultiplier)
+    const current = (lotsExecuted * product.lot * currentPrice * priceMultiplier)
+    const delta = last - executedOrderPrice - (2 * openCommission)
+    const deltaCurrent = current - executedOrderPrice - (2 * openCommission)
+    unrealizedProfit += delta
+    unrealizedProfitCurrent += deltaCurrent
+  })
+
   return {
-    executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell, closedPositions
+    executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell, closedPositions, unrealizedProfit, unrealizedProfitCurrent
   }
 }

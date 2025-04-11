@@ -1,6 +1,8 @@
 import type { HistoricCandle } from '../../../types/tinkoff/marketdata'
 import { getFromMoneyValue } from '../../../utils/money'
 import { getMinMax } from '../../../utils/math'
+import type { SxProps } from '@mui/system'
+import type { Theme } from '@mui/material'
 
 interface IntervalType {
   low: number
@@ -53,4 +55,13 @@ export const calculateBudget = ({ lowBoundary, highBoundary, stepsCount, amountP
     result += i * amountPerStep * productLots
   }
   return result
+}
+
+export const getColorSx = (value?: number): SxProps<Theme> | null => {
+  if (!value) {
+    return null
+  }
+  return {
+    color: value > 0 ? 'success.main' : 'error.light'
+  }
 }
