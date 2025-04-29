@@ -212,6 +212,8 @@ export const getBotStatistics = (orders, { lastPrice, product, currentPrice }) =
     unrealizedProfitCurrent += deltaCurrent
   })
 
+  openOrders.clear()
+
   return {
     executedOrdersLength, lotsBuy, lotsSell, lots, commission, serviceCommission, priceBuy, priceSell, closedPositions, unrealizedProfit, unrealizedProfitCurrent
   }

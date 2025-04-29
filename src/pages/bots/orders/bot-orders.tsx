@@ -102,7 +102,7 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
                     </TableCell>
                     <TableCell>{fromNumberToMoneyString(order.executedOrderPrice, 'RUB')}</TableCell>
                     <TableCell>{fromNumberToMoneyString(order.commission, 'RUB')}</TableCell>
-                    <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined && fromNumberToMoneyString(order.profit, 'RUB')}</TableCell>
+                    <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined ? fromNumberToMoneyString(order.profit, 'RUB') : '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
