@@ -15,23 +15,27 @@ import { OrderStatus } from './order-status'
 
 interface Props {
   data: OrdersListDataType
+  lotPrice?: number
 }
 
 const accordionMargin = { marginY: 4 }
 
-export const BotOrders: React.FC<Props> = ({ data }) => {
-  const orderStepMap = useMemo(() => {
-    if (!data?.steps) {
-      return undefined
-    }
+export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
+  const openOrders = useMemo(() => {
+    const dict = new Set()
 
-    return data.steps.reduce<Record<string, number>>((accumulator, item) => {
-      item.orders.forEach((id) => {
-        accumulator[id] = item.serialNumber
-      })
-      return accumulator
-    }, {})
-  }, [data?.steps])
+    data.orders.forEach((item) => {
+      if (item.direction === 1) {
+        dict.add(item.orderId)
+      } else {
+        if (dict.has(item.previousOrderId)) {
+          dict.delete(item.previousOrderId)
+        }
+      }
+    })
+
+    return dict
+  }, [data.orders])
 
   const ordersMap = useMemo(() => {
     if (!data?.orders) {
@@ -45,32 +49,34 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
   }, [data?.orders])
 
   const orders = useMemo(() => {
-    if (!data?.steps || !data.orders || !orderStepMap || !ordersMap) {
+    if (!data?.steps || !data.orders || !ordersMap) {
       return undefined
     }
 
     return data.orders.slice().sort(sortByDate).map((item) => {
       const commission = item.executedCommission || item.initialCommission
       let profit: number | undefined
+      let upnl: number | undefined
       try {
         if (item.direction === 2) {
-          const serialNumber = orderStepMap[item.orderId]
-          const arr = data.steps[serialNumber].orders
-          const index = arr.indexOf(item.orderId) - 1
-          const prevId = arr[index]
-          const prevOrder = ordersMap[prevId]
+          const previousOrderId = item.previousOrderId
+          const prevOrder = ordersMap[previousOrderId]
           const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission
           profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission - prevCommission
+        }
+        if (openOrders.has(item.orderId) && lotPrice !== undefined) {
+          upnl = lotPrice * item.lotsExecuted - item.executedOrderPrice
         }
       } catch (e) {}
 
       return {
         ...item,
         profit,
+        upnl,
         commission
       }
     })
-  }, [data, orderStepMap, ordersMap])
+  }, [data.orders, data?.steps, lotPrice, openOrders, ordersMap])
 
   return (
       <Accordion sx={accordionMargin}>
@@ -91,6 +97,7 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
                   <TableCell>Цена</TableCell>
                   <TableCell>Комиссия</TableCell>
                   <TableCell>Профит</TableCell>
+                  <TableCell>Upnl</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -103,6 +110,7 @@ export const BotOrders: React.FC<Props> = ({ data }) => {
                     <TableCell>{fromNumberToMoneyString(order.executedOrderPrice, 'RUB')}</TableCell>
                     <TableCell>{fromNumberToMoneyString(order.commission, 'RUB')}</TableCell>
                     <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined ? fromNumberToMoneyString(order.profit, 'RUB') : '-'}</TableCell>
+                    <TableCell sx={getColorSx(order.upnl)}>{ order.upnl !== undefined && fromNumberToMoneyString(order.upnl, 'RUB')}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

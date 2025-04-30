@@ -3,6 +3,7 @@ import { getFromMoneyValue } from '../../../utils/money'
 import { getMinMax } from '../../../utils/math'
 import type { SxProps } from '@mui/system'
 import type { Theme } from '@mui/material'
+import {BotStatisticsType} from "../../../services/bots";
 
 interface IntervalType {
   low: number
@@ -64,4 +65,18 @@ export const getColorSx = (value?: number): SxProps<Theme> | null => {
   return {
     color: value > 0 ? 'success.main' : 'error.light'
   }
+}
+
+export const getLotPrice = (product: BotStatisticsType['product'], currentPrice?: number) => {
+  if (!currentPrice) {
+    return undefined
+  }
+
+  let priceMultiplier = 1
+
+  if (product.type === 'future' && product.minPriceIncrement && product.minPriceIncrementAmount) {
+    priceMultiplier = product.minPriceIncrementAmount / product.minPriceIncrement
+  }
+
+  return product.lot * currentPrice * priceMultiplier
 }

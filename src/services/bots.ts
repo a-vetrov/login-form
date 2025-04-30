@@ -42,6 +42,7 @@ export interface OrderDataType {
   direction: number
   executionDate: string
   orderDate: string
+  previousOrderId: string
   lotsRequested: number
   lotsExecuted: number
   initialOrderPrice: number

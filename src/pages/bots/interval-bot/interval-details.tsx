@@ -6,6 +6,7 @@ import {
 import { Typography } from '@mui/material'
 import { IntervalStats } from './interval-stats'
 import { BotOrders } from '../orders/bot-orders'
+import { getLotPrice } from './utils'
 
 interface Props {
   id: string
@@ -19,6 +20,15 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
     pollingInterval: active ? 5000 : undefined,
     skipPollingIfUnfocused: true
   })
+
+  const lotPrice = useMemo(() => {
+    console.log('statData', statData)
+    if (!statData) {
+      return undefined
+    }
+
+    return getLotPrice(statData.product, statData.currentPrice ?? statData.lastPrice)
+  }, [statData])
 
   useEffect(() => {
     if (statData) {
@@ -37,7 +47,7 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
           <IntervalStats data={statData} />
         </>
       )}
-      {ordersData && <BotOrders data={ordersData} /> }
+      {ordersData && <BotOrders data={ordersData} lotPrice={lotPrice}/> }
 
     </>
   )

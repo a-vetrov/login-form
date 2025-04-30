@@ -206,8 +206,8 @@ export const getBotStatistics = (orders, { lastPrice, product, currentPrice }) =
     const openCommission = executedCommission || initialCommission || 0
     const last = (lotsExecuted * product.lot * lastPrice * priceMultiplier)
     const current = (lotsExecuted * product.lot * currentPrice * priceMultiplier)
-    const delta = last - executedOrderPrice - (2 * openCommission)
-    const deltaCurrent = current - executedOrderPrice - (2 * openCommission)
+    const delta = last - executedOrderPrice - openCommission
+    const deltaCurrent = current - executedOrderPrice - openCommission
     unrealizedProfit += delta
     unrealizedProfitCurrent += deltaCurrent
   })
