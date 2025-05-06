@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import type { OrderDataType } from '../../../services/bots'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -18,8 +18,12 @@ export const OrderStatus: React.FC<Props> = ({ order }) => {
     return getOrderDirection(order.direction)
   }, [order.direction])
 
+  const handleOpen = useCallback(() => {
+    console.log(order)
+  }, [order])
+
   return (
-    <Tooltip title={title}>
+    <Tooltip title={title} onOpen={handleOpen}>
       <IconClass color={color} />
     </Tooltip>
   )

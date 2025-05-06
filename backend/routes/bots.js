@@ -2,7 +2,7 @@ import express from 'express'
 import { ensureLoggedIn } from '../handlers/ensure-logged-in.js'
 import { getUserById } from '../db/models/user.js'
 import { sendError } from '../handlers/error.js'
-import { BotsModel, BotsType, getBotById, getBotsByUserId } from '../db/models/bots/bots.js'
+import {BotsModel, BotsType, getAllBots, getBotById, getBotsByUserId} from '../db/models/bots/bots.js'
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
@@ -10,6 +10,7 @@ import { getInstrumentByUid } from '../db/models/catalog/common.js'
 import { getBotOrders, getBotStatistics, getBotSuccessOrders, OrdersModel } from '../db/models/bots/order.js'
 import { getBotSteps, IntervalStepModel } from '../db/models/bots/interval-step.js'
 import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
+import {isAdmin} from "../utils/user.js";
 
 export const botsRouter = express.Router()
 
@@ -102,7 +103,7 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
 botsRouter.get('/api/bots', ensureLoggedIn, async (req, res) => {
   try {
     const user = await getUserById(req.user._id)
-    const bots = await getBotsByUserId(user._id)
+    const bots = isAdmin(req.user) ? await getAllBots() : await getBotsByUserId(user._id)
     const data = bots.map(item => {
       const { _id, type, created, accountType, selectedAccount, properties, active } = item
       return { type, created, accountType, selectedAccount, properties, active, id: _id }
@@ -121,7 +122,7 @@ botsRouter.get('/api/bots', ensureLoggedIn, async (req, res) => {
 botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
   try {
     const bot = await getBotById(req.params.id)
-    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !isAdmin(req.user))) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
     const { _id, type, created, accountType, selectedAccount, properties, active } = bot
@@ -145,16 +146,17 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
 botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
   try {
     const bot = await getBotById(req.params.id)
-    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !isAdmin(req.user))) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
     const orders = await getBotSuccessOrders(bot._id)
+    const ordersAll = await getBotOrders(bot._id)
     const info = {}
     if (bot.type === BotsType.interval) {
       const dbSteps = await getBotSteps(bot._id)
       info.steps = dbSteps.map(({ botId, min, max, orders, serialNumber, state }) => ({ botId, bounds: { min, max }, orders, serialNumber, state }))
     }
-    res.status(200).send({ success: true, data: { orders, ...info } })
+    res.status(200).send({ success: true, data: { orders, ordersAll, ...info } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
@@ -168,7 +170,7 @@ botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
 botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
   try {
     const bot = await getBotById(req.params.id)
-    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !isAdmin(req.user))) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
 
@@ -210,7 +212,7 @@ botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
 botsRouter.put('/api/bots/:id/stop', ensureLoggedIn, async (req, res) => {
   try {
     const bot = await getBotById(req.params.id)
-    if (!bot || req.user._id.toString() !== bot.userId.toString()) {
+    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !isAdmin(req.user))) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
     BotManager.instance.stopBot(req.params.id)

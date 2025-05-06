@@ -80,6 +80,7 @@ export interface IntervalStepInfo {
 
 export interface OrdersListDataType {
   orders: OrderDataType[]
+  ordersAll: OrderDataType[]
   steps?: IntervalStepInfo[]
 }
 

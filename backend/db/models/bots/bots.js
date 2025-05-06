@@ -20,6 +20,8 @@ const botsSchema = new Schema({
 
 export const BotsModel = mongoose.model('Bots', botsSchema)
 
+export const getAllBots = async () => BotsModel.find({ })
+
 export const getBotsByUserId = async (userId) => BotsModel.find({ userId })
 
 export const getBotById = async (id) => BotsModel.findById(id)
