@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import type { OrderDataType, OrdersListDataType } from '../../../services/bots'
 import { Accordion, AccordionDetails, AccordionSummary, TableHead, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import TableContainer from '@mui/material/TableContainer'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
@@ -11,7 +10,7 @@ import TableBody from '@mui/material/TableBody'
 import { format } from 'date-fns'
 import { OrderStatus } from './order-status'
 import { fromNumberToMoneyString } from '../../../utils/money'
-import {getColorSx, getOrderStatus} from './utils'
+import { getOrderStatus } from './utils'
 
 const accordionMargin = { marginY: 4 }
 
@@ -20,7 +19,7 @@ interface Props {
   lotPrice?: number
 }
 
-const BotSteps: React.FC<Props> = ({ data, lotPrice }) => {
+export const BotSteps: React.FC<Props> = ({ data, lotPrice }) => {
   const ordersMap = useMemo(() => {
     if (!data?.ordersAll) {
       return undefined
@@ -86,5 +85,3 @@ const BotSteps: React.FC<Props> = ({ data, lotPrice }) => {
     </Accordion>
   )
 }
-
-export default BotSteps

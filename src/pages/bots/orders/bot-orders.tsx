@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { type OrderDataType, type OrdersListDataType } from '../../../services/bots'
+import { type OrdersListDataType } from '../../../services/bots'
 import { Accordion, AccordionDetails, AccordionSummary, TableHead, Typography } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow'
 import TableCell from '@mui/material/TableCell'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import TableContainer from '@mui/material/TableContainer'
-import { getColorSx, sortByDate } from './utils'
+import { createOrdersDict, createStepOrdersDict, getColorSx, getNextOrder, getPreviousOrder, sortByDate } from './utils'
 import { fromNumberToMoneyString } from '../../../utils/money'
 import { format } from 'date-fns'
 import { OrderStatus } from './order-status'
@@ -21,35 +21,25 @@ interface Props {
 const accordionMargin = { marginY: 4 }
 
 export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
+  const stepOrdersDict = useMemo(() => createStepOrdersDict(data.steps), [data])
+  const ordersDict = useMemo(() => createOrdersDict(data.orders), [data])
+
   const openOrders = useMemo(() => {
     const dict = new Set()
 
-    data.orders.forEach((item) => {
-      if (item.direction === 1) {
-        dict.add(item.orderId)
-      } else {
-        if (dict.has(item.previousOrderId)) {
-          dict.delete(item.previousOrderId)
+    if (ordersDict && stepOrdersDict) {
+      data.orders.forEach((item) => {
+        if (item.direction === 1 && !getNextOrder(item, ordersDict, stepOrdersDict)) {
+          dict.add(item.orderId)
         }
-      }
-    })
-
-    return dict
-  }, [data.orders])
-
-  const ordersMap = useMemo(() => {
-    if (!data?.orders) {
-      return undefined
+      })
     }
 
-    return data.orders.reduce<Record<string, OrderDataType>>((accumulator, item) => {
-      accumulator[item.orderId] = item
-      return accumulator
-    }, {})
-  }, [data?.orders])
+    return dict
+  }, [data.orders, ordersDict, stepOrdersDict])
 
   const orders = useMemo(() => {
-    if (!data?.steps || !data.orders || !ordersMap) {
+    if (!data.orders || !ordersDict || !stepOrdersDict) {
       return undefined
     }
 
@@ -59,10 +49,11 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
       let upnl: number | undefined
       try {
         if (item.direction === 2) {
-          const previousOrderId = item.previousOrderId
-          const prevOrder = ordersMap[previousOrderId]
-          const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission
-          profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission - prevCommission
+          const prevOrder = getPreviousOrder(item, ordersDict, stepOrdersDict)
+          if (prevOrder) {
+            const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission
+            profit = item.executedOrderPrice - prevOrder.executedOrderPrice - commission - prevCommission
+          }
         }
         if (openOrders.has(item.orderId) && lotPrice !== undefined) {
           upnl = lotPrice * item.lotsExecuted - item.executedOrderPrice
@@ -76,7 +67,34 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
         commission
       }
     })
-  }, [data.orders, data?.steps, lotPrice, openOrders, ordersMap])
+  }, [data.orders, lotPrice, openOrders, ordersDict, stepOrdersDict])
+
+  const total = useMemo(() => {
+    if (!orders) {
+      return {}
+    }
+    let commission = 0
+    let profit = 0
+    let upnl = 0
+
+    orders?.forEach((item) => {
+      if (item.commission) {
+        commission += item.commission
+      }
+      if (item.profit) {
+        profit += item.profit
+      }
+      if (item.upnl) {
+        upnl += item.upnl
+      }
+    })
+
+    return {
+      commission,
+      profit,
+      upnl
+    }
+  }, [orders])
 
   return (
       <Accordion sx={accordionMargin}>
@@ -113,6 +131,14 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
                     <TableCell sx={getColorSx(order.upnl)}>{ order.upnl !== undefined && fromNumberToMoneyString(order.upnl, 'RUB')}</TableCell>
                   </TableRow>
                 ))}
+                <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell>Итого</TableCell>
+                  <TableCell> </TableCell>
+                  <TableCell> </TableCell>
+                  <TableCell>{total.commission && fromNumberToMoneyString(total.commission, 'RUB')}</TableCell>
+                  <TableCell sx={getColorSx(total.profit)}>{ total.profit !== undefined && fromNumberToMoneyString(total.profit, 'RUB')}</TableCell>
+                  <TableCell sx={getColorSx(total.upnl)}>{ total.upnl !== undefined && fromNumberToMoneyString(total.upnl, 'RUB')}</TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </TableContainer>

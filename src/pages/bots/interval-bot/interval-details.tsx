@@ -7,7 +7,7 @@ import { Typography } from '@mui/material'
 import { IntervalStats } from './interval-stats'
 import { BotOrders } from '../orders/bot-orders'
 import { getLotPrice } from './utils'
-import BotSteps from '../orders/bot-steps';
+import { BotSteps } from '../orders/bot-steps'
 
 interface Props {
   id: string
@@ -48,7 +48,7 @@ export const IntervalDetails: React.FC<Props> = ({ id, active }) => {
         </>
       )}
       {ordersData && <BotOrders data={ordersData} lotPrice={lotPrice}/> }
-      {ordersData && <BotSteps data={ordersData} lotPrice={lotPrice} /> }
+      {ordersData?.ordersAll && <BotSteps data={ordersData} lotPrice={lotPrice} /> }
 
     </>
   )

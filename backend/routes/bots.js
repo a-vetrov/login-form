@@ -2,15 +2,16 @@ import express from 'express'
 import { ensureLoggedIn } from '../handlers/ensure-logged-in.js'
 import { getUserById } from '../db/models/user.js'
 import { sendError } from '../handlers/error.js'
-import {BotsModel, BotsType, getAllBots, getBotById, getBotsByUserId} from '../db/models/bots/bots.js'
+import { BotsModel, BotsType, getAllBots, getBotById, getBotsByUserId } from '../db/models/bots/bots.js'
 import { getFirstRealToken, getFirstSandboxToken } from '../utils/tokens.js'
 import { BotManager } from '../bots/bot-manager.js'
 import { IntervalBot } from '../bots/interval/interval-bot.js'
 import { getInstrumentByUid } from '../db/models/catalog/common.js'
-import { getBotOrders, getBotStatistics, getBotSuccessOrders, OrdersModel } from '../db/models/bots/order.js'
+import { getBotOrders, getBotSuccessOrders, OrdersModel } from '../db/models/bots/order.js'
 import { getBotSteps, IntervalStepModel } from '../db/models/bots/interval-step.js'
 import { Helpers, TinkoffInvestApi } from 'tinkoff-invest-api'
-import {isAdmin} from "../utils/user.js";
+import { isAdmin } from '../utils/user.js'
+import { getBotStatistics } from '../bots/interval/iterval-statistics.js'
 
 export const botsRouter = express.Router()
 
@@ -145,18 +146,22 @@ botsRouter.get('/api/bots/:id', ensureLoggedIn, async (req, res) => {
  */
 botsRouter.get('/api/bots/:id/orders', ensureLoggedIn, async (req, res) => {
   try {
+    const admin = isAdmin(req.user)
     const bot = await getBotById(req.params.id)
-    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !isAdmin(req.user))) {
+    if (!bot || (req.user._id.toString() !== bot.userId.toString() && !admin)) {
       return sendError(res, 403, 'Ошибка', 'Такой бот не найден')
     }
     const orders = await getBotSuccessOrders(bot._id)
-    const ordersAll = await getBotOrders(bot._id)
+
     const info = {}
     if (bot.type === BotsType.interval) {
       const dbSteps = await getBotSteps(bot._id)
       info.steps = dbSteps.map(({ botId, min, max, orders, serialNumber, state }) => ({ botId, bounds: { min, max }, orders, serialNumber, state }))
     }
-    res.status(200).send({ success: true, data: { orders, ordersAll, ...info } })
+    if (admin) {
+      info.ordersAll = await getBotOrders(bot._id)
+    }
+    res.status(200).send({ success: true, data: { orders, ...info } })
   } catch (error) {
     console.log('error', error)
     sendError(res, 403, 'Ошибка', error.details ?? 'Что-то пошло не так')
@@ -194,9 +199,10 @@ botsRouter.get('/api/bots/:id/stats', ensureLoggedIn, async (req, res) => {
       }
     }
 
-    const orders = await OrdersModel.find({ botId: bot._id, status: 1 })
+    const orders = await getBotSuccessOrders(bot._id)
+    const steps = await getBotSteps(bot._id)
 
-    const statistics = getBotStatistics(orders, info)
+    const statistics = getBotStatistics(orders, steps, info)
 
     res.status(200).send({ success: true, data: { ...statistics, ...info } })
   } catch (error) {
