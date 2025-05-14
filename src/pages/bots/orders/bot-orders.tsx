@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { type OrdersListDataType } from '../../../services/bots'
-import { Accordion, AccordionDetails, AccordionSummary, TableHead, Typography } from '@mui/material'
+import {Accordion, AccordionDetails, AccordionSummary, Button, Link, TableHead, Typography} from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -20,7 +20,10 @@ interface Props {
 
 const accordionMargin = { marginY: 4 }
 
+const COUNT_STEP = 20
+
 export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
+  const [countToShow, setCountToShow] = useState(COUNT_STEP)
   const stepOrdersDict = useMemo(() => createStepOrdersDict(data.steps), [data])
   const ordersDict = useMemo(() => createOrdersDict(data.orders), [data])
 
@@ -43,7 +46,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
       return undefined
     }
 
-    return data.orders.slice().sort(sortByDate).map((item) => {
+    return data.orders.slice().sort(sortByDate).slice(0, countToShow).map((item) => {
       const commission = item.executedCommission || item.initialCommission
       let profit: number | undefined
       let upnl: number | undefined
@@ -67,7 +70,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
         commission
       }
     })
-  }, [data.orders, lotPrice, openOrders, ordersDict, stepOrdersDict])
+  }, [countToShow, data.orders, lotPrice, openOrders, ordersDict, stepOrdersDict])
 
   const total = useMemo(() => {
     if (!orders) {
@@ -96,14 +99,47 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
     }
   }, [orders])
 
+  const handleClickShowAll = useCallback(() => {
+    setCountToShow(data.orders.length)
+  }, [data.orders])
+
+  const lastRow = useMemo(() => {
+    if (countToShow >= data.orders.length) {
+      return null
+    }
+
+    const handleClick = (): void => {
+      setCountToShow(countToShow + COUNT_STEP)
+    }
+
+    return (
+      <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+        <TableCell colSpan={6}>
+          <Button onClick={handleClick}>
+            Показать еще {COUNT_STEP}...
+          </Button>
+          <Button onClick={handleClickShowAll}>
+            Показать все {data.orders.length}...
+          </Button>
+        </TableCell>
+      </TableRow>
+    )
+  }, [countToShow, data.orders, handleClickShowAll])
+
+  const handleAccordionChange = useCallback((_event: React.SyntheticEvent, expanded: boolean) => {
+    if (!expanded) {
+      setCountToShow(COUNT_STEP)
+    }
+  }, [])
+
   return (
-      <Accordion sx={accordionMargin}>
+      <Accordion sx={accordionMargin} onChange={handleAccordionChange}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1-content"
           id="panel1-header"
         >
-          <Typography component="h2">Список ордеров ({data?.orders.length} шт.)</Typography>
+          <Typography variant="h3">Список ордеров ({data?.orders.length} шт.)</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TableContainer component={Paper}>
@@ -131,6 +167,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
                     <TableCell sx={getColorSx(order.upnl)}>{ order.upnl !== undefined && fromNumberToMoneyString(order.upnl, 'RUB')}</TableCell>
                   </TableRow>
                 ))}
+                {lastRow}
                 <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>Итого</TableCell>
                   <TableCell> </TableCell>
