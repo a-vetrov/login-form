@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { type OrdersListDataType } from '../../../services/bots'
-import {Accordion, AccordionDetails, AccordionSummary, Button, Link, TableHead, Typography} from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Button, TableHead, Typography } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -46,7 +46,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
       return undefined
     }
 
-    return data.orders.slice().sort(sortByDate).slice(0, countToShow).map((item) => {
+    return data.orders.slice().sort(sortByDate).map((item) => {
       const commission = item.executedCommission || item.initialCommission
       let profit: number | undefined
       let upnl: number | undefined
@@ -59,7 +59,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
           }
         }
         if (openOrders.has(item.orderId) && lotPrice !== undefined) {
-          upnl = lotPrice * item.lotsExecuted - item.executedOrderPrice
+          upnl = lotPrice * item.lotsExecuted - item.executedOrderPrice - commission
         }
       } catch (e) {}
 
@@ -70,7 +70,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
         commission
       }
     })
-  }, [countToShow, data.orders, lotPrice, openOrders, ordersDict, stepOrdersDict])
+  }, [data.orders, lotPrice, openOrders, ordersDict, stepOrdersDict])
 
   const total = useMemo(() => {
     if (!orders) {
@@ -132,6 +132,8 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
     }
   }, [])
 
+  const slicedOrders = useMemo(() => orders?.slice(0, countToShow), [orders, countToShow])
+
   return (
       <Accordion sx={accordionMargin} onChange={handleAccordionChange}>
         <AccordionSummary
@@ -155,7 +157,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {orders?.map((order) => (
+                {slicedOrders?.map((order) => (
                   <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }} key={order.orderId}>
                     <TableCell>{order.executionDate ? format(order.executionDate, 'dd.MM.yyyy HH:mm:ss') : ''}</TableCell>
                     <TableCell>
