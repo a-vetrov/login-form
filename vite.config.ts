@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  resolve: {
+/*  resolve: {
     // MUI + SSR issue https://github.com/vikejs/vike/discussions/901#discussioncomment-6167919
     alias: {
       '@mui/material': '@mui/material/node',
@@ -14,5 +14,8 @@ export default defineConfig({
       '@mui/lab': '@mui/lab/node',
     }
   },
+
+ */
+  ssr: {noExternal: ["@mui/material", "@mui/utils", "@mui/base", "@mui/icons-material"]},
   plugins: [react()]
 })
