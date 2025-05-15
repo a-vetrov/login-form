@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:21.6.2
+FROM --platform=linux/amd64 node:22.15.1
 #FROM  node:21.6.2
 
 WORKDIR /code
