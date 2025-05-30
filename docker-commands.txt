@@ -13,6 +13,8 @@ docker run -dp 3000:5173 --network my-bridge-network  vizify-app
 docker run -dp 80:5173 --network my-bridge-network  --name vizify-app aavetrov/vizify-login-form:latest
 
 
+docker pull aavetrov/vizify-login-form:latest
+
 //Remove all exited docker containers
 docker rm -v $(docker ps --filter status=exited -q)
 //Clear system
