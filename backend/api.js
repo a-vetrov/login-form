@@ -13,7 +13,7 @@ router.post('/api/register', (req, res) => {
   sendError(res, 403, 'Уходите', 'Вам здесь не рады')
 })
 
-router.all('/api/*', (req, res) => {
+router.all('/api/*splat', (req, res) => {
   sendError(res, 404, 'API route not found')
 })
 

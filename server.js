@@ -19,9 +19,6 @@ const base = process.env.BASE || '/'
 const templateHtml = isProduction
   ? await fs.readFile('./dist/client/index.html', 'utf-8')
   : ''
-const ssrManifest = isProduction
-  ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
-  : undefined
 
 void createDefaultUsers()
 void updateCatalog()
@@ -51,6 +48,7 @@ const botManager = new BotManager()
 void botManager.initialize()
 
 // Add Vite or respective production middlewares
+/** @type {import('vite').ViteDevServer | undefined} */
 let vite
 if (!isProduction) {
   const { createServer } = await import('vite')
@@ -68,11 +66,13 @@ if (!isProduction) {
 }
 
 // Serve HTML
-app.use('*', async (req, res) => {
+app.use('*all', async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, '')
 
+    /** @type {string} */
     let template
+    /** @type {import('./src/entry-server.ts').render} */
     let render
     if (!isProduction) {
       // Always read fresh template in development
@@ -84,7 +84,7 @@ app.use('*', async (req, res) => {
       render = (await import('./dist/server/entry-server.js')).render
     }
 
-    const rendered = await render('/' + url, ssrManifest)
+    const rendered = await render(url)
 
     const html = template
       .replace('<!--app-head-->', rendered.head ?? '')
