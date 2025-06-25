@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { type BotsListDataType } from '../../../services/bots'
 import { Avatar, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material'
-import { ViewDayOutlined } from '@mui/icons-material'
+import ViewDayOutlined from '@mui/icons-material/ViewDayOutlined'
 import { AccountTypes, BotsType, dotDelimiter } from '../../../constants'
 import { Link } from 'react-router-dom'
 import { fromNumberToMoneyString } from '../../../utils/money'

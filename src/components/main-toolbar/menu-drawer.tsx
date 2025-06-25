@@ -2,12 +2,15 @@ import React, { useCallback, useMemo } from 'react'
 import { Box, Divider, Drawer } from '@mui/material'
 import { useUserInfo } from '../../utils/hooks/use-user-info'
 import { useNavigate } from 'react-router-dom'
-import {
-  BusinessCenterOutlined,
-  ListAltOutlined, LoginOutlined,
-  Logout,
-  SportsEsportsOutlined, TokenOutlined, ViewDayOutlined, InsightsOutlined
-} from '@mui/icons-material'
+
+import BusinessCenterOutlined from '@mui/icons-material/BusinessCenterOutlined'
+import ListAltOutlined from '@mui/icons-material/ListAltOutlined'
+import LoginOutlined from '@mui/icons-material/LoginOutlined'
+import Logout from '@mui/icons-material/Logout'
+import SportsEsportsOutlined from '@mui/icons-material/SportsEsportsOutlined'
+import TokenOutlined from '@mui/icons-material/TokenOutlined'
+import ViewDayOutlined from '@mui/icons-material/ViewDayOutlined'
+import InsightsOutlined from '@mui/icons-material/InsightsOutlined'
 
 import { MenuItemLink } from './menu-item'
 import { loginApi } from '../../services/login'
