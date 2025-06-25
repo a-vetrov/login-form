@@ -15,7 +15,6 @@ import {
 import { useMatch, useNavigate } from 'react-router-dom'
 import { MoneyInput } from '../../components/money-input'
 import { NumberInput } from '../../components/number-input'
-import LoadingButton from '@mui/lab/LoadingButton'
 import { catalogApi } from '../../services/catalog'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { LastPrice } from '../../components/last-price/last-price'
@@ -129,11 +128,9 @@ export const OrderAddPage: React.FC = () => {
 
               <ErrorAlert error={postError} />
 
-              <NoSsr>
-                <LoadingButton loading={postIsLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
-                  Создать заявку
-                </LoadingButton>
-              </NoSsr>
+              <Button loading={postIsLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
+                Создать заявку
+              </Button>
 
               <Button variant="outlined" fullWidth sx={inputMargin} onClick={handleCancel}>Отмена</Button>
 

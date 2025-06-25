@@ -9,7 +9,6 @@ import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
 import { fromNumberToMoneyString, getFromMaskedValue, setMaskedValue } from '../../utils/money'
 import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
-import LoadingButton from '@mui/lab/LoadingButton'
 import { calculateBudget, getCandlesInterval } from './interval-bot/utils'
 import { BudgetControl } from './interval-bot/budget-control'
 import { AccountControl } from './interval-bot/account-control'
@@ -307,9 +306,9 @@ export const CreateIntervalBot: React.FC = () => {
               <ErrorAlert error={postError} />
 
               <NoSsr>
-                <LoadingButton loading={isLoading} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
+                <Button loading={isLoading} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
                   Создать интервальный бот
-                </LoadingButton>
+                </Button>
               </NoSsr>
 
               <Button variant="outlined" fullWidth onClick={handleResetProduct} sx={{ my: 1 }}>Отмена</Button>

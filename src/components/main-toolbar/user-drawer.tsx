@@ -2,11 +2,11 @@ import React, { useCallback, useState } from 'react'
 import { useUserInfo } from '../../utils/hooks/use-user-info'
 import { Avatar, Box, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material'
 import AccountCircle from '@mui/icons-material/AccountCircle'
+import Logout from '@mui/icons-material/Logout'
 import { loginApi } from '../../services/login'
 import { userInfoSlice } from '../../store/slices/user-slice'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { Logout } from '@mui/icons-material'
 import { MenuItemLink } from './menu-item'
 
 export const UserDrawer: React.FC = () => {
