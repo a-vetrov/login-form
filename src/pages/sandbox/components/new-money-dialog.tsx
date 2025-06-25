@@ -7,7 +7,6 @@ import {
   DialogContentText,
   DialogTitle
 } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton'
 import { sandboxApi } from '../../../services/sandbox'
 import { MoneyInput } from '../../../components/money-input'
 import { getFromMaskedValue } from '../../../utils/money'
@@ -74,9 +73,9 @@ export const NewMoneyDialog: React.FC<Props> = ({ open, onClose, id }) => {
       <DialogActions>
         <Button onClick={onClose} disabled={isLoading}>Отмена</Button>
 
-        <LoadingButton loading={isLoading} variant="outlined" type="submit">
+        <Button loading={isLoading} variant="outlined" type="submit">
           Добавить
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   )
