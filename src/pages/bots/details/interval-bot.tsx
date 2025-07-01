@@ -11,6 +11,7 @@ import { fromNumberToMoneyString } from '../../../utils/money'
 import { getInstrumentName } from '../../../utils/product'
 import { getBotOrders } from '../../../store/selectors/orders'
 import { useSelector } from 'react-redux'
+import { CandleStickChartTradingView } from '../../../components/candle-stick-chart/candle-stick-chart-trading-view'
 
 interface Props {
   data: BotsListDataType
@@ -83,6 +84,9 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
             </BlueTable.Row>
           </TableBody>
         </Table>
+      <Box marginY={2}>
+        <CandleStickChartTradingView instrumentId={product.uid} steps={steps} orders={orders} />
+      </Box>
       <Box marginY={2}>
         <CandleStickChart instrumentId={product.uid} steps={steps} orders={orders} />
       </Box>
