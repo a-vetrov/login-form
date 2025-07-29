@@ -15,7 +15,7 @@ export const timeToCoordinate = (time: Time, timeScale: ITimeScaleApi<Time>): Co
   const index = timeScale.timeToIndex(time, true)
   const x1 = timeScale.logicalToCoordinate(index as Logical)
   const x0 = timeScale.logicalToCoordinate((index - 1) as Logical)
-  if (x1 === null || x0 === null) {
+  if (x1 === null || x0 === null || index === 0) {
     return null
   }
   const time0 = timeScale.coordinateToTime(x0)

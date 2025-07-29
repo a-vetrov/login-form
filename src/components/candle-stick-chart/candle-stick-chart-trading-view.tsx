@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata.ts'
 import type { IntervalBotStepParams, OrderDataType } from '../../services/bots.ts'
 import { marketDataApi } from '../../services/market-data.ts'
@@ -32,6 +32,10 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   const [primitives, setPrimitives] = useState<Record<string, TrianglePrimitive>>({})
   const [chart, setChart] = useState<IChartApi>()
 
+  const handleClick = useCallback((param) => {
+    console.log('Click!', param)
+  }, [])
+
   useLayoutEffect(() => {
     if (!containerRef.current || series) {
       return
@@ -56,10 +60,10 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     })
 
     const candlestickSeries = localChart.addSeries(CandlestickSeries, { upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350' })
+    localChart.subscribeClick(handleClick)
     setSeries(candlestickSeries)
-    localChart.timeScale().fitContent()
     setChart(localChart)
-  }, [data, series])
+  }, [data, handleClick, series])
 
   useEffect(() => {
     if (!data || !series) {

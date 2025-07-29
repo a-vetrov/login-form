@@ -4,7 +4,7 @@ import {
   type IPrimitivePaneView,
   type IChartApi,
   type Time,
-  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer
+  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer, PrimitiveHoveredItem
 } from 'lightweight-charts'
 import { type CanvasRenderingTarget2D } from 'fancy-canvas'
 import { timeToCoordinate } from './utils.ts'
@@ -68,6 +68,23 @@ export class TrianglePrimitive implements ISeriesPrimitive {
   setDirection (direction: TRIANGLE_DIRECTION): void {
     this._direction = direction
     this.updateAllViews()
+  }
+
+  hitTest (x: number, y: number): PrimitiveHoveredItem | null {
+    console.log('hittest', x, y)
+    /*
+    this._paneViews.forEach((pw) => {
+      const dx = pw._x - x
+      const dy = pw._y - y
+      const d = (dx * dx) + (dy * dy)
+      if (d < this.size * this.size) {
+        console.log(pw._x, pw._y)
+      }
+    })
+
+     */
+
+    return null
   }
 }
 
