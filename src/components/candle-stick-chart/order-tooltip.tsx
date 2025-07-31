@@ -10,30 +10,55 @@ interface Props {
 }
 
 export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y }) => {
-  const orderContent = useMemo(() => {
+  const selectedOrder = useMemo(() => {
     if (!orderId || !orders) {
       return null
     }
+    return orders.find((item) => item.orderId === orderId)
+  }, [orderId, orders])
 
-    const selectedOrder = orders.find((item) => item.orderId === orderId)
+  const containerStyle = useMemo(() => {
+    return {
+      position: 'absolute',
+      zIndex: 1,
+      top: y,
+      left: x,
+      transform: 'translate(-50%, 5px)'
+    }
+  }, [x, y])
 
+  const innerBoxStyle = useMemo(() => {
+    const sx = {
+      border: '1px solid red',
+      marginLeft: '-50%',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    }
+
+    if (selectedOrder?.direction === 1) {
+      sx.border = '1px solid green'
+    }
+
+    return sx
+  }, [selectedOrder])
+
+  const orderContent = useMemo(() => {
     if (!selectedOrder) {
       return null
     }
 
     return (
-      <div>
+      <Box sx={innerBoxStyle}>
         {selectedOrder.orderId}
-      </div>
+      </Box>
     )
-  }, [orderId, orders])
+  }, [innerBoxStyle, selectedOrder])
 
   if (!orderContent) {
     return null
   }
 
   return (
-    <Box sx={{ border: '1px solid red', position: 'absolute', top: y, left: x }}>
+    <Box sx={containerStyle}>
       {orderContent}
     </Box>
   )
