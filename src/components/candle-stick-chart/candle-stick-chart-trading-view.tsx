@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata.ts'
 import type { IntervalBotStepParams, OrderDataType } from '../../services/bots.ts'
 import { marketDataApi } from '../../services/market-data.ts'
 import { getFromMoneyValue } from '../../utils/money.ts'
-import { CircularProgress } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert.tsx'
 import {
   CandlestickSeries,
@@ -15,12 +15,19 @@ import {
 } from 'lightweight-charts'
 import { getPriceMultiplier } from './utils.ts'
 import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
+import { OrderTooltip } from './order-tooltip.tsx'
 
 interface Props {
   instrumentId: string
   onChange?: (candles: HistoricCandle[]) => void
   steps?: IntervalBotStepParams[]
   orders?: OrderDataType[]
+}
+
+interface TooltipData {
+  x: number
+  y: number
+  orderId: string
 }
 
 export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders }) => {
@@ -31,10 +38,26 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   const [series, setSeries] = useState<ISeriesApi<'Candlestick', Time>>()
   const [primitives, setPrimitives] = useState<Record<string, TrianglePrimitive>>({})
   const [chart, setChart] = useState<IChartApi>()
+  const [tooltip, setTooltip] = useState<TooltipData | undefined>()
 
   const handleClick = useCallback((param) => {
-    console.log('Click!', param)
-  }, [])
+    const { x, y } = param.point
+    let minD = 1000
+    let minP: TrianglePrimitive
+
+    Object.values(primitives).forEach((item) => {
+      const d = item.getDistanceToPoint(x, y)
+      if (d !== null && d < 20 && d < minD) {
+        minD = d
+        minP = item
+      }
+    })
+    if (minP && minP.orderId !== tooltip?.orderId) {
+      setTooltip({ x, y, orderId: minP.orderId })
+    } else {
+      setTooltip(undefined)
+    }
+  }, [primitives, tooltip])
 
   useLayoutEffect(() => {
     if (!containerRef.current || series) {
@@ -180,8 +203,9 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   }
 
   return (
-    <>
+    <Box sx={{ position: 'relative' }}>
       <div ref={containerRef}/>
-    </>
+      <OrderTooltip orders={orders} {...tooltip} />
+    </Box>
   )
 }

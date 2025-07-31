@@ -4,7 +4,7 @@ import {
   type IPrimitivePaneView,
   type IChartApi,
   type Time,
-  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer, PrimitiveHoveredItem
+  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer, type PrimitiveHoveredItem
 } from 'lightweight-charts'
 import { type CanvasRenderingTarget2D } from 'fancy-canvas'
 import { timeToCoordinate } from './utils.ts'
@@ -58,6 +58,8 @@ export class TrianglePrimitive implements ISeriesPrimitive {
   get chart (): IChartApi { return this._chart }
   get series (): ISeriesApi<keyof SeriesOptionsMap> { return this._series }
 
+  get orderId (): string { return this._orderId }
+
   // Setters to update the triangle position and properties
   setPosition (time: Time, price: number): void {
     this._time = time
@@ -70,21 +72,16 @@ export class TrianglePrimitive implements ISeriesPrimitive {
     this.updateAllViews()
   }
 
-  hitTest (x: number, y: number): PrimitiveHoveredItem | null {
-    console.log('hittest', x, y)
-    /*
-    this._paneViews.forEach((pw) => {
-      const dx = pw._x - x
-      const dy = pw._y - y
-      const d = (dx * dx) + (dy * dy)
-      if (d < this.size * this.size) {
-        console.log(pw._x, pw._y)
-      }
-    })
+  getDistanceToPoint (x: number, y: number): number | null {
+    const { _x, _y } = this._paneViews[0]
 
-     */
+    if (_x === null || _y === 0) {
+      return null
+    }
 
-    return null
+    const dx = _x - x
+    const dy = _y - y
+    return (dx * dx) + (dy * dy)
   }
 }
 
