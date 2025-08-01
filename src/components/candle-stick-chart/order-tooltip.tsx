@@ -1,15 +1,18 @@
 import React, { useMemo } from 'react'
 import type { OrderDataType } from '../../services/bots.ts'
-import { Box } from '@mui/material'
+import { Box, Typography } from '@mui/material'
+import { format } from 'date-fns'
+import { fromNumberToMoneyString } from '../../utils/money.ts'
 
 interface Props {
   orders?: OrderDataType[]
   orderId: string | undefined
   x: number
   y: number
+  containerWidth: number
 }
 
-export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y }) => {
+export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y, containerWidth }) => {
   const selectedOrder = useMemo(() => {
     if (!orderId || !orders) {
       return null
@@ -17,21 +20,48 @@ export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y }) => {
     return orders.find((item) => item.orderId === orderId)
   }, [orderId, orders])
 
-  const containerStyle = useMemo(() => {
-    return {
-      position: 'absolute',
-      zIndex: 1,
-      top: y,
-      left: x,
-      transform: 'translate(-50%, 5px)'
+  const commission = selectedOrder?.executedCommission || selectedOrder?.initialCommission || 0
+
+  const profit = useMemo(() => {
+    if (!selectedOrder?.previousOrderId || selectedOrder.direction === 1) {
+      return null
     }
-  }, [x, y])
+    const prevOrder = orders.find((item) => item.orderId === selectedOrder.previousOrderId)
+    if (!prevOrder) {
+      return null
+    }
+    const prevCommission = prevOrder.executedCommission || prevOrder.initialCommission
+    return selectedOrder.executedOrderPrice - prevOrder.executedOrderPrice - commission - prevCommission
+  }, [commission, orders, selectedOrder])
+
+  const containerStyle = useMemo(() => {
+    const sx = {
+      position: 'absolute',
+      zIndex: 100,
+      top: y + 5,
+      left: x
+    }
+
+    if (x + 80 > containerWidth) {
+      sx.left = x - 80
+    }
+
+    if (x < 80) {
+      sx.left = x + 80
+    }
+
+    return sx
+  }, [containerWidth, x, y])
 
   const innerBoxStyle = useMemo(() => {
     const sx = {
       border: '1px solid red',
-      marginLeft: '-50%',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      borderRadius: 2,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      px: 2,
+      py: 1,
+      width: 170,
+      marginLeft: '-85px'
     }
 
     if (selectedOrder?.direction === 1) {
@@ -48,10 +78,29 @@ export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y }) => {
 
     return (
       <Box sx={innerBoxStyle}>
-        {selectedOrder.orderId}
+        <Typography variant="body1">
+          {selectedOrder.direction === 1 ? 'Покупка ' : 'Продажа '}
+        </Typography>
+        <Typography variant="body2">
+          Цена: {fromNumberToMoneyString(selectedOrder.executedOrderPrice, 'RUB')}
+        </Typography>
+        {commission && (
+          <Typography variant="body2">
+            Комиссия: {fromNumberToMoneyString(commission, 'RUB')}
+          </Typography>
+        )}
+        {profit !== null && (
+          <Typography variant="body2">
+            Профит: {fromNumberToMoneyString(profit, 'RUB')}
+          </Typography>
+        )}
+        {selectedOrder.executionDate && (
+          <Typography variant="body2">{format(selectedOrder.executionDate, 'dd.MM.yyyy HH:mm:ss')}</Typography>
+        )}
       </Box>
     )
-  }, [innerBoxStyle, selectedOrder])
+  }, [commission, innerBoxStyle, profit, selectedOrder])
+
 
   if (!orderContent) {
     return null

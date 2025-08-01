@@ -47,17 +47,35 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
 
     Object.values(primitives).forEach((item) => {
       const d = item.getDistanceToPoint(x, y)
-      if (d !== null && d < 20 && d < minD) {
+      if (d !== null && d < 100 && d < minD) {
         minD = d
         minP = item
       }
     })
     if (minP && minP.orderId !== tooltip?.orderId) {
-      setTooltip({ x, y, orderId: minP.orderId })
+      setTooltip({ x, y, orderId: minP.orderId, containerWidth: containerRef.current?.clientWidth })
     } else {
       setTooltip(undefined)
     }
   }, [primitives, tooltip])
+
+  useEffect(() => {
+    if (!chart || !tooltip || !chart.timeScale()) {
+      return
+    }
+
+    const changeHandler = (): void => {
+      setTooltip(undefined)
+    }
+
+    chart.timeScale().subscribeSizeChange(changeHandler)
+    chart.timeScale().subscribeVisibleTimeRangeChange(changeHandler)
+
+    return () => {
+      chart.timeScale().unsubscribeSizeChange(changeHandler)
+      chart.timeScale().unsubscribeVisibleTimeRangeChange(changeHandler)
+    }
+  }, [chart, tooltip])
 
   useLayoutEffect(() => {
     if (!containerRef.current || series) {
@@ -194,6 +212,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     }
   }, [series, orders, orders?.length, chart, primitives])
 
+
   if (isLoading) {
     return <CircularProgress />
   }
@@ -205,7 +224,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   return (
     <Box sx={{ position: 'relative' }}>
       <div ref={containerRef}/>
-      <OrderTooltip orders={orders} {...tooltip} />
+      <OrderTooltip orders={orders} {...tooltip}/>
     </Box>
   )
 }
