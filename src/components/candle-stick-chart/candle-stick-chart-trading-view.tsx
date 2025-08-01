@@ -16,6 +16,7 @@ import {
 import { getPriceMultiplier } from './utils.ts'
 import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
 import { OrderTooltip } from './order-tooltip.tsx'
+import {CandleIntervalBar} from './interval-bar.tsx';
 
 interface Props {
   instrumentId: string
@@ -32,8 +33,9 @@ interface TooltipData {
 
 export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const [interval, setInterval] = useState(3)
 
-  const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval: 3 }, { pollingInterval: 5000 })
+  const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
 
   const [series, setSeries] = useState<ISeriesApi<'Candlestick', Time>>()
   const [primitives, setPrimitives] = useState<Record<string, TrianglePrimitive>>({})
@@ -46,7 +48,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     let minP: TrianglePrimitive
 
     Object.values(primitives).forEach((item) => {
-      const d = item.getDistanceToPoint(x, y)
+      const d = item.getDistanceToPoint(x as number, y as number)
       if (d !== null && d < 100 && d < minD) {
         minD = d
         minP = item
@@ -212,6 +214,10 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     }
   }, [series, orders, orders?.length, chart, primitives])
 
+  useEffect(() => {
+    series?.setData([])
+  }, [interval])
+
 
   if (isLoading) {
     return <CircularProgress />
@@ -223,6 +229,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
 
   return (
     <Box sx={{ position: 'relative' }}>
+      <CandleIntervalBar interval={interval} onChange={setInterval}/>
       <div ref={containerRef}/>
       <OrderTooltip orders={orders} {...tooltip}/>
     </Box>
