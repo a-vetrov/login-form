@@ -38,7 +38,7 @@ export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y, container
     const sx = {
       position: 'absolute',
       zIndex: 100,
-      top: y + 5,
+      top: y + 35,
       left: x
     }
 
@@ -82,7 +82,10 @@ export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y, container
           {selectedOrder.direction === 1 ? 'Покупка ' : 'Продажа '}
         </Typography>
         <Typography variant="body2">
-          Цена: {fromNumberToMoneyString(selectedOrder.executedOrderPrice, 'RUB')}
+          Цена: {fromNumberToMoneyString(selectedOrder.executedOrderPrice / selectedOrder.lotsExecuted / selectedOrder.product.lot, 'RUB')}
+        </Typography>
+        <Typography variant="body2">
+          Сумма: {fromNumberToMoneyString(selectedOrder.executedOrderPrice, 'RUB')}
         </Typography>
         {commission && (
           <Typography variant="body2">
@@ -100,7 +103,6 @@ export const OrderTooltip: React.FC<Props> = ({ orderId, orders, x, y, container
       </Box>
     )
   }, [commission, innerBoxStyle, profit, selectedOrder])
-
 
   if (!orderContent) {
     return null

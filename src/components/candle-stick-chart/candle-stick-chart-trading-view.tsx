@@ -16,7 +16,7 @@ import {
 import { getPriceMultiplier } from './utils.ts'
 import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
 import { OrderTooltip } from './order-tooltip.tsx'
-import {CandleIntervalBar} from './interval-bar.tsx';
+import { CandleIntervalBar } from './interval-bar.tsx'
 
 interface Props {
   instrumentId: string
@@ -217,7 +217,6 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   useEffect(() => {
     series?.setData([])
   }, [interval])
-
 
   if (isLoading) {
     return <CircularProgress />
