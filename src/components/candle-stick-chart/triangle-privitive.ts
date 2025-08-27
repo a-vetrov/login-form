@@ -4,7 +4,7 @@ import {
   type IPrimitivePaneView,
   type IChartApi,
   type Time,
-  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer, type PrimitiveHoveredItem
+  type ISeriesApi, type SeriesOptionsMap, type IPrimitivePaneRenderer
 } from 'lightweight-charts'
 import { type CanvasRenderingTarget2D } from 'fancy-canvas'
 import { timeToCoordinate } from './utils.ts'
@@ -121,7 +121,7 @@ class TriangleRenderer implements IPrimitivePaneRenderer {
 
   draw (target: CanvasRenderingTarget2D): void {
     if (this.x === null || this.y === null) return
-    target.useBitmapCoordinateSpace(scope => {
+    target.useMediaCoordinateSpace(scope => {
       const ctx = scope.context
       if (this.x === null || this.y === null) return
       ctx.beginPath()
