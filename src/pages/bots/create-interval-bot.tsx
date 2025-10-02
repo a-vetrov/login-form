@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
-import { Alert, AlertTitle, Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, Container, FormControl, NoSsr, Stack, Typography, Breadcrumbs, Link } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
 import { catalogApi, type GetCatalogResponseType } from '../../services/catalog'
 import { ProductTitle } from './interval-bot/product-title'
@@ -16,9 +17,10 @@ import { AccountTypes } from '../../constants'
 import { getMinMax } from '../../utils/math'
 import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } from '../../services/bots'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
-import { useNavigate } from 'react-router-dom'
 import { DecimalInput } from '../../components/decimal-input'
 import { roundToMinPriceIncrement } from '../../../backend/utils/money'
+import { BreadCrumbsWrapper } from '../../components/bread-crumbs/bread-crumbs-wrapper.tsx'
+import { breadCrumbsConfig } from '../../components/bread-crumbs/config.ts'
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -182,7 +184,10 @@ export const CreateIntervalBot: React.FC = () => {
   return (
     <>
       <MainToolbar />
+
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+        <BreadCrumbsWrapper items={breadCrumbsConfig.createIntervalBot} />
+
         <Typography variant="h1" marginBottom={1}>
           Создать интервальный бот
         </Typography>

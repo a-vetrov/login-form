@@ -1,0 +1,24 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - /Users/developer/WebstormProjects/login-form/db/mongo:/data/db
+    networks:
+      - my-bridge-network
+    container_name: "vizify-mongo"
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - /Users/developer/WebstormProjects/login-form/db/redis:/data
+    networks:
+      - my-bridge-network
+    container_name: "vizify-redis"
+
+networks:
+  my-bridge-network:

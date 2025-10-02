@@ -4,7 +4,8 @@ import { useMatch } from 'react-router-dom'
 import { MainToolbar } from '../../components/main-toolbar'
 import { CircularProgress, Container } from '@mui/material'
 import { getBotDetailsView } from './details/details-factory'
-import { BotOrders } from './orders/bot-orders'
+import { breadCrumbsConfig } from '../../components/bread-crumbs/config.ts'
+import { BreadCrumbsWrapper } from '../../components/bread-crumbs/bread-crumbs-wrapper.tsx'
 
 export const BotDetails: React.FC = () => {
   const match = useMatch('/bots/:id')
@@ -22,6 +23,7 @@ export const BotDetails: React.FC = () => {
     <>
       <MainToolbar />
       <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+        <BreadCrumbsWrapper items={breadCrumbsConfig.botDetails} />
         {isLoading && <CircularProgress />}
         {BotComponent && data && <BotComponent data={data}/>}
       </Container>

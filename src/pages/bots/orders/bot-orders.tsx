@@ -116,10 +116,10 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
       <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
         <TableCell colSpan={6}>
           <Button onClick={handleClick}>
-            Показать еще {COUNT_STEP}...
+            Показать еще {COUNT_STEP}
           </Button>
           <Button onClick={handleClickShowAll}>
-            Показать все {data.orders.length}...
+            Показать все {data.orders.length}
           </Button>
         </TableCell>
       </TableRow>
@@ -163,7 +163,7 @@ export const BotOrders: React.FC<Props> = ({ data, lotPrice }) => {
                     <TableCell>
                       <OrderStatus order={order}/>
                     </TableCell>
-                    <TableCell>{fromNumberToMoneyString(order.executedOrderPrice, 'RUB')}</TableCell>
+                    <TableCell>{fromNumberToMoneyString(order.executedOrderPrice / order.lotsExecuted, 'RUB')}</TableCell>
                     <TableCell>{fromNumberToMoneyString(order.commission, 'RUB')}</TableCell>
                     <TableCell sx={getColorSx(order.profit)}>{ order.profit !== undefined ? fromNumberToMoneyString(order.profit, 'RUB') : '-'}</TableCell>
                     <TableCell sx={getColorSx(order.upnl)}>{ order.upnl !== undefined && fromNumberToMoneyString(order.upnl, 'RUB')}</TableCell>
