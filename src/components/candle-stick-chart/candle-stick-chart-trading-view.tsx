@@ -125,28 +125,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     })
 
     try {
-      if (series.data().length === 0) {
-        series.setData(plotData)
-      } else {
-        const oldData = series.data()
-        let shiftIndex = 0
-
-        oldData.find((item, index) => {
-          if (item.time === plotData[0].time) {
-            shiftIndex = index
-            return true
-          }
-          return false
-        })
-
-        series.update(plotData[plotData.length - 1 - shiftIndex], true)
-
-        if (shiftIndex > 0) {
-          for (let i = shiftIndex; i > 0; i--) {
-            series.update(plotData[plotData.length - i], false)
-          }
-        }
-      }
+      series.setData(plotData)
     } catch (e: Error) {
       console.log(e)
     }
