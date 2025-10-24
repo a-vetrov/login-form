@@ -5,18 +5,9 @@ import { marketDataApi } from '../../services/market-data.ts'
 import { getFromMoneyValue } from '../../utils/money.ts'
 import { Box, CircularProgress } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert.tsx'
-import {
-  CandlestickSeries,
-  createChart,
-  ColorType,
-  type ISeriesApi,
-  type Time,
-  type IChartApi
-} from 'lightweight-charts'
-import { getPriceMultiplier } from './utils.ts'
-import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
 import { OrderTooltip } from './order-tooltip.tsx'
 import { CandleIntervalBar } from './interval-bar.tsx'
+import { CandleStickChart } from './candle-stick.ts'
 
 interface Props {
   instrumentId: string
@@ -32,84 +23,29 @@ interface TooltipData {
 }
 
 export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement>()
   const [interval, setInterval] = useState(3)
 
   const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
 
-  const [series, setSeries] = useState<ISeriesApi<'Candlestick', Time>>()
-  const [primitives, setPrimitives] = useState<Record<string, TrianglePrimitive>>({})
-  const [chart, setChart] = useState<IChartApi>()
+  const chart = useRef<CandleStickChart>()
   const [tooltip, setTooltip] = useState<TooltipData | undefined>()
 
-  const handleClick = useCallback((param) => {
-    const { x, y } = param.point
-    let minD = 1000
-    let minP: TrianglePrimitive
-
-    Object.values(primitives).forEach((item) => {
-      const d = item.getDistanceToPoint(x as number, y as number)
-      if (d !== null && d < 100 && d < minD) {
-        minD = d
-        minP = item
-      }
-    })
-    if (minP && minP.orderId !== tooltip?.orderId) {
-      setTooltip({ x, y, orderId: minP.orderId, containerWidth: containerRef.current?.clientWidth })
-    } else {
-      setTooltip(undefined)
-    }
-  }, [primitives, tooltip])
-
-  useEffect(() => {
-    if (!chart || !tooltip || !chart.timeScale()) {
-      return
-    }
-
-    const changeHandler = (): void => {
-      setTooltip(undefined)
-    }
-
-    chart.timeScale().subscribeSizeChange(changeHandler)
-    chart.timeScale().subscribeVisibleTimeRangeChange(changeHandler)
-
-    return () => {
-      chart.timeScale().unsubscribeSizeChange(changeHandler)
-      chart.timeScale().unsubscribeVisibleTimeRangeChange(changeHandler)
-    }
-  }, [chart, tooltip])
-
   useLayoutEffect(() => {
-    if (!containerRef.current || series) {
+    if (!containerRef.current || chart.current) {
       return
     }
-    const localChart = createChart(containerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: 'white'
-      },
-      grid: {
-        vertLines: { color: '#444' },
-        horzLines: { color: '#444' }
-      },
-      height: 400,
-      autoSize: true,
-      localization: {
-        timeFormatter: (time) => {
-          // Custom time formatting logic here
-          return new Date(time * 1000).toLocaleTimeString()
-        }
-      }
-    })
 
-    const candlestickSeries = localChart.addSeries(CandlestickSeries, { upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350' })
-    localChart.subscribeClick(handleClick)
-    setSeries(candlestickSeries)
-    setChart(localChart)
-  }, [data, handleClick, series])
+    const localChart = new CandleStickChart(containerRef.current)
+    if (steps?.length) {
+      localChart.setSteps(steps)
+    }
+    chart.current = localChart
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Так и задумано, чтобы не создавать чарт несколько раз
+  }, [])
 
   useEffect(() => {
-    if (!data || !series) {
+    if (!data || !(chart.current instanceof CandleStickChart)) {
       return
     }
 
@@ -124,77 +60,26 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
       }
     })
 
-    try {
-      series.setData(plotData)
-    } catch (e: Error) {
-      console.log(e)
-    }
-  }, [data, series])
+    chart.current.updateData(plotData)
+  }, [data])
 
+  // Обновляем интервалы
   useEffect(() => {
-    if (!steps?.length || !series) {
-      return
+    if (steps?.length) {
+      chart.current?.setSteps(steps)
     }
+  }, [steps])
 
-    series.priceLines().forEach((priceLine) => {
-      series.removePriceLine(priceLine)
-    })
-
-    steps.forEach((step, index) => {
-      const priceLine = {
-        price: step.min,
-        color: '#FFFF0066',
-        lineWidth: 1,
-        lineStyle: 2, // LineStyle.Dashed
-        axisLabelVisible: false,
-        title: ''
-      }
-
-      if (index === 0) {
-        priceLine.axisLabelVisible = true
-        priceLine.title = 'min'
-      } else if (index === steps.length - 1) {
-        priceLine.axisLabelVisible = true
-        priceLine.title = 'max'
-      }
-
-      series.createPriceLine(priceLine)
-    })
-  }, [series !== undefined, steps])
-
+  // Обновляем ордера
   useEffect(() => {
-    if (!orders?.length || !series || !chart) {
-      return
+    if (orders?.length) {
+      chart.current?.updateOrders(orders)
     }
+  }, [orders, orders?.length])
 
-    let changed = false
-
-    orders.forEach(({ executionDate, averagePositionPrice, direction, product, orderId }) => {
-      if (primitives[orderId]) {
-        return
-      }
-
-      changed = true
-
-      const primitive = new TrianglePrimitive(
-        chart,
-        series,
-        new Date(executionDate).getTime() / 1000 as Time,
-        averagePositionPrice * getPriceMultiplier(product),
-        direction === 1 ? TRIANGLE_DIRECTION.up : TRIANGLE_DIRECTION.down,
-        orderId
-      )
-      series.attachPrimitive(primitive)
-      primitives[orderId] = primitive
-    })
-
-    if (changed) {
-      setPrimitives({ ...primitives })
-    }
-  }, [series, orders, orders?.length, chart, primitives])
-
+  // Стираем предыдущие данные, если интервал изменился
   useEffect(() => {
-    series?.setData([])
+    chart.current?.clearData()
   }, [interval])
 
   if (isLoading) {

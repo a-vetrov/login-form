@@ -4,9 +4,12 @@ import {
   ColorType,
   type ISeriesApi,
   type Time,
-  type IChartApi, type MouseEventParams, type SeriesDataItemTypeMap
+  type IChartApi, type MouseEventParams, type SeriesDataItemTypeMap, type CreatePriceLineOptions
 } from 'lightweight-charts'
-import { type TrianglePrimitive } from './triangle-privitive.ts'
+import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
+import { mergeCandles } from '../../utils/array.ts'
+import type { IntervalBotStepParams, OrderDataType } from '../../services/bots.ts'
+import { getPriceMultiplier } from './utils.ts'
 
 interface TooltipData {
   x: number
@@ -73,7 +76,57 @@ export class CandleStickChart {
     this.tooltip = null
   }
 
-  public setData = (data: Array<SeriesDataItemTypeMap<Time>['Candlestick']>): void => {
-    this.candlestickSeries.setData(data)
+  public updateData = (data: Array<SeriesDataItemTypeMap<Time>['Candlestick']>): void => {
+    this.candlestickSeries.setData(mergeCandles(this.candlestickSeries.data(), data))
+  }
+
+  public clearData = (): void => {
+    this.candlestickSeries.setData([])
+  }
+
+  public setSteps = (steps: IntervalBotStepParams[]): void => {
+    this.candlestickSeries.priceLines().forEach((priceLine) => {
+      this.candlestickSeries.removePriceLine(priceLine)
+    })
+
+    steps.forEach((step, index) => {
+      const priceLine = {
+        price: step.min,
+        color: '#FFFF0066',
+        lineWidth: 1,
+        lineStyle: 2, // LineStyle.Dashed
+        axisLabelVisible: false,
+        title: ''
+      } as CreatePriceLineOptions
+
+      if (index === 0) {
+        priceLine.axisLabelVisible = true
+        priceLine.title = 'min'
+      } else if (index === steps.length - 1) {
+        priceLine.axisLabelVisible = true
+        priceLine.title = 'max'
+      }
+
+      this.candlestickSeries.createPriceLine(priceLine)
+    })
+  }
+
+  public updateOrders = (orders: OrderDataType[]): void => {
+    orders.forEach(({ executionDate, averagePositionPrice, direction, product, orderId }) => {
+      if (this.primitives[orderId]) {
+        return
+      }
+
+      const primitive = new TrianglePrimitive(
+        this.chart,
+        this.candlestickSeries,
+        new Date(executionDate).getTime() / 1000 as Time,
+        averagePositionPrice * getPriceMultiplier(product),
+        direction === 1 ? TRIANGLE_DIRECTION.up : TRIANGLE_DIRECTION.down,
+        orderId
+      )
+      this.candlestickSeries.attachPrimitive(primitive)
+      this.primitives[orderId] = primitive
+    })
   }
 }
