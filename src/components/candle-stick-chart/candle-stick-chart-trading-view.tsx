@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata.ts'
 import type { IntervalBotStepParams, OrderDataType } from '../../services/bots.ts'
 import { marketDataApi } from '../../services/market-data.ts'
@@ -23,7 +23,7 @@ interface TooltipData {
 }
 
 export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders }) => {
-  const containerRef = useRef<HTMLDivElement>()
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const [interval, setInterval] = useState(3)
 
   const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
@@ -31,36 +31,34 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   const chart = useRef<CandleStickChart>()
   const [tooltip, setTooltip] = useState<TooltipData | undefined>()
 
-  useLayoutEffect(() => {
-    if (!containerRef.current || chart.current) {
-      return
-    }
-
-    const localChart = new CandleStickChart(containerRef.current)
-    if (steps?.length) {
-      localChart.setSteps(steps)
-    }
-    chart.current = localChart
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Так и задумано, чтобы не создавать чарт несколько раз
-  }, [])
-
   useEffect(() => {
-    if (!data || !(chart.current instanceof CandleStickChart)) {
+    if (!containerRef.current) {
       return
     }
 
-    const plotData = data.candles.map((item) => {
-      return {
-        // TODO: convert UTC to Moscow timezone
-        time: new Date(item.time).getTime() / 1000,
-        close: getFromMoneyValue(item.close),
-        open: getFromMoneyValue(item.open),
-        low: getFromMoneyValue(item.low),
-        high: getFromMoneyValue(item.high)
-      }
-    })
+    if (!chart.current) {
+      chart.current = new CandleStickChart(containerRef.current)
+      chart.current.updateTooltip = setTooltip
 
-    chart.current.updateData(plotData)
+      if (steps?.length) {
+        (chart.current).setSteps(steps)
+      }
+    }
+
+    if (chart.current instanceof CandleStickChart) {
+      const plotData = data.candles.map((item) => {
+        return {
+          time: new Date(item.time).getTime() / 1000,
+          close: getFromMoneyValue(item.close),
+          open: getFromMoneyValue(item.open),
+          low: getFromMoneyValue(item.low),
+          high: getFromMoneyValue(item.high)
+        }
+      })
+      chart.current.updateData(plotData)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Шаги обновляем другим хуком
   }, [data])
 
   // Обновляем интервалы

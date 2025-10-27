@@ -23,6 +23,7 @@ export class CandleStickChart {
   public candlestickSeries: ISeriesApi<'Candlestick', Time>
   public primitives: Record<string, TrianglePrimitive> = {}
   public tooltip: TooltipData | null
+  public updateTooltip?: (tooltip: TooltipData | null) => void
 
   public constructor (container: HTMLElement) {
     this.container = container
@@ -69,6 +70,9 @@ export class CandleStickChart {
       this.tooltip = { x, y, orderId: minP.orderId, containerWidth: this.container.clientWidth }
     } else {
       this.tooltip = null
+    }
+    if (this.updateTooltip) {
+      this.updateTooltip(this.tooltip)
     }
   }
 

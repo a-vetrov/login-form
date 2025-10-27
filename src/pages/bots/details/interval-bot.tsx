@@ -85,7 +85,7 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
           </TableBody>
         </Table>
       <Box marginY={2}>
-        <CandleStickChartTradingView instrumentId={product.uid} steps={steps} orders={orders} />
+        <CandleStickChartTradingView instrumentId={product.uid} steps={steps} orders={orders} key={id} />
       </Box>
       <Box marginY={2}>
         <CandleStickChart instrumentId={product.uid} steps={steps} orders={orders} />
