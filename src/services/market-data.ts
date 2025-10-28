@@ -18,6 +18,12 @@ export interface GetCandlesRequestType {
   interval: number
 }
 
+export interface GetCandlesFromRequestType {
+  instrumentId: string
+  interval: number
+  to: number
+}
+
 export interface GetCandlesResponseType {
   candles: HistoricCandle[]
 }
@@ -39,6 +45,14 @@ export const marketDataApi = apiWithTag.injectEndpoints({
         url: `market-data/candles/${data.instrumentId}`,
         method: 'GET',
         params: { interval: data.interval }
+      }),
+      transformResponse: ({ data }) => data as GetCandlesResponseType
+    }),
+    getCandlesTo: build.mutation<GetCandlesResponseType, GetCandlesFromRequestType>({
+      query: ({ instrumentId, interval, to }) => ({
+        url: `market-data/candles/${instrumentId}`,
+        method: 'GET',
+        params: { interval, to }
       }),
       transformResponse: ({ data }) => data as GetCandlesResponseType
     })

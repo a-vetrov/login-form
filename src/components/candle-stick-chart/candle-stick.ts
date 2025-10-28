@@ -4,7 +4,7 @@ import {
   ColorType,
   type ISeriesApi,
   type Time,
-  type IChartApi, type MouseEventParams, type SeriesDataItemTypeMap, type CreatePriceLineOptions
+  type IChartApi, type MouseEventParams, type SeriesDataItemTypeMap, type CreatePriceLineOptions, type IRange
 } from 'lightweight-charts'
 import { TRIANGLE_DIRECTION, TrianglePrimitive } from './triangle-privitive.ts'
 import { mergeCandles } from '../../utils/array.ts'
@@ -23,7 +23,9 @@ export class CandleStickChart {
   public candlestickSeries: ISeriesApi<'Candlestick', Time>
   public primitives: Record<string, TrianglePrimitive> = {}
   public tooltip: TooltipData | null
+  public isLoadingAdditionalData: boolean = false
   public updateTooltip?: (tooltip: TooltipData | null) => void
+  public handleMinBounds?: (time: Time) => void
 
   public constructor (container: HTMLElement) {
     this.container = container
@@ -50,7 +52,7 @@ export class CandleStickChart {
     this.candlestickSeries = this.chart.addSeries(CandlestickSeries, { upColor: '#26a69a', downColor: '#ef5350', borderVisible: false, wickUpColor: '#26a69a', wickDownColor: '#ef5350' })
     this.chart.subscribeClick(this.handleClick)
     this.chart.timeScale().subscribeSizeChange(this.removeTooltip)
-    this.chart.timeScale().subscribeVisibleTimeRangeChange(this.removeTooltip)
+    this.chart.timeScale().subscribeVisibleTimeRangeChange(this.visibleTimeRangeChangeHandler)
   }
 
   public handleClick = (param: MouseEventParams): void => {
@@ -76,6 +78,21 @@ export class CandleStickChart {
     }
   }
 
+  public visibleTimeRangeChangeHandler = (newVisibleTimeRange: IRange<Time> | null): void => {
+    this.removeTooltip()
+    const first = this.candlestickSeries.data()[0]
+
+    if (newVisibleTimeRange === null || !first) {
+      return
+    }
+
+    // Если достигли минимальной границы, то вызываем загрузку дополнительных свечей
+    if (newVisibleTimeRange.from === first.time && this.handleMinBounds) {
+      console.log('newVisibleTimeRange', newVisibleTimeRange)
+      this.handleMinBounds(first.time)
+    }
+  }
+
   public removeTooltip = (): void => {
     this.tooltip = null
   }
@@ -94,14 +111,14 @@ export class CandleStickChart {
     })
 
     steps.forEach((step, index) => {
-      const priceLine = {
+      const priceLine: CreatePriceLineOptions = {
         price: step.min,
         color: '#FFFF0066',
         lineWidth: 1,
         lineStyle: 2, // LineStyle.Dashed
         axisLabelVisible: false,
         title: ''
-      } as CreatePriceLineOptions
+      }
 
       if (index === 0) {
         priceLine.axisLabelVisible = true

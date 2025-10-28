@@ -1,5 +1,7 @@
 import { type OrderDataType } from '../../services/bots'
 import { type ITimeScaleApi, type Logical, type Time, type Coordinate } from 'lightweight-charts'
+import {getFromMoneyValue} from '../../utils/money.ts';
+import {GetCandlesResponseType} from '../../services/market-data.ts';
 
 export const getPriceMultiplier = (product: OrderDataType['product']): number => {
   let priceMultiplier = 1
@@ -27,4 +29,16 @@ export const timeToCoordinate = (time: Time, timeScale: ITimeScaleApi<Time>): Co
 
   const slope = (time1 - time0) / (x1 - x0)
   return x0 + (time - time0) / slope
+}
+
+export const prepareCandlesData = (data: GetCandlesResponseType) => {
+  return data.candles.map((item) => {
+    return {
+      time: new Date(item.time).getTime() / 1000,
+      close: getFromMoneyValue(item.close),
+      open: getFromMoneyValue(item.open),
+      low: getFromMoneyValue(item.low),
+      high: getFromMoneyValue(item.high)
+    }
+  })
 }

@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { Box, Typography } from '@mui/material'
 import { type BotsListDataType } from '../../../services/bots'
 import { StopBotButton } from './stop-button'
-import { CandleStickChart } from '../../../components/candle-stick-chart/candle-stick-chart'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import { IntervalDetails } from '../interval-bot/interval-details'
@@ -86,9 +85,6 @@ export const IntervalBotDetails: React.FC<Props> = ({ data }) => {
         </Table>
       <Box marginY={2}>
         <CandleStickChartTradingView instrumentId={product.uid} steps={steps} orders={orders} key={id} />
-      </Box>
-      <Box marginY={2}>
-        <CandleStickChart instrumentId={product.uid} steps={steps} orders={orders} />
       </Box>
       <IntervalDetails id={id} active={active} />
       {active && <StopBotButton id={id}/>}

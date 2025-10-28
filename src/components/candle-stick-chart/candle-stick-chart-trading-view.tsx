@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata.ts'
 import type { IntervalBotStepParams, OrderDataType } from '../../services/bots.ts'
 import { marketDataApi } from '../../services/market-data.ts'
-import { getFromMoneyValue } from '../../utils/money.ts'
 import { Box, CircularProgress } from '@mui/material'
 import { ErrorAlert } from '../error-alert/error-alert.tsx'
 import { OrderTooltip } from './order-tooltip.tsx'
 import { CandleIntervalBar } from './interval-bar.tsx'
 import { CandleStickChart } from './candle-stick.ts'
+import { type SeriesDataItemTypeMap, type Time } from 'lightweight-charts'
+import { prepareCandlesData } from './utils.ts'
 
 interface Props {
   instrumentId: string
@@ -27,9 +28,21 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
   const [interval, setInterval] = useState(3)
 
   const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
+  const [loadTrigger, additionalData] = marketDataApi.useGetCandlesToMutation()
 
   const chart = useRef<CandleStickChart>()
   const [tooltip, setTooltip] = useState<TooltipData | undefined>()
+
+  const loadAdditionalData = useCallback((to: Time): void => {
+    if (chart.current instanceof CandleStickChart && !chart.current.isLoadingAdditionalData) {
+      chart.current.isLoadingAdditionalData = true
+      void loadTrigger({
+        instrumentId,
+        interval,
+        to: to * 1000
+      })
+    }
+  }, [instrumentId, interval, loadTrigger])
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -39,27 +52,40 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     if (!chart.current) {
       chart.current = new CandleStickChart(containerRef.current)
       chart.current.updateTooltip = setTooltip
+      chart.current.handleMinBounds = loadAdditionalData
 
       if (steps?.length) {
         (chart.current).setSteps(steps)
       }
     }
 
-    if (chart.current instanceof CandleStickChart) {
-      const plotData = data.candles.map((item) => {
-        return {
-          time: new Date(item.time).getTime() / 1000,
-          close: getFromMoneyValue(item.close),
-          open: getFromMoneyValue(item.open),
-          low: getFromMoneyValue(item.low),
-          high: getFromMoneyValue(item.high)
-        }
-      })
+    if (data && chart.current instanceof CandleStickChart) {
+      const plotData = prepareCandlesData(data) as Array<SeriesDataItemTypeMap<Time>['Candlestick']>
       chart.current.updateData(plotData)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Шаги обновляем другим хуком
   }, [data])
+
+  useEffect(() => {
+    if (chart.current instanceof CandleStickChart) {
+      chart.current.handleMinBounds = loadAdditionalData
+    }
+  }, [loadAdditionalData])
+
+  useEffect(() => {
+    if (!(chart.current instanceof CandleStickChart)) {
+      return
+    }
+
+    if (additionalData.data ?? additionalData.isError) {
+      chart.current.isLoadingAdditionalData = false
+    }
+
+    if (additionalData.data) {
+      chart.current.updateData(prepareCandlesData(additionalData.data) as Array<SeriesDataItemTypeMap<Time>['Candlestick']>)
+    }
+  }, [additionalData.data, additionalData.isError])
 
   // Обновляем интервалы
   useEffect(() => {
@@ -75,10 +101,11 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     }
   }, [orders, orders?.length])
 
-  // Стираем предыдущие данные, если интервал изменился
-  useEffect(() => {
+  const handleIntervalChange = useCallback((newValue: number) => {
+    // Стираем предыдущие данные, если интервал изменился
     chart.current?.clearData()
-  }, [interval])
+    setInterval(newValue)
+  }, [])
 
   if (isLoading) {
     return <CircularProgress />
@@ -90,7 +117,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
 
   return (
     <Box sx={{ position: 'relative' }}>
-      <CandleIntervalBar interval={interval} onChange={setInterval}/>
+      <CandleIntervalBar interval={interval} onChange={handleIntervalChange}/>
       <div ref={containerRef}/>
       <OrderTooltip orders={orders} {...tooltip}/>
     </Box>

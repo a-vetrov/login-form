@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server",
+    "debug": "cross-env DEBUG=tinkoff-invest-api:* node server",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
