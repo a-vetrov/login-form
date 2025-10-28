@@ -1,7 +1,7 @@
 import { type OrderDataType } from '../../services/bots'
 import { type ITimeScaleApi, type Logical, type Time, type Coordinate } from 'lightweight-charts'
-import {getFromMoneyValue} from '../../utils/money.ts';
-import {GetCandlesResponseType} from '../../services/market-data.ts';
+import { getFromMoneyValue } from '../../utils/money.ts'
+import { type GetCandlesResponseType } from '../../services/market-data.ts'
 
 export const getPriceMultiplier = (product: OrderDataType['product']): number => {
   let priceMultiplier = 1
