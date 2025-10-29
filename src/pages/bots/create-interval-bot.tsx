@@ -21,6 +21,7 @@ import { DecimalInput } from '../../components/decimal-input'
 import { roundToMinPriceIncrement } from '../../../backend/utils/money'
 import { BreadCrumbsWrapper } from '../../components/bread-crumbs/bread-crumbs-wrapper.tsx'
 import { breadCrumbsConfig } from '../../components/bread-crumbs/config.ts'
+import {CandleStickChartTradingView} from '../../components/candle-stick-chart/candle-stick-chart-trading-view.tsx';
 
 const lowBoundaryInputName = 'low-boundary-input'
 const highBoundaryInputName = 'high-boundary-input'
@@ -305,7 +306,7 @@ export const CreateIntervalBot: React.FC = () => {
               </Box>
 
               <Box marginY={2}>
-                <CandleStickChart instrumentId={product.uid} onChange={handleCandlesChange} steps={steps} />
+                <CandleStickChartTradingView instrumentId={product.uid} steps={steps} onChange={handleCandlesChange} />
               </Box>
 
               <ErrorAlert error={postError} />

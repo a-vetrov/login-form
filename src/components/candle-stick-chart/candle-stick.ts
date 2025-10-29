@@ -88,7 +88,6 @@ export class CandleStickChart {
 
     // Если достигли минимальной границы, то вызываем загрузку дополнительных свечей
     if (newVisibleTimeRange.from === first.time && this.handleMinBounds) {
-      console.log('newVisibleTimeRange', newVisibleTimeRange)
       this.handleMinBounds(first.time)
     }
   }
@@ -98,11 +97,19 @@ export class CandleStickChart {
   }
 
   public updateData = (data: Array<SeriesDataItemTypeMap<Time>['Candlestick']>): void => {
-    this.candlestickSeries.setData(mergeCandles(this.candlestickSeries.data(), data))
+    try {
+      this.candlestickSeries.setData(mergeCandles(this.candlestickSeries.data(), data))
+    } catch (e) {
+      this.clearData()
+    }
   }
 
   public clearData = (): void => {
     this.candlestickSeries.setData([])
+  }
+
+  public get data (): Array<SeriesDataItemTypeMap<Time>['Candlestick']> {
+    return this.candlestickSeries.data()
   }
 
   public setSteps = (steps: IntervalBotStepParams[]): void => {

@@ -55,7 +55,7 @@ marketDataRouter.get('/api/market-data/candles/:instrumentId', ensureLoggedIn, a
       instrumentId,
       interval: parseInt(req.query.interval) || 3, // 3 - 15 минут
       to: req.query.to ? new Date(parseInt(req.query.to)) : undefined,
-      minCount: 200 // <- этот параметр позволяет задать кол-во свечей в результате
+      minCount: 300 // <- этот параметр позволяет задать кол-во свечей в результате
     })
 
     res.status(200).send({ success: true, data: { ...data } })

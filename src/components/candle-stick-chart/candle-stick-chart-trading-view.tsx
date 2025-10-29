@@ -23,15 +23,18 @@ interface TooltipData {
   orderId: string
 }
 
-export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders }) => {
+export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, steps, orders, onChange }) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [interval, setInterval] = useState(3)
+  const [isChartEmpty, setIsChartEmpty] = useState(true)
 
-  const { data, isLoading, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 5000 })
+  const { data, isFetching, error } = marketDataApi.useGetCandlesQuery({ instrumentId, interval }, { pollingInterval: 10000 })
   const [loadTrigger, additionalData] = marketDataApi.useGetCandlesToMutation()
 
   const chart = useRef<CandleStickChart>()
   const [tooltip, setTooltip] = useState<TooltipData | undefined>()
+
+  const isLoading = additionalData.isLoading || (isFetching && isChartEmpty)
 
   const loadAdditionalData = useCallback((to: Time): void => {
     if (chart.current instanceof CandleStickChart && !chart.current.isLoadingAdditionalData) {
@@ -62,6 +65,7 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     if (data && chart.current instanceof CandleStickChart) {
       const plotData = prepareCandlesData(data) as Array<SeriesDataItemTypeMap<Time>['Candlestick']>
       chart.current.updateData(plotData)
+      setIsChartEmpty(false)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Шаги обновляем другим хуком
@@ -101,25 +105,33 @@ export const CandleStickChartTradingView: React.FC<Props> = ({ instrumentId, ste
     }
   }, [orders, orders?.length])
 
+  useEffect(() => {
+    if (onChange && chart.current instanceof CandleStickChart) {
+      const data = chart.current.data
+      if (data?.length) {
+        onChange(data)
+      }
+    }
+  }, [onChange, data, additionalData.data])
+
   const handleIntervalChange = useCallback((newValue: number) => {
     // Стираем предыдущие данные, если интервал изменился
     chart.current?.clearData()
+    setIsChartEmpty(true)
     setInterval(newValue)
   }, [])
-
-  if (isLoading) {
-    return <CircularProgress />
-  }
-
-  if (error) {
-    return <ErrorAlert error={error} />
-  }
 
   return (
     <Box sx={{ position: 'relative' }}>
       <CandleIntervalBar interval={interval} onChange={handleIntervalChange}/>
       <div ref={containerRef}/>
       <OrderTooltip orders={orders} {...tooltip}/>
+      {isLoading && (
+        <Box sx={{ position: 'absolute', top: 200 }}>
+          <CircularProgress />
+        </Box>
+      )}
+      {error && <ErrorAlert error={error} />}
     </Box>
   )
 }

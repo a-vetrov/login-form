@@ -26,8 +26,16 @@ export const getCurrencySign = (currency?: string): string => {
   return mainCurrencies[toUpperCase as keyof typeof mainCurrencies] || toUpperCase
 }
 
-export const getFromMoneyValue = (value?: MoneyValue | Quotation): number | undefined => {
-  return (value ? value.units + value.nano / 1000000000 : undefined)
+export const getFromMoneyValue = (value?: MoneyValue | Quotation | number): number | undefined => {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  if (!value) {
+    return undefined
+  }
+
+  return value.units + value.nano / 1000000000
 }
 
 const localeOptions = {
