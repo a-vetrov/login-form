@@ -47,7 +47,8 @@
     "redis": "^4.6.13",
     "sirv": "^3.0.1",
     "tinkoff-invest-api": "7.0.1",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
