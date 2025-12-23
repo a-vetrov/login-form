@@ -6,11 +6,14 @@ import { CircularProgress, Container } from '@mui/material'
 import { getBotDetailsView } from './details/details-factory'
 import { breadCrumbsConfig } from '../../components/bread-crumbs/config.ts'
 import { BreadCrumbsWrapper } from '../../components/bread-crumbs/bread-crumbs-wrapper.tsx'
+import { useWebsockets } from '../../utils/hooks/use-websockets.ts'
 
 export const BotDetails: React.FC = () => {
   const match = useMatch('/bots/:id')
 
   const { data, isLoading } = useGetBotByIdQuery(match?.params.id as unknown as string)
+
+  useWebsockets()
 
   const BotComponent = useMemo(() => {
     if (!data) {

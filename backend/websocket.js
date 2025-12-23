@@ -1,48 +1,73 @@
 import { WebSocketServer } from 'ws'
+import passport from 'passport'
+import expressSession from 'express-session'
+import { credentials } from '../credentials.js'
+import { redisStore } from './db/redis.js'
 
-const map = new Map();
+const map = new Map()
 
 function onSocketError (err) {
   console.error(err)
 }
 
-const wss = new WebSocketServer({ clientTracking: false, noServer: true })
+const authenticateByPassport = ({ req }, done) => {
+  const onFinish = (request) => {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      done(false, 401, 'Unauthorized: Access denied')
+    } else {
+      done(true)
+    }
+  }
 
-wss.on('connection', function (ws, request) {
-  const userId = request.session.userId;
+  const onSession = () => {
+    passport.authenticate('session')(req, {}, onFinish)
+  }
 
-  map.set(userId, ws);
+  expressSession({
+    secret: credentials.cookieSecret,
+    resave: false, // don't save session if unmodified
+    saveUninitialized: false, // don't create session until something stored
+    store: redisStore,
+    cookie: { secure: false }
+  })(req, {}, onSession)
+}
 
-  ws.on('error', console.error);
+export const startWebsocket = (app, server) => {
+  console.log('startWebsocket !!!!!!')
 
-  ws.on('message', function (message) {
-    //
-    // Here we can now use session parameters.
-    //
-    console.log(`Received message ${message} from user ${userId}`);
-  });
+  const wss = new WebSocketServer({
+    server,
+    verifyClient: authenticateByPassport
+  })
 
-  ws.on('close', function () {
-    map.delete(userId);
-  });
-});
+  wss.on('connection', function (ws, request) {
+    const userId = request?.user?._id
 
-export const startWebsocket = (app) => {
-  app.on('upgrade', function (request, socket, head) {
-    socket.on('error', onSocketError)
-
-    console.log('Parsing session from request...')
-
-    if (!request.isAuthenticated || !request.isAuthenticated()) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
-      socket.destroy()
+    if (!userId) {
       return
     }
 
-    socket.removeListener('error', onSocketError)
+    console.log('map.get(userId)', userId, map.get(userId))
 
-    wss.handleUpgrade(request, socket, head, function (ws) {
-      wss.emit('connection', ws, request)
+    map.get(userId)?.terminate()
+
+    map.set(userId, ws)
+
+    ws.on('error', onSocketError)
+
+    ws.on('message', function (message) {
+      //
+      // Here we can now use session parameters.
+      //
+      console.log(`Received message ${message} from user ${userId}`)
+
+      setTimeout(function () {
+        ws.send((new Date().toLocaleString()))
+      }, 3000)
+    })
+
+    ws.on('close', function () {
+      map.delete(userId)
     })
   })
 }

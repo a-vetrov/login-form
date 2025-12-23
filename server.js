@@ -9,6 +9,7 @@ import passport from 'passport'
 import { updateCatalog } from './backend/utils/update-catalog.js'
 import { credentials } from './credentials.js'
 import { BotManager } from './backend/bots/bot-manager.js'
+import { startWebsocket } from './backend/websocket.js'
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -99,6 +100,8 @@ app.use('*all', async (req, res) => {
 })
 
 // Start http server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
+
+startWebsocket(app, server)
