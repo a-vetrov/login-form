@@ -33,7 +33,8 @@ export class BotManager {
           stepsCount: bot.properties.get('stepsCount'),
           stepProfit: bot.properties.get('stepProfit'),
           amountPerStep: bot.properties.get('amountPerStep'),
-          id: bot._id.toString()
+          id: bot._id.toString(),
+          userId: bot.userId.toString()
         })
 
         await botInstance.updateStepsFromDB()

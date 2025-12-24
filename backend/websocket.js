@@ -32,22 +32,18 @@ const authenticateByPassport = ({ req }, done) => {
   })(req, {}, onSession)
 }
 
-export const startWebsocket = (app, server) => {
-  console.log('startWebsocket !!!!!!')
-
+export const startWebsocket = (server) => {
   const wss = new WebSocketServer({
     server,
     verifyClient: authenticateByPassport
   })
 
-  wss.on('connection', function (ws, request) {
-    const userId = request?.user?._id
+  wss.on('connection', (ws, request) => {
+    const userId = request?.user?._id.toString()
 
     if (!userId) {
       return
     }
-
-    console.log('map.get(userId)', userId, map.get(userId))
 
     map.get(userId)?.terminate()
 
@@ -55,19 +51,34 @@ export const startWebsocket = (app, server) => {
 
     ws.on('error', onSocketError)
 
-    ws.on('message', function (message) {
+    ws.on('message', (message) => {
       //
       // Here we can now use session parameters.
       //
       console.log(`Received message ${message} from user ${userId}`)
 
-      setTimeout(function () {
+      /*setTimeout(() => {
         ws.send((new Date().toLocaleString()))
       }, 3000)
+
+       */
     })
 
-    ws.on('close', function () {
+    ws.on('close', () => {
       map.delete(userId)
     })
   })
+
+  console.log('Websocket started')
+}
+
+export const sendSocketMessage = (userId, type, data) => {
+  const ws = map.get(userId.toString())
+
+  if (!ws) {
+    return
+  }
+
+  const message = JSON.stringify({ type, data })
+  ws.send(message)
 }

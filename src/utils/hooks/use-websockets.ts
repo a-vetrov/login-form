@@ -24,10 +24,6 @@ export const useWebsockets = (): void => {
 
     socket.onmessage = function (event) {
       console.log('Получены данные:', event.data)
-
-      setTimeout(function () {
-        socket.send((new Date().toLocaleString()))
-      }, 500)
     }
 
     socket.onerror = function (error) {

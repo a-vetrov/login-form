@@ -57,8 +57,6 @@ export const createNewOrderRecord = async ({ orderId, botId, quantity, price, di
     return
   }
 
-  console.log('createNewOrderRecord', { orderId, botId, quantity, price, direction })
-
   await new OrdersModel({
     orderId,
     previousOrderId,
@@ -123,7 +121,6 @@ export const updateOrderRecord = async ({ orderId, status, data }) => {
 }
 */
 
-  console.log('updateOrderRecord', { orderId, status, data })
   await OrdersModel.findOneAndUpdate({ orderId },
     {
       status,

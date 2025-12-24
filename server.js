@@ -104,4 +104,4 @@ const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`)
 })
 
-startWebsocket(app, server)
+startWebsocket(server)

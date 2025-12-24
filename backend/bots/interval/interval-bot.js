@@ -7,9 +7,10 @@ import { updateBotProperties } from '../../db/models/bots/bots.js'
 import { TinkoffSandboxAccount } from '../../broker/tinkoff-sandbox.js'
 import { TinkoffRealAccount } from '../../broker/tinkoff-real.js'
 import { OrderUpdater } from '../utils/order-updater.js'
+import { BotLoggerMessageType, logBotMessage } from '../bot-logger.js'
 
 export class IntervalBot {
-  constructor ({ token, account, accountType, product, bounds, stepsCount, stepProfit, amountPerStep, id }) {
+  constructor ({ token, account, accountType, product, bounds, stepsCount, stepProfit, amountPerStep, id, userId }) {
     this.token = token
     this.account = accountType === 'sandbox' ? new TinkoffSandboxAccount({ token, account }) : new TinkoffRealAccount({ token, account })
     this.accountType = accountType
@@ -20,6 +21,7 @@ export class IntervalBot {
     this.stepProfit = stepProfit
     this.amountPerStep = amountPerStep
     this.id = id
+    this.userId = userId
     this.unsubscribeLastPrice = undefined
     this.active = false
     this.tradingStatus = true
@@ -71,11 +73,11 @@ export class IntervalBot {
   }
 
   handleStreamError = (error) => {
-    console.log('stream error', error)
+    logBotMessage(this.userId, this.id, BotLoggerMessageType.ERROR, error)
   }
 
   handleStreamClose = (error) => {
-    console.log('stream closed, reason:', error)
+    logBotMessage(this.userId, this.id, BotLoggerMessageType.ERROR, error)
   }
 
   subscribeLastPriceHandler = async (result) => {
@@ -94,7 +96,7 @@ export class IntervalBot {
     if (!price) {
       return
     }
-    console.log('subscribeLastPriceHandler', this.product.name, price)
+    logBotMessage(this.userId, this.id, BotLoggerMessageType.PRICE_UPDATE, { product: this.product.name, price })
     await updateBotProperties(this.id, { lastPrice: price })
 
     const stepsToBuy = this.steps.filter((item) => item.state === STATE.WAIT_ENTRY_PRICE && item.bounds.min <= price)
@@ -124,9 +126,9 @@ export class IntervalBot {
         orderId,
         status: OrderStatus.EXECUTION_REPORT_STATUS_CANCELLED
       })
-      console.log('Order canceled', data)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.ORDER_CANCELED, data)
     } catch (error) {
-      console.log('cancelOrder error', error)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.ORDER_CANCELED_ERROR, error)
     }
   }
 
@@ -136,7 +138,7 @@ export class IntervalBot {
       const ids = orders.filter(({ figi }) => figi === this.product.figi).map(({ orderId }) => orderId)
       await forEachSeries(ids, this.cancelOrder)
     } catch (error) {
-      console.log('cancelActiveOrders error', error)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.CANCEL_ACTIVE_ORDERS_ERROR, error)
     }
   }
 
@@ -154,9 +156,9 @@ export class IntervalBot {
       }
       await forEachSeries(stepsToCheck, this.updateStepState)
     } catch (error) {
-      console.log('IntervalBot.checkSteps error', error)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.CHECK_STEPS_ERROR, error)
       if (error.type === 'RESOURCE_EXHAUSTED') {
-        console.log('FREEZE!!!!')
+        logBotMessage(this.userId, this.id, BotLoggerMessageType.FREEZE, 'Freeze for a minute')
         this.freezeForMinute()
       }
     }
@@ -180,17 +182,18 @@ export class IntervalBot {
 
     // Заявка исполнена
     if (data.executionReportStatus === 1) {
-      console.log(`${data.orderType === 1 ? 'Покупка' : 'Продажа'} ${this.product.name} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.ORDER_EXECUTE,
+        `${data.orderType === 1 ? 'Покупка' : 'Продажа'} ${this.product.name} по цене ${Helpers.toNumber(data.executedOrderPrice)}`)
 
       switch (step.state) {
         case STATE.TRY_TO_BUY : {
-          console.log(`Купили ${this.product.name}, ставим заявку на продажу.'`)
+          logBotMessage(this.userId, this.id, BotLoggerMessageType.ORDER_EXECUTE, `Купили ${this.product.name}, ставим заявку на продажу.`)
           await this.sellOrder(step)
           break
         }
 
         case STATE.TRY_TO_SELL: {
-          console.log(`'Продали ${this.product.name}, теперь ждем цену, чтобы купить.`)
+          logBotMessage(this.userId, this.id, BotLoggerMessageType.ORDER_EXECUTE, `Продали ${this.product.name}, теперь ждем цену, чтобы купить.`)
           await step.update(STATE.WAIT_ENTRY_PRICE, undefined)
           break
         }
@@ -233,7 +236,7 @@ export class IntervalBot {
     }
     try {
       const data = await this.account.postOrder(body)
-      console.log('buyOrder price = ', price, 'orderId = ', data.orderId)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.BUY_ORDER, `Выставили заявку на покупку ${this.product.name} по цене ${price}`)
       const previousOrderId = step.getLastOrder()
       await step.update(STATE.TRY_TO_BUY, data.orderId)
       await createNewOrderRecord({
@@ -247,7 +250,7 @@ export class IntervalBot {
       })
       return data
     } catch (e) {
-      console.log('buyOrder error', e)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.BUY_ORDER_ERROR, e)
       return null
     }
   }
@@ -270,7 +273,7 @@ export class IntervalBot {
 
     try {
       const data = await this.account.postOrder(body)
-      console.log('sellOrder price = ', price, 'orderId = ', data.orderId)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.BUY_ORDER, `Выставили заявку на продажу ${this.product.name} по цене ${price}`)
       const previousOrderId = step.getLastOrder()
       await step.update(STATE.TRY_TO_SELL, data.orderId)
       await createNewOrderRecord({
@@ -284,7 +287,7 @@ export class IntervalBot {
       })
       return data
     } catch (e) {
-      console.log('sellOrder error', e)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.SELL_ORDER_ERROR, e)
       return null
     }
   }
@@ -304,7 +307,7 @@ export class IntervalBot {
       const data = await this.api.marketdata.getTradingStatus(request)
       result = data.tradingStatus === 5 && data.apiTradeAvailableFlag && data.limitOrderAvailableFlag
     } catch (e) {
-      console.log('getTradingStatus error', e)
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.ERROR, e)
       result = false
     }
 
@@ -317,7 +320,6 @@ export class IntervalBot {
     }
 
     this.tradingStatus = await this.getTradingStatus()
-    console.log('updateTradingStatus', this.tradingStatus)
   }
 
   startStatusChecking = () => {
@@ -335,6 +337,7 @@ export class IntervalBot {
 
     const unfreeze = () => {
       this.isFreeze = false
+      logBotMessage(this.userId, this.id, BotLoggerMessageType.FREEZE, 'Unfreeze')
     }
     setTimeout(unfreeze, 60_000)
   }

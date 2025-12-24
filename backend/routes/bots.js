@@ -73,7 +73,8 @@ botsRouter.post('/api/bots/interval-bot', ensureLoggedIn, async (req, res) => {
       stepsCount,
       stepProfit,
       amountPerStep,
-      id: botId
+      id: botId,
+      userId: user._id.toString()
     })
 
     IntervalStepModel.insertMany(intervalBot.steps.map((step) => {
