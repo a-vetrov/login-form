@@ -1,14 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { MainToolbar } from '../../components/main-toolbar'
 import {
   Box,
   Button,
   CircularProgress,
-  Container,
   FormControl,
   InputLabel,
   MenuItem,
-  NoSsr,
   Select,
   Typography
 } from '@mui/material'
@@ -72,73 +69,70 @@ export const OrderAddPage: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h1">
-          Выставление заявки на покупку
-        </Typography>
+      <Typography variant="h1">
+        Выставление заявки на покупку
+      </Typography>
 
-        {isLoading && <CircularProgress />}
+      {isLoading && <CircularProgress />}
 
-        <ErrorAlert error={error} />
+      <ErrorAlert error={error} />
 
-        {data !== undefined && (
-          <>
-            <Typography variant="h2">
-              {getInstrumentName(data)}
-            </Typography>
-            {data.uid && <CandleStickChart instrumentId={data.uid} />}
-            <SandboxAccountsList accounts={accounts.data?.accounts}
-                                 selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}
-                                 titleVisible={false} controlsVisible={false}/>
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, maxWidth: '500px' }}>
-              <FormControl fullWidth sx={inputMargin}>
-                <InputLabel id="order-type-select-label">Тип заявки</InputLabel>
-                <Select
-                  labelId="order-type-select-label"
-                  id="order-type-select"
-                  name="order_type"
-                  label="Тип заявки"
-                  defaultValue={1}
-                >
-                  <MenuItem value={1}>Лимитная</MenuItem>
-                  <MenuItem value={2}>Рыночная</MenuItem>
-                  <MenuItem value={3}>Лучшая цена</MenuItem>
-                </Select>
-              </FormControl>
+      {data !== undefined && (
+        <>
+          <Typography variant="h2">
+            {getInstrumentName(data)}
+          </Typography>
+          {data.uid && <CandleStickChart instrumentId={data.uid} />}
+          <SandboxAccountsList accounts={accounts.data?.accounts}
+                               selectedAccount={selectedAccount} setSelectedAccount={setSelectedAccount}
+                               titleVisible={false} controlsVisible={false}/>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, maxWidth: '500px' }}>
+            <FormControl fullWidth sx={inputMargin}>
+              <InputLabel id="order-type-select-label">Тип заявки</InputLabel>
+              <Select
+                labelId="order-type-select-label"
+                id="order-type-select"
+                name="order_type"
+                label="Тип заявки"
+                defaultValue={1}
+              >
+                <MenuItem value={1}>Лимитная</MenuItem>
+                <MenuItem value={2}>Рыночная</MenuItem>
+                <MenuItem value={3}>Лучшая цена</MenuItem>
+              </Select>
+            </FormControl>
 
-              <NumberInput
-                name="quantity"
-                fullWidth
-                required
-                label="Количество лотов"
-                sx={inputMargin}
-              />
-                {lotSize}
+            <NumberInput
+              name="quantity"
+              fullWidth
+              required
+              label="Количество лотов"
+              sx={inputMargin}
+            />
+              {lotSize}
 
-              <MoneyInput
-                name="price"
-                fullWidth
-                required
-                label="Цена за 1 инструмент"
-                sx={inputMargin}
-              />
+            <MoneyInput
+              name="price"
+              fullWidth
+              required
+              label="Цена за 1 инструмент"
+              sx={inputMargin}
+            />
 
-              <LastPrice uid={data.uid} />
+            <LastPrice uid={data.uid} />
 
-              <ErrorAlert error={postError} />
+            <ErrorAlert error={postError} />
 
-              <Button loading={postIsLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
-                Создать заявку
-              </Button>
+            <Button loading={postIsLoading} variant="contained" type="submit" fullWidth sx={inputMargin}>
+              Создать заявку
+            </Button>
 
-              <Button variant="outlined" fullWidth sx={inputMargin} onClick={handleCancel}>Отмена</Button>
+            <Button variant="outlined" fullWidth sx={inputMargin} onClick={handleCancel}>Отмена</Button>
 
-            </Box>
-          </>
-        )}
+          </Box>
+        </>
+      )}
 
-      </Container>
     </>
   )
 }

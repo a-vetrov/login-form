@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
-import { MainToolbar } from '../../components/main-toolbar'
-import { Box, Button, CircularProgress, Container, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Typography } from '@mui/material'
 import { type BotsListDataType, useGetBotsQuery } from '../../services/bots'
 import { BotListCard } from './bots-list/bot-card'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
@@ -31,46 +30,43 @@ export const BotsList: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <BreadCrumbsWrapper items={breadCrumbsConfig.botsList} />
+      <BreadCrumbsWrapper items={breadCrumbsConfig.botsList} />
 
-        <Typography variant="h1" marginBottom={1}>
-          Список роботов
+      <Typography variant="h1" marginBottom={1}>
+        Список роботов
+      </Typography>
+
+      {isLoading && <CircularProgress />}
+
+      {bots.active.length === 0 && (
+        <Typography variant="body1" marginBottom={1}>
+          Активные боты отсутствуют
+        </Typography>
+      )}
+      {bots.active.map((item) => (
+        <BotListCard data={item} key={item.id} />
+      ))}
+
+      <Box marginTop={4}>
+        <Button variant="contained" startIcon={<IconLoader IconClass={AddIcon} />} component={RouterLink} to='/bots/create/interval'>
+          Создать
+        </Button>
+      </Box>
+
+      {bots.inactive.length > 0 && (
+        <Box marginTop={4}>
+
+        <Typography variant="h3" marginBottom={1}>
+          Неактивные боты
         </Typography>
 
-        {isLoading && <CircularProgress />}
-
-        {bots.active.length === 0 && (
-          <Typography variant="body1" marginBottom={1}>
-            Активные боты отсутствуют
-          </Typography>
-        )}
-        {bots.active.map((item) => (
-          <BotListCard data={item} key={item.id} />
-        ))}
-
-        <Box marginTop={4}>
-          <Button variant="contained" startIcon={<IconLoader IconClass={AddIcon} />} component={RouterLink} to='/bots/create/interval'>
-            Создать
-          </Button>
+          {bots.inactive.map((item) => (
+            <BotListCard data={item} key={item.id} />
+          ))}
         </Box>
+      )}
 
-        {bots.inactive.length > 0 && (
-          <Box marginTop={4}>
-
-          <Typography variant="h3" marginBottom={1}>
-            Неактивные боты
-          </Typography>
-
-            {bots.inactive.map((item) => (
-              <BotListCard data={item} key={item.id} />
-            ))}
-          </Box>
-        )}
-
-        <ErrorAlert error={error} />
-      </Container>
+      <ErrorAlert error={error} />
     </>
   )
 }

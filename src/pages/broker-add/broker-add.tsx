@@ -43,7 +43,7 @@ export const BrokerAddPage: React.FC = () => {
     if (result.name !== null && result.token !== null) {
       void postData(result as TokenDataType)
     }
-  }, [])
+  }, [postData])
 
   const alert = useMemo(() => {
     if (error) {
@@ -63,56 +63,52 @@ export const BrokerAddPage: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container component="main" maxWidth="xs" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Добавить токен брокера Тинькофф
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} noValidate>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="name"
-            label="Имя токена"
-            name="name"
-            autoComplete="Тинькофф"
-            autoFocus
-          />
-          <FormControl fullWidth sx={{ my: 1 }}>
-          <InputLabel id="demo-simple-select-helper-label">Тип токена</InputLabel>
-            <Select
-              id="token-type"
-              name="token-type"
-              label="Тип токена"
-              labelId="demo-simple-select-helper-label"
-              onChange={handleTokenTypeChange}
-              value={tokenType}
-            >
-              <MenuItem value='real'>Боевой</MenuItem>
-              <MenuItem value='sandbox'>Песочница</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="token"
-            label="Токен"
-            name="token"
-            multiline
-            rows={4}
-          />
-          {alert}
-          <Button variant="contained" fullWidth type="submit" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
-            Добавить
-          </Button>
-          <Button variant="outlined" component={RouterLink} to='/broker/list' fullWidth disabled={isLoading}>
-            Отмена
-          </Button>
-        </Box>
-
-      </Container>
+      <Typography variant="h4" gutterBottom>
+        Добавить токен брокера Тинькофф
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} noValidate>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="name"
+          label="Имя токена"
+          name="name"
+          autoComplete="Тинькофф"
+          autoFocus
+        />
+        <FormControl fullWidth sx={{ my: 1 }}>
+        <InputLabel id="demo-simple-select-helper-label">Тип токена</InputLabel>
+          <Select
+            id="token-type"
+            name="token-type"
+            label="Тип токена"
+            labelId="demo-simple-select-helper-label"
+            onChange={handleTokenTypeChange}
+            value={tokenType}
+          >
+            <MenuItem value='real'>Боевой</MenuItem>
+            <MenuItem value='sandbox'>Песочница</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="token"
+          label="Токен"
+          name="token"
+          multiline
+          rows={4}
+        />
+        {alert}
+        <Button variant="contained" fullWidth type="submit" sx={{ mt: 3, mb: 2 }} disabled={isLoading}>
+          Добавить
+        </Button>
+        <Button variant="outlined" component={RouterLink} to='/broker/list' fullWidth disabled={isLoading}>
+          Отмена
+        </Button>
+      </Box>
     </>
   )
 }

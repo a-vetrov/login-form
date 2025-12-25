@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
 import { userInfoSelector } from '../../store/selectors/user-info'
 import { useSelector } from 'react-redux'
-import { MainToolbar } from '../../components/main-toolbar'
-import { Container, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { MarketWidget } from './market-widget'
 
 export const MainPage: React.FC = () => {
@@ -19,20 +18,17 @@ export const MainPage: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h1">
-          Главная страница
-        </Typography>
-        <Typography variant="body1">
-          {greetingMessage}
-        </Typography>
+      <Typography variant="h1">
+        Главная страница
+      </Typography>
+      <Typography variant="body1">
+        {greetingMessage}
+      </Typography>
 
-        <Typography variant="h2" marginY={2}>
-          Обзор рынков
-        </Typography>
-        <MarketWidget />
-      </Container>
+      <Typography variant="h2" marginY={2}>
+        Обзор рынков
+      </Typography>
+      <MarketWidget />
     </>
   )
 }

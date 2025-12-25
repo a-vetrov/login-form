@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { MainToolbar } from '../../components/main-toolbar'
 import { CircularProgress, Container, TextField, Typography } from '@mui/material'
 import { CategoryToolbar } from './components/category-toolbar'
 import { useMatch } from 'react-router-dom'
@@ -43,37 +42,34 @@ export const CatalogPage: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h1">
-          Каталог
-        </Typography>
-        <Typography variant="body1">
-          Список продуктов, торгующихся на Московской бирже.
-        </Typography>
-        <CategoryToolbar value={category}/>
-        <TextField
-          margin="normal"
-          fullWidth
-          label="Фильтр по названию, ISIN, ticker"
-          autoComplete="filter-caption"
-          value={filterValue}
-          onChange={handleFilterChange}
-        />
-        {
-          isFetching && (
-            <Container sx={{ display: 'flex', justifyContent: 'center', marginY: 2 }}>
-              <CircularProgress />
-            </Container>
-          )
-        }
-        {!isFetching && <ErrorAlert error={error} />}
-        {items?.map((item) => {
-          return (
-            <CardClass data={item} key={item.isin || item.ticker || item.figi} category={category}/>
-          )
-        })}
-      </Container>
+      <Typography variant="h1">
+        Каталог
+      </Typography>
+      <Typography variant="body1">
+        Список продуктов, торгующихся на Московской бирже.
+      </Typography>
+      <CategoryToolbar value={category}/>
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Фильтр по названию, ISIN, ticker"
+        autoComplete="filter-caption"
+        value={filterValue}
+        onChange={handleFilterChange}
+      />
+      {
+        isFetching && (
+          <Container sx={{ display: 'flex', justifyContent: 'center', marginY: 2 }}>
+            <CircularProgress />
+          </Container>
+        )
+      }
+      {!isFetching && <ErrorAlert error={error} />}
+      {items?.map((item) => {
+        return (
+          <CardClass data={item} key={item.isin || item.ticker || item.figi} category={category}/>
+        )
+      })}
     </>
   )
 }

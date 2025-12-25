@@ -3,6 +3,7 @@ import passport from 'passport'
 import expressSession from 'express-session'
 import { credentials } from '../credentials.js'
 import { redisStore } from './db/redis.js'
+import { SocketMessageType } from './enums/SocketMessageType.js'
 
 const map = new Map()
 
@@ -49,19 +50,23 @@ export const startWebsocket = (server) => {
 
     map.set(userId, ws)
 
+    ws.currentBot = null
+
     ws.on('error', onSocketError)
 
     ws.on('message', (message) => {
       //
       // Here we can now use session parameters.
       //
-      console.log(`Received message ${message} from user ${userId}`)
-
-      /*setTimeout(() => {
-        ws.send((new Date().toLocaleString()))
-      }, 3000)
-
-       */
+      try {
+        const data = JSON.parse(message)
+        if (data.type === SocketMessageType.SET_CURRENT_BOT) {
+          ws.currentBot = data.botId || null
+        }
+        console.log(`Received message ${message} from user ${userId}`)
+      } catch (e) {
+        console.log(`User: ${userId} Error parsing message ${message}: `, e)
+      }
     })
 
     ws.on('close', () => {
@@ -79,6 +84,8 @@ export const sendSocketMessage = (userId, type, data) => {
     return
   }
 
-  const message = JSON.stringify({ type, data })
-  ws.send(message)
+  if (data.botId && data.botId === ws.currentBot) {
+    const message = JSON.stringify({ type, data })
+    ws.send(message)
+  }
 }

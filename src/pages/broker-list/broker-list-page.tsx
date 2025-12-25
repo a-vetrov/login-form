@@ -1,19 +1,18 @@
 import React, { useMemo } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { format } from 'date-fns'
-import { MainToolbar } from '../../components/main-toolbar'
 import { useGetBrokerListQuery } from '../../services/broker'
 import {
   Alert,
   Avatar, Box,
   Button,
   CircularProgress,
-  Container,
   List,
   ListItem,
   ListItemAvatar,
-
-  ListItemText, Paper, Typography
+  ListItemText,
+  Paper,
+  Typography
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import TokenIcon from '@mui/icons-material/Token'
@@ -68,19 +67,16 @@ export const BrokerListPage: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h1" gutterBottom>
-          Список токенов
-        </Typography>
-        {isLoading && <CircularProgress />}
-        {list}
-        <Box marginTop={4}>
-          <Button variant="contained" startIcon={<IconLoader IconClass={AddIcon} />} component={RouterLink} to='/broker/add'>
-            Добавить
-          </Button>
-        </Box>
-      </Container>
+      <Typography variant="h1" gutterBottom>
+        Список токенов
+      </Typography>
+      {isLoading && <CircularProgress />}
+      {list}
+      <Box marginTop={4}>
+        <Button variant="contained" startIcon={<IconLoader IconClass={AddIcon} />} component={RouterLink} to='/broker/add'>
+          Добавить
+        </Button>
+      </Box>
     </>
   )
 }

@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MainToolbar } from '../../components/main-toolbar'
-import { Alert, AlertTitle, Box, Button, Container, FormControl, NoSsr, Stack, Typography } from '@mui/material'
+import { Alert, AlertTitle, Box, Button, FormControl, NoSsr, Stack, Typography } from '@mui/material'
 import { SearchProduct } from '../../components/search-product/search-product'
 import { catalogApi, type GetCatalogResponseType } from '../../services/catalog'
 import { ProductTitle } from './interval-bot/product-title'
 import type { HistoricCandle } from '../../types/tinkoff/marketdata'
 import { MoneyInput, type MoneyInputChangeType } from '../../components/money-input'
-import { fromNumberToMoneyString, getFromMaskedValue, setMaskedValue } from '../../utils/money'
+import { fromNumberToMoneyString, getFromMaskedValue, roundToMinPriceIncrement, setMaskedValue } from '../../utils/money'
 import { NumberInput, type NumberInputChangeType } from '../../components/number-input'
 import { calculateBudget, getCandlesInterval } from './interval-bot/utils'
 import { BudgetControl } from './interval-bot/budget-control'
@@ -17,7 +16,6 @@ import { getMinMax } from '../../utils/math'
 import { type AddIntervalBotData, useAddIntervalBotMutation, useGetBotsQuery } from '../../services/bots'
 import { ErrorAlert } from '../../components/error-alert/error-alert'
 import { DecimalInput } from '../../components/decimal-input'
-import { roundToMinPriceIncrement } from '../../../backend/utils/money'
 import { BreadCrumbsWrapper } from '../../components/bread-crumbs/bread-crumbs-wrapper.tsx'
 import { breadCrumbsConfig } from '../../components/bread-crumbs/config.ts'
 import { CandleStickChartTradingView } from '../../components/candle-stick-chart/candle-stick-chart-trading-view.tsx'
@@ -183,144 +181,140 @@ export const CreateIntervalBot: React.FC = () => {
 
   return (
     <>
-      <MainToolbar />
+      <BreadCrumbsWrapper items={breadCrumbsConfig.createIntervalBot} />
 
-      <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
-        <BreadCrumbsWrapper items={breadCrumbsConfig.createIntervalBot} />
+      <Typography variant="h1" marginBottom={1}>
+        Создать интервальный бот
+      </Typography>
+      {!product && <SearchProduct onChange={handleProductChange}/>}
+      {(product && sameBotIsAlreadyExists) && (
+        <Box marginTop={2}>
+          <Alert
+            severity="error"
+            action={
+              <Button color="inherit" size="small" onClick={handleResetProduct}>
+                Отмена
+              </Button>
+          }>
+            <AlertTitle>Бот с таким продуктом уже существует!</AlertTitle>
+            Нельзя создать несколько ботов для одного продукта.
+            <Box marginTop={1}>
+              <Button href="/bots" color="inherit">К списку ботов</Button>
+              <Button color="inherit" onClick={handleResetProduct}>Выбрать другой продукт</Button>
+            </Box>
+          </Alert>
+        </Box>
+      )
+      }
+      {(product && !sameBotIsAlreadyExists) && (
+        <Box component='form' onSubmit={handleSubmit}>
+          <ProductTitle data={product} onReset={handleResetProduct}/>
 
-        <Typography variant="h1" marginBottom={1}>
-          Создать интервальный бот
-        </Typography>
-        {!product && <SearchProduct onChange={handleProductChange}/>}
-        {(product && sameBotIsAlreadyExists) && (
-          <Box marginTop={2}>
-            <Alert
-              severity="error"
-              action={
-                <Button color="inherit" size="small" onClick={handleResetProduct}>
-                  Отмена
-                </Button>
-            }>
-              <AlertTitle>Бот с таким продуктом уже существует!</AlertTitle>
-              Нельзя создать несколько ботов для одного продукта.
-              <Box marginTop={1}>
-                <Button href="/bots" color="inherit">К списку ботов</Button>
-                <Button color="inherit" onClick={handleResetProduct}>Выбрать другой продукт</Button>
-              </Box>
-            </Alert>
-          </Box>
-        )
-        }
-        {(product && !sameBotIsAlreadyExists) && (
-          <Box component='form' onSubmit={handleSubmit}>
-            <ProductTitle data={product} onReset={handleResetProduct}/>
+          <FormControl fullWidth>
 
-            <FormControl fullWidth>
-
-              <Box marginY={2}>
-                <Typography variant="body1" marginBottom={1}>
-                  Границы интервала
-                </Typography>
-                <Stack direction="row" spacing={2} marginY={2}>
-                  <MoneyInput
-                    id={lowBoundaryInputName}
-                    name={lowBoundaryInputName}
-                    margin="dense"
-                    label={boundaryLabel.low}
-                    onChange={handleBoundaryChange}
-                    error={lowBoundary === highBoundary}
-                    required
-                    autoComplete="off"
-                    value={lowBoundary !== undefined ? setMaskedValue(lowBoundary) : lowBoundary}
-                  />
-                  <MoneyInput
-                    id={highBoundaryInputName}
-                    name={highBoundaryInputName}
-                    margin="dense"
-                    label={boundaryLabel.high}
-                    onChange={handleBoundaryChange}
-                    error={lowBoundary === highBoundary}
-                    required
-                    autoComplete="off"
-                    value={highBoundary !== undefined ? setMaskedValue(highBoundary) : highBoundary}
-                  />
-                </Stack>
-              </Box>
-
-              <Box marginY={2}>
-                <Typography variant="body1" marginBottom={1}>
-                  Число шагов сетки в интервале
-                </Typography>
-                <NumberInput
-                  name="stepsQuantity"
+            <Box marginY={2}>
+              <Typography variant="body1" marginBottom={1}>
+                Границы интервала
+              </Typography>
+              <Stack direction="row" spacing={2} marginY={2}>
+                <MoneyInput
+                  id={lowBoundaryInputName}
+                  name={lowBoundaryInputName}
+                  margin="dense"
+                  label={boundaryLabel.low}
+                  onChange={handleBoundaryChange}
+                  error={lowBoundary === highBoundary}
                   required
-                  label="Количество шагов"
-                  defaultValue={10}
-                  error={stepsCount !== undefined && stepsCount < 2}
                   autoComplete="off"
-                  value={setMaskedValue(stepsCount)}
-                  onChange={handleStepsCountChange}
+                  value={lowBoundary !== undefined ? setMaskedValue(lowBoundary) : lowBoundary}
                 />
-              </Box>
-
-              {stepSize !== undefined && stepSize > 0 && (
-                <Typography variant="body1" marginY={2}>
-                  Размер шага сетки {fromNumberToMoneyString(stepSize, 'RUB')}
-                </Typography>
-              )}
-
-              <Box marginY={2}>
-                <Typography variant="body1" marginBottom={1}>
-                  Профит одного шага
-                </Typography>
-                  <DecimalInput
-                    id="stepProfit"
-                    name="stepProfit"
-                    margin="dense"
-                    label="В единицах размера шага"
-                    required
-                    autoComplete="off"
-                    defaultValue={1}
-                    onChange={handleStepsProfitChange}
-                    error={!stepProfit || stepProfit <= 0}
-                  />
-              </Box>
-
-              <Box marginY={2}>
-                {/* eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style */}
-                <BudgetControl product={product} amountPerStep={amountPerStep} onChange={setAmountPerStep}/>
-                <Typography variant="body1" marginTop={2}>
-                  Необходимый бюджет {fromNumberToMoneyString(budget, 'RUB')}
-                </Typography>
-              </Box>
-
-              <Box marginY={2}>
-                <AccountControl
-                  accountType={accountType}
-                  onChangeAccountType={setAccountType}
-                  selectedAccount={selectedAccount}
-                  onChangeSelectedAccount={setSelectedAccount}
-                  budget={budget}
+                <MoneyInput
+                  id={highBoundaryInputName}
+                  name={highBoundaryInputName}
+                  margin="dense"
+                  label={boundaryLabel.high}
+                  onChange={handleBoundaryChange}
+                  error={lowBoundary === highBoundary}
+                  required
+                  autoComplete="off"
+                  value={highBoundary !== undefined ? setMaskedValue(highBoundary) : highBoundary}
                 />
-              </Box>
+              </Stack>
+            </Box>
 
-              <Box marginY={2}>
-                <CandleStickChartTradingView instrumentId={product.uid} steps={steps} onChange={handleCandlesChange} />
-              </Box>
+            <Box marginY={2}>
+              <Typography variant="body1" marginBottom={1}>
+                Число шагов сетки в интервале
+              </Typography>
+              <NumberInput
+                name="stepsQuantity"
+                required
+                label="Количество шагов"
+                defaultValue={10}
+                error={stepsCount !== undefined && stepsCount < 2}
+                autoComplete="off"
+                value={setMaskedValue(stepsCount)}
+                onChange={handleStepsCountChange}
+              />
+            </Box>
 
-              <ErrorAlert error={postError} />
+            {stepSize !== undefined && stepSize > 0 && (
+              <Typography variant="body1" marginY={2}>
+                Размер шага сетки {fromNumberToMoneyString(stepSize, 'RUB')}
+              </Typography>
+            )}
 
-              <NoSsr>
-                <Button loading={isLoading} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
-                  Создать интервальный бот
-                </Button>
-              </NoSsr>
+            <Box marginY={2}>
+              <Typography variant="body1" marginBottom={1}>
+                Профит одного шага
+              </Typography>
+                <DecimalInput
+                  id="stepProfit"
+                  name="stepProfit"
+                  margin="dense"
+                  label="В единицах размера шага"
+                  required
+                  autoComplete="off"
+                  defaultValue={1}
+                  onChange={handleStepsProfitChange}
+                  error={!stepProfit || stepProfit <= 0}
+                />
+            </Box>
 
-              <Button variant="outlined" fullWidth onClick={handleResetProduct} sx={{ my: 1 }}>Отмена</Button>
-            </FormControl>
-          </Box>
-        )}
-      </Container>
+            <Box marginY={2}>
+              {/* eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style */}
+              <BudgetControl product={product} amountPerStep={amountPerStep} onChange={setAmountPerStep}/>
+              <Typography variant="body1" marginTop={2}>
+                Необходимый бюджет {fromNumberToMoneyString(budget, 'RUB')}
+              </Typography>
+            </Box>
+
+            <Box marginY={2}>
+              <AccountControl
+                accountType={accountType}
+                onChangeAccountType={setAccountType}
+                selectedAccount={selectedAccount}
+                onChangeSelectedAccount={setSelectedAccount}
+                budget={budget}
+              />
+            </Box>
+
+            <Box marginY={2}>
+              <CandleStickChartTradingView instrumentId={product.uid} steps={steps} onChange={handleCandlesChange} />
+            </Box>
+
+            <ErrorAlert error={postError} />
+
+            <NoSsr>
+              <Button loading={isLoading} variant="contained" type="submit" fullWidth sx={{ mt: 3 }}>
+                Создать интервальный бот
+              </Button>
+            </NoSsr>
+
+            <Button variant="outlined" fullWidth onClick={handleResetProduct} sx={{ my: 1 }}>Отмена</Button>
+          </FormControl>
+        </Box>
+      )}
     </>
   )
 }
