@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { api } from '../services/api.ts'
 import { userInfoSlice } from './slices/user-slice.ts'
+import { socketDataSlice } from './slices/socket-slice.ts'
 
 export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
-    [userInfoSlice.name]: userInfoSlice.reducer
+    [userInfoSlice.name]: userInfoSlice.reducer,
+    [socketDataSlice.name]: socketDataSlice.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(api.middleware)

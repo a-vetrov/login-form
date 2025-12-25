@@ -1,9 +1,11 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { userInfoSelector } from '../../store/selectors/user-info.ts'
 import { useEffect } from 'react'
+import { socketDataSlice } from '../../store/slices/socket-slice.ts'
 
 export const useWebsockets = (): void => {
   const userInfo = useSelector(userInfoSelector)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (!userInfo || !window) {
@@ -16,10 +18,7 @@ export const useWebsockets = (): void => {
 
     socket.onopen = function (event) {
       console.log('Соединение WebSocket установлено!', event)
-
-      setTimeout(function () {
-        socket.send((new Date().toLocaleString()))
-      }, 3000)
+      dispatch(socketDataSlice.actions.updateReadyState(true))
     }
 
     socket.onmessage = function (event) {
@@ -32,6 +31,11 @@ export const useWebsockets = (): void => {
 
     socket.onclose = function (event) {
       console.log('Соединение WebSocket закрыто:', event.code, event.reason)
+      socketDataSlice.actions.updateReadyState(false)
     }
-  }, [userInfo])
+
+    return () => {
+      socket.close()
+    }
+  }, [dispatch, userInfo])
 }
